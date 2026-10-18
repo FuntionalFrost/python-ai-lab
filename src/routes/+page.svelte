@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { ALL_TRACKS } from '#lib/data/curriculum/index';
+	import { ALL_TRACKS } from '#lib/data/curriculum/index.ts';
 	import { progress } from '#lib/progress.svelte';
 	import {
 		Terminal,
 		Sparkles,
 		Layers,
-		CheckCircle2,
+		CircleCheck,
 		ArrowRight,
 		Bot,
 		Activity,
@@ -21,7 +21,7 @@
 <div class="space-y-12">
 	<!-- Hero Section -->
 	<section
-		class="relative overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-b from-zinc-900/80 via-zinc-950 to-zinc-950 p-8 shadow-2xl md:p-12"
+		class="relative overflow-hidden rounded-3xl border border-zinc-800 bg-linear-to-b from-zinc-900/80 via-zinc-950 to-zinc-950 p-8 shadow-2xl md:p-12"
 	>
 		<div class="relative z-10 max-w-3xl space-y-6">
 			<div
@@ -34,7 +34,7 @@
 			<h1 class="text-3xl leading-tight font-extrabold tracking-tight text-white sm:text-5xl">
 				Master Production-Grade <br />
 				<span
-					class="bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent"
+					class="bg-linear-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent"
 				>
 					Python AI Architectures
 				</span>
@@ -55,7 +55,7 @@
 			<div class="flex flex-wrap items-center gap-3 pt-2">
 				<a
 					href="/module/01-frameworks-mvc"
-					class="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 px-5 py-3 text-xs font-semibold text-zinc-950 shadow-lg shadow-cyan-500/20 transition-all hover:opacity-95 sm:text-sm"
+					class="flex items-center gap-2 rounded-xl bg-linear-to-r from-cyan-500 to-emerald-500 px-5 py-3 text-xs font-semibold text-zinc-950 shadow-lg shadow-cyan-500/20 transition-all hover:opacity-95 sm:text-sm"
 				>
 					<span>Start Track 1: Flask vs. Litestar</span>
 					<ArrowRight class="h-4 w-4" />
@@ -117,7 +117,7 @@
 		<div class="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-5">
 			<div class="flex items-center justify-between text-zinc-400">
 				<span class="text-xs font-medium">Your Progress</span>
-				<CheckCircle2 class="h-4 w-4 text-emerald-400" />
+				<CircleCheck class="h-4 w-4 text-emerald-400" />
 			</div>
 			<div class="mt-2 font-mono text-2xl font-bold text-emerald-400">
 				{completedCount} / {ALL_TRACKS.length}
@@ -206,7 +206,7 @@
 					<div class="mt-6 flex items-center justify-between border-t border-zinc-800/80 pt-4">
 						{#if isDone}
 							<div class="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
-								<CheckCircle2 class="h-4 w-4" />
+								<CircleCheck class="h-4 w-4" />
 								<span>Completed</span>
 							</div>
 						{:else}

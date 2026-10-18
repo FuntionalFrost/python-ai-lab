@@ -5,7 +5,7 @@ import {
 	getNextTrack,
 	getPreviousTrack,
 	ALL_TRACKS
-} from '#lib/data/curriculum/index';
+} from '#lib/data/curriculum/index.ts';
 
 export const entries: EntryGenerator = () => {
 	return ALL_TRACKS.map((t) => ({ slug: t.slug }));

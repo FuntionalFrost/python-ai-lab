@@ -7,10 +7,10 @@
 	import ChatPlayground from '#lib/components/ChatPlayground.svelte';
 	import BenchmarkGraph from '#lib/components/BenchmarkGraph.svelte';
 	import { progress } from '#lib/progress.svelte';
-	import { ALL_TRACKS } from '#lib/data/curriculum/index';
+	import { ALL_TRACKS } from '#lib/data/curriculum/index.ts';
 	import {
 		Terminal,
-		CheckCircle2,
+		CircleCheck,
 		Circle,
 		ArrowRight,
 		ArrowLeft,
@@ -60,7 +60,7 @@
 			<button
 				type="button"
 				onclick={() => (isPytestModalOpen = true)}
-				class="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20 transition-all hover:from-emerald-500 hover:to-teal-500"
+				class="flex items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20 transition-all hover:from-emerald-500 hover:to-teal-500"
 			>
 				<Terminal class="h-4 w-4" />
 				<span>Run pytest Suite</span>
@@ -75,7 +75,7 @@
 					: 'border-zinc-700 bg-zinc-800 text-zinc-200 hover:bg-zinc-700'}"
 			>
 				{#if isCompleted}
-					<CheckCircle2 class="h-4 w-4" />
+					<CircleCheck class="h-4 w-4" />
 					<span>Track Completed</span>
 				{:else}
 					<Circle class="h-4 w-4 text-zinc-400" />
@@ -122,7 +122,7 @@
 		<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
 			{#each track.objectives as objective (objective)}
 				<div class="flex items-start gap-2.5 text-xs text-zinc-300">
-					<CheckCircle2 class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+					<CircleCheck class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
 					<span class="leading-relaxed">{objective}</span>
 				</div>
 			{/each}
@@ -334,7 +334,7 @@
 				? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
 				: 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20'}"
 		>
-			<CheckCircle2 class="h-4 w-4" />
+			<CircleCheck class="h-4 w-4" />
 			<span>{isCompleted ? 'Marked as Completed' : 'Mark as Completed'}</span>
 		</button>
 

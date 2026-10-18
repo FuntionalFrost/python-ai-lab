@@ -3,7 +3,7 @@
 	import favicon from '#lib/assets/favicon.svg';
 	import type { LayoutProps } from './$types';
 	import { page } from '$app/state';
-	import { ALL_TRACKS, searchTracks } from '#lib/data/curriculum/index';
+	import { ALL_TRACKS, searchTracks } from '#lib/data/curriculum/index.ts';
 	import { progress } from '#lib/progress.svelte';
 	import { Bot, Activity, Search, Terminal, Menu, X, Layers, Check } from '@lucide/svelte';
 
@@ -69,7 +69,7 @@
 				onclick={() => (isMobileSidebarOpen = false)}
 			>
 				<div
-					class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-cyan-500 to-emerald-400 text-zinc-950 shadow-md"
+					class="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-tr from-cyan-500 to-emerald-400 text-zinc-950 shadow-md"
 				>
 					<Terminal class="h-4 w-4" />
 				</div>
@@ -116,7 +116,7 @@
 			</div>
 			<div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
 				<div
-					class="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-all duration-300"
+					class="h-full rounded-full bg-linear-to-r from-cyan-500 to-emerald-400 transition-all duration-300"
 					style="width: {progressPercentage}%"
 				></div>
 			</div>
