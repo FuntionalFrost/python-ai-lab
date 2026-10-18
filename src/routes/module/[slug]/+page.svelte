@@ -7,7 +7,7 @@
 	import ChatPlayground from '#lib/components/ChatPlayground.svelte';
 	import BenchmarkGraph from '#lib/components/BenchmarkGraph.svelte';
 	import { progress } from '#lib/progress.svelte';
-	import { ALL_TRACKS } from '#lib/data/curriculum/index.ts';
+	import { ALL_TRACKS } from '#lib/data/curriculum/index';
 	import {
 		Terminal,
 		CircleCheck,

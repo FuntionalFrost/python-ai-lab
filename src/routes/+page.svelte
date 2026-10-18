@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ALL_TRACKS } from '#lib/data/curriculum/index.ts';
+	import { ALL_TRACKS } from '#lib/data/curriculum/index';
 	import { progress } from '#lib/progress.svelte';
 	import {
 		Terminal,

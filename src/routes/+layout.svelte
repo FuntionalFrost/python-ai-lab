@@ -3,7 +3,7 @@
 	import favicon from '#lib/assets/favicon.svg';
 	import type { LayoutProps } from './$types';
 	import { page } from '$app/state';
-	import { ALL_TRACKS, searchTracks } from '#lib/data/curriculum/index.ts';
+	import { ALL_TRACKS, searchTracks } from '#lib/data/curriculum/index';
 	import { progress } from '#lib/progress.svelte';
 	import { Bot, Activity, Search, Terminal, Menu, X, Layers, Check } from '@lucide/svelte';
 
