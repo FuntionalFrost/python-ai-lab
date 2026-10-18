@@ -4,8 +4,7 @@
 	import type { LayoutProps } from './$types';
 	import { page } from '$app/state';
 	import { ALL_TRACKS, searchTracks } from '#lib/data/curriculum/index';
-	import { progress } from '#lib/progress.svelte';
-	import { Bot, Activity, Search, Terminal, Menu, X, Layers, Check } from '@lucide/svelte';
+	import { Bot, Activity, Search, Terminal, Menu, X, Layers } from '@lucide/svelte';
 
 	let { children }: LayoutProps = $props();
 
@@ -16,14 +15,6 @@
 	const searchResults = $derived.by(() => {
 		if (!searchQuery.trim()) return ALL_TRACKS;
 		return searchTracks(searchQuery);
-	});
-
-	const completedCount = $derived.by(() => {
-		return ALL_TRACKS.filter((t) => progress.isCompleted(t.slug)).length;
-	});
-
-	const progressPercentage = $derived.by(() => {
-		return Math.round((completedCount / ALL_TRACKS.length) * 100);
 	});
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -75,7 +66,6 @@
 				</div>
 				<div>
 					<span class="text-sm font-semibold tracking-wide text-zinc-100">Python AI Lab</span>
-					<span class="block font-mono text-[10px] text-cyan-400">3.13+ · SvelteKit</span>
 				</div>
 			</a>
 
@@ -89,45 +79,8 @@
 			</button>
 		</div>
 
-		<!-- Quick Search Button -->
-		<div class="px-4 py-3">
-			<button
-				type="button"
-				onclick={() => (isSearchOpen = true)}
-				class="flex w-full items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/70 px-3 py-2 text-xs text-zinc-400 transition-colors hover:border-zinc-700 hover:text-zinc-200"
-			>
-				<div class="flex items-center gap-2">
-					<Search class="h-3.5 w-3.5 text-zinc-500" />
-					<span>Search topics...</span>
-				</div>
-				<kbd
-					class="rounded border border-zinc-700/60 bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px] text-zinc-400"
-				>
-					⌘K
-				</kbd>
-			</button>
-		</div>
-
-		<!-- Progress Tracker Widget -->
-		<div class="mx-4 mb-3 rounded-xl border border-zinc-800/80 bg-zinc-900/40 p-3">
-			<div class="flex items-center justify-between text-xs">
-				<span class="font-medium text-zinc-400">Curriculum Progress</span>
-				<span class="font-mono font-bold text-cyan-400">{progressPercentage}%</span>
-			</div>
-			<div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-				<div
-					class="h-full rounded-full bg-linear-to-r from-cyan-500 to-emerald-400 transition-all duration-300"
-					style="width: {progressPercentage}%"
-				></div>
-			</div>
-			<div class="mt-1.5 flex justify-between font-mono text-[10px] text-zinc-500">
-				<span>{completedCount} of {ALL_TRACKS.length} Completed</span>
-				<span>{ALL_TRACKS.length} Tracks Total</span>
-			</div>
-		</div>
-
 		<!-- Navigation Links -->
-		<div class="flex-1 space-y-6 overflow-y-auto px-3 py-2">
+		<div class="flex-1 space-y-6 overflow-y-auto px-3 py-4">
 			<!-- Platform Section -->
 			<div>
 				<div
@@ -182,7 +135,6 @@
 				<nav class="space-y-1">
 					{#each ALL_TRACKS as track (track.id)}
 						{@const isCurrent = page.url.pathname === `/module/${track.slug}`}
-						{@const isDone = progress.isCompleted(track.slug)}
 						<a
 							href="/module/{track.slug}"
 							onclick={() => (isMobileSidebarOpen = false)}
@@ -192,17 +144,11 @@
 						>
 							<div class="flex items-center gap-2 truncate">
 								<span
-									class="flex h-5 w-5 shrink-0 items-center justify-center rounded font-mono text-[10px] {isDone
-										? 'bg-emerald-500/20 font-bold text-emerald-400'
-										: isCurrent
-											? 'bg-cyan-500/20 font-bold text-cyan-400'
-											: 'bg-zinc-800 text-zinc-500'}"
+									class="flex h-5 w-5 shrink-0 items-center justify-center rounded font-mono text-[10px] {isCurrent
+										? 'bg-cyan-500/20 font-bold text-cyan-400'
+										: 'bg-zinc-800 text-zinc-500'}"
 								>
-									{#if isDone}
-										<Check class="h-3 w-3 text-emerald-400" />
-									{:else}
-										{track.trackNumber}
-									{/if}
+									{track.trackNumber}
 								</span>
 								<span class="truncate">{track.shortTitle}</span>
 							</div>
@@ -220,14 +166,6 @@
 						</a>
 					{/each}
 				</nav>
-			</div>
-		</div>
-
-		<!-- Footer Info -->
-		<div class="border-t border-zinc-800/80 px-4 py-3 text-[11px] text-zinc-500">
-			<div class="flex items-center justify-between">
-				<span>Python 3.13+ · Flask · Litestar</span>
-				<span class="text-emerald-400">Production</span>
 			</div>
 		</div>
 	</aside>

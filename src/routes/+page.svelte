@@ -1,21 +1,15 @@
 <script lang="ts">
 	import { ALL_TRACKS } from '#lib/data/curriculum/index';
-	import { progress } from '#lib/progress.svelte';
 	import {
 		Terminal,
 		Sparkles,
 		Layers,
-		CircleCheck,
 		ArrowRight,
 		Bot,
 		Activity,
 		ShieldCheck,
 		Clock
 	} from '@lucide/svelte';
-
-	const completedCount = $derived.by(() => {
-		return ALL_TRACKS.filter((t) => progress.isCompleted(t.slug)).length;
-	});
 </script>
 
 <div class="space-y-12">
@@ -86,7 +80,7 @@
 	</section>
 
 	<!-- Quick Stats Row -->
-	<section class="grid grid-cols-2 gap-4 md:grid-cols-4">
+	<section class="grid grid-cols-1 gap-4 sm:grid-cols-3">
 		<div class="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-5">
 			<div class="flex items-center justify-between text-zinc-400">
 				<span class="text-xs font-medium">Curriculum Tracks</span>
@@ -113,17 +107,6 @@
 			<div class="mt-2 font-mono text-2xl font-bold text-zinc-100">&ge; 90% Cov</div>
 			<p class="mt-1 text-[11px] text-zinc-500">pytest-cov enforced coverage</p>
 		</div>
-
-		<div class="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-5">
-			<div class="flex items-center justify-between text-zinc-400">
-				<span class="text-xs font-medium">Your Progress</span>
-				<CircleCheck class="h-4 w-4 text-emerald-400" />
-			</div>
-			<div class="mt-2 font-mono text-2xl font-bold text-emerald-400">
-				{completedCount} / {ALL_TRACKS.length}
-			</div>
-			<p class="mt-1 text-[11px] text-zinc-500">Persisted locally in browser</p>
-		</div>
 	</section>
 
 	<!-- Curriculum Tracks Grid -->
@@ -140,7 +123,6 @@
 
 		<div class="grid grid-cols-1 gap-5 md:grid-cols-2">
 			{#each ALL_TRACKS as track (track.id)}
-				{@const isDone = progress.isCompleted(track.slug)}
 				<div
 					class="flex flex-col justify-between rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-lg transition-all hover:border-zinc-700 hover:bg-zinc-900/80"
 				>
@@ -149,9 +131,7 @@
 						<div class="flex items-start justify-between gap-3">
 							<div class="flex items-center gap-2.5">
 								<span
-									class="flex h-7 w-7 items-center justify-center rounded-lg font-mono text-xs font-bold {isDone
-										? 'border border-emerald-500/30 bg-emerald-500/20 text-emerald-400'
-										: 'border border-cyan-500/20 bg-cyan-500/10 text-cyan-400'}"
+									class="flex h-7 w-7 items-center justify-center rounded-lg border border-cyan-500/20 bg-cyan-500/10 font-mono text-xs font-bold text-cyan-400"
 								>
 									{track.trackNumber}
 								</span>
@@ -204,20 +184,13 @@
 
 					<!-- Card Footer Action -->
 					<div class="mt-6 flex items-center justify-between border-t border-zinc-800/80 pt-4">
-						{#if isDone}
-							<div class="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
-								<CircleCheck class="h-4 w-4" />
-								<span>Completed</span>
-							</div>
-						{:else}
-							<span class="font-mono text-xs text-zinc-500">Not started</span>
-						{/if}
+						<span class="font-mono text-xs text-zinc-500">{track.level} Track</span>
 
 						<a
 							href="/module/{track.slug}"
 							class="flex items-center gap-1.5 rounded-lg bg-zinc-800 px-3.5 py-1.5 text-xs font-semibold text-zinc-200 transition-colors hover:bg-cyan-600 hover:text-white"
 						>
-							<span>{isDone ? 'Review Track' : 'Start Track'}</span>
+							<span>Explore Module</span>
 							<ArrowRight class="h-3.5 w-3.5" />
 						</a>
 					</div>

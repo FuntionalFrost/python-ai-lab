@@ -6,12 +6,10 @@
 	import ToolExecutionVisualizer from '#lib/components/ToolExecutionVisualizer.svelte';
 	import ChatPlayground from '#lib/components/ChatPlayground.svelte';
 	import BenchmarkGraph from '#lib/components/BenchmarkGraph.svelte';
-	import { progress } from '#lib/progress.svelte';
 	import { ALL_TRACKS } from '#lib/data/curriculum/index';
 	import {
 		Terminal,
 		CircleCheck,
-		Circle,
 		ArrowRight,
 		ArrowLeft,
 		Play,
@@ -27,12 +25,6 @@
 	const prevTrack = $derived(data.prevTrack);
 
 	let isPytestModalOpen = $state(false);
-
-	const isCompleted = $derived(progress.isCompleted(track.slug));
-
-	function toggleCompletion() {
-		progress.toggleCompleted(track.slug);
-	}
 </script>
 
 <div class="space-y-12">
@@ -64,23 +56,6 @@
 			>
 				<Terminal class="h-4 w-4" />
 				<span>Run pytest Suite</span>
-			</button>
-
-			<!-- Mark Complete Button -->
-			<button
-				type="button"
-				onclick={toggleCompletion}
-				class="flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold transition-all {isCompleted
-					? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
-					: 'border-zinc-700 bg-zinc-800 text-zinc-200 hover:bg-zinc-700'}"
-			>
-				{#if isCompleted}
-					<CircleCheck class="h-4 w-4" />
-					<span>Track Completed</span>
-				{:else}
-					<Circle class="h-4 w-4 text-zinc-400" />
-					<span>Mark as Complete</span>
-				{/if}
 			</button>
 		</div>
 	</div>
@@ -326,17 +301,6 @@
 		{:else}
 			<div></div>
 		{/if}
-
-		<button
-			type="button"
-			onclick={toggleCompletion}
-			class="flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-semibold transition-all {isCompleted
-				? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
-				: 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20'}"
-		>
-			<CircleCheck class="h-4 w-4" />
-			<span>{isCompleted ? 'Marked as Completed' : 'Mark as Completed'}</span>
-		</button>
 
 		{#if nextTrack}
 			<a
