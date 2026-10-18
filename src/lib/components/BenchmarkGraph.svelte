@@ -133,7 +133,7 @@
 </script>
 
 <div
-	class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl {className}"
+	class="benchmark-chart overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl {className}"
 >
 	<!-- Top Bar -->
 	<div
@@ -436,3 +436,34 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	:global(.benchmark-chart svg text) {
+		fill: #d4d4d8 !important;
+		font-weight: 500;
+	}
+
+	:global(.benchmark-chart div:has(> svg)) {
+		overflow: visible !important;
+	}
+
+	:global(.benchmark-chart svg) {
+		overflow: visible !important;
+	}
+
+	:global(.benchmark-chart svg g text[text-anchor='middle']:first-child) {
+		text-anchor: start !important;
+	}
+
+	:global(.benchmark-chart svg g text[text-anchor='middle']:last-child) {
+		text-anchor: end !important;
+	}
+
+	:global(.benchmark-chart div:has(> svg) > div.absolute) {
+		background-color: rgba(9, 9, 11, 0.95);
+		border-color: #27272a;
+		box-shadow:
+			0 10px 25px -5px rgba(0, 0, 0, 0.8),
+			0 0 0 1px rgba(255, 255, 255, 0.1);
+	}
+</style>
