@@ -6,6 +6,7 @@
 	import 'prismjs/components/prism-typescript.js';
 	import 'prismjs/components/prism-ini.js';
 	import { Check, Copy, Terminal, FileCode } from '@lucide/svelte';
+	import { useClipboard } from 'yaxa-svelte';
 
 	interface Props {
 		code: string;
@@ -25,8 +26,7 @@
 		class: className = ''
 	}: Props = $props();
 
-	let copied = $state(false);
-	let timeoutId: ReturnType<typeof setTimeout> | null = null;
+	const clipboard = useClipboard({ timeout: 2000 });
 
 	const highlightedHtml = $derived.by(() => {
 		const lang = language.toLowerCase();
@@ -42,19 +42,6 @@
 	const lines = $derived.by(() => {
 		return code.trim().split('\n');
 	});
-
-	async function copyToClipboard() {
-		try {
-			await navigator.clipboard.writeText(code.trim());
-			copied = true;
-			if (timeoutId) clearTimeout(timeoutId);
-			timeoutId = setTimeout(() => {
-				copied = false;
-			}, 2000);
-		} catch (err) {
-			console.error('Failed to copy', err);
-		}
-	}
 </script>
 
 <div class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 shadow-xl {className}">
@@ -80,11 +67,11 @@
 
 		<button
 			type="button"
-			onclick={copyToClipboard}
+			onclick={() => clipboard.copy(code.trim())}
 			class="flex items-center gap-1.5 rounded-md border border-zinc-700/60 bg-zinc-800/80 px-2.5 py-1 text-xs font-medium text-zinc-300 transition-colors hover:border-zinc-600 hover:bg-zinc-700 hover:text-white"
 			aria-label="Copy code to clipboard"
 		>
-			{#if copied}
+			{#if clipboard.copied}
 				<Check class="h-3.5 w-3.5 text-emerald-400" />
 				<span class="text-emerald-400">Copied</span>
 			{:else}

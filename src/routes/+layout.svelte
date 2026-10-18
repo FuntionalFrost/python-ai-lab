@@ -5,8 +5,9 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { ALL_TRACKS } from '#lib/data/curriculum/index';
+	import BrandLogo from '#lib/components/BrandLogo.svelte';
 	import { CommandPalette, Kbd, type CommandItem } from 'yaxa-svelte';
-	import { Bot, Activity, Search, Terminal, Menu, X, Layers } from '@lucide/svelte';
+	import { Bot, Activity, Search, Menu, X, Layers, Terminal } from '@lucide/svelte';
 
 	let { children }: LayoutProps = $props();
 
@@ -19,6 +20,8 @@
 				id: 'home',
 				label: 'Curriculum Overview',
 				description: 'Explore all 10 production engineering modules',
+				icon: Layers,
+				shortcut: 'G H',
 				group: 'Navigation',
 				onSelect: () => goto('/')
 			},
@@ -26,6 +29,8 @@
 				id: 'playground',
 				label: 'Live Chat SSE Playground',
 				description: 'Inspect streaming chunks, jitter, and tokens in real time',
+				icon: Bot,
+				shortcut: 'G P',
 				group: 'Navigation',
 				onSelect: () => goto('/playground/chat')
 			},
@@ -33,6 +38,8 @@
 				id: 'benchmarks',
 				label: 'Telemetry & Benchmarks',
 				description: 'Flask WSGI vs Litestar ASGI latency and evals',
+				icon: Activity,
+				shortcut: 'G B',
 				group: 'Navigation',
 				onSelect: () => goto('/benchmarks')
 			}
@@ -42,6 +49,8 @@
 			id: t.slug,
 			label: `Track ${t.trackNumber}: ${t.title}`,
 			description: `${t.level} · ${t.estimatedMinutes} min · ${t.frameworks.slice(0, 3).join(', ')}`,
+			icon: Terminal,
+			shortcut: `T${t.trackNumber}`,
 			group: 'Curriculum Tracks',
 			onSelect: () => goto(`/module/${t.slug}`)
 		}));
@@ -51,7 +60,7 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" type="image/svg+xml" href={favicon} />
 	<title>Python AI Lab - Interactive Self-Teaching Platform</title>
 </svelte:head>
 
@@ -81,9 +90,9 @@
 				onclick={() => (isMobileSidebarOpen = false)}
 			>
 				<div
-					class="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-tr from-cyan-500 to-emerald-400 text-zinc-950 shadow-md"
+					class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-800/80 bg-zinc-900/90 p-1 shadow-md shadow-cyan-950/40"
 				>
-					<Terminal class="h-4 w-4" />
+					<BrandLogo class="h-full w-full" />
 				</div>
 				<div>
 					<span class="text-sm font-semibold tracking-wide text-zinc-100">Python AI Lab</span>
@@ -211,7 +220,9 @@
 					<a href="/" class="hover:text-zinc-200">Python AI Lab</a>
 					<span>/</span>
 					<span class="font-medium text-zinc-200">
-						{#if page.url.pathname === '/'}
+						{#if page.error}
+							System Notice ({page.status || 404})
+						{:else if page.url.pathname === '/'}
 							Curriculum Dashboard
 						{:else if page.url.pathname === '/playground/chat'}
 							Streaming Chat Playground
@@ -263,6 +274,8 @@
 		content: 'border-zinc-800 bg-zinc-950 text-zinc-100 shadow-2xl',
 		input: 'text-zinc-100 placeholder:text-zinc-500',
 		group: 'text-zinc-500 font-mono text-[10px] tracking-wider uppercase',
-		item: 'text-zinc-300 hover:bg-zinc-900/80 hover:text-cyan-300'
+		item: 'text-zinc-300 hover:bg-zinc-900/80 hover:text-cyan-300',
+		shortcut:
+			'text-zinc-500 font-mono text-[10px] bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded'
 	}}
 />

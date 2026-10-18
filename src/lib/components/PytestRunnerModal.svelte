@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { TestSuite } from '../types/curriculum';
-	import { Modal } from 'yaxa-svelte';
+	import { Modal, useClipboard } from 'yaxa-svelte';
 	import { Terminal, CircleCheck, CircleX, RotateCw, Copy, Check } from '@lucide/svelte';
 
 	interface Props {
@@ -11,6 +11,8 @@
 
 	let { isOpen = $bindable(false), testSuite, onClose }: Props = $props();
 
+	const clipboard = useClipboard({ timeout: 2000 });
+
 	let isRunning = $state(false);
 	let isComplete = $state(false);
 	let simulateFailure = $state(false);
@@ -18,7 +20,6 @@
 	let isVerbose = $state(true);
 	let withCoverage = $state(true);
 	let outputLines = $state<string[]>([]);
-	let copiedTerminal = $state(false);
 
 	function startTestExecution() {
 		isRunning = true;
@@ -69,18 +70,6 @@
 		}
 	});
 
-	async function copyOutput() {
-		try {
-			await navigator.clipboard.writeText(outputLines.join('\n'));
-			copiedTerminal = true;
-			setTimeout(() => {
-				copiedTerminal = false;
-			}, 2000);
-		} catch (err) {
-			console.error(err);
-		}
-	}
-
 	function handleClose() {
 		isOpen = false;
 		onClose?.();
@@ -118,11 +107,11 @@
 			<div class="flex items-center gap-2 pr-8">
 				<button
 					type="button"
-					onclick={copyOutput}
+					onclick={() => clipboard.copy(outputLines.join('\n'))}
 					class="flex items-center gap-1 rounded-md bg-zinc-800 px-2.5 py-1 text-xs text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-white"
 					title="Copy terminal output"
 				>
-					{#if copiedTerminal}
+					{#if clipboard.copied}
 						<Check class="h-3 w-3 text-emerald-400" />
 						<span class="text-[11px] text-emerald-400">Copied</span>
 					{:else}
