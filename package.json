@@ -43,6 +43,7 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^1.59.0",
-		"prismjs": "^1.30.0"
+		"prismjs": "^1.30.0",
+		"yaxa-svelte": "^1.15.0"
 	}
 }

@@ -1,43 +1,40 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+@import 'yaxa-svelte/theme.css';
+@source '../../node_modules/yaxa-svelte/dist/**/*.{js,svelte}';
 
-:root {
-	color-scheme: dark;
-	--scrollbar-thumb: #27272a;
-	--scrollbar-thumb-hover: #3f3f46;
-	--scrollbar-track: #09090b;
+/* High-contrast crisp chart axis and legend text in dark mode */
+svg text {
+	fill: #d4d4d8 !important; /* zinc-300 readable contrast */
+	font-weight: 500;
 }
 
-html {
-	color-scheme: dark;
-	background-color: #09090b;
+/* Ensure chart tooltip is securely pinned at the top and never obscures bottom labels or legend */
+div:has(> svg) > div.absolute {
+	top: 0.5rem !important;
+	z-index: 40;
+	background-color: rgba(9, 9, 11, 0.95) !important; /* zinc-950 */
+	border-color: #27272a !important; /* zinc-800 */
+	box-shadow:
+		0 10px 25px -5px rgba(0, 0, 0, 0.8),
+		0 0 0 1px rgba(255, 255, 255, 0.1);
+	pointer-events: none;
 }
 
-/* Custom scrollbars aligning with dark zinc palette */
-html,
-body,
-* {
-	scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-	scrollbar-width: thin;
+/* Allow chart labels and SVG content to render cleanly without getting clipped by overflow containers */
+div:has(> svg) {
+	overflow: visible !important;
 }
 
-/* Legacy fallback for WebKit/Blink browsers without standard scrollbar-color support */
-@supports not (scrollbar-color: auto) {
-	::-webkit-scrollbar {
-		width: 8px;
-		height: 8px;
-	}
+svg {
+	overflow: visible !important;
+}
 
-	::-webkit-scrollbar-track {
-		background: var(--scrollbar-track);
-	}
+/* Ensure the first and last X-axis labels stay neatly aligned within chart margins */
+svg g text[text-anchor='middle']:first-child {
+	text-anchor: start !important;
+}
 
-	::-webkit-scrollbar-thumb {
-		background: var(--scrollbar-thumb);
-		border-radius: 9999px;
-	}
-
-	::-webkit-scrollbar-thumb:hover {
-		background: var(--scrollbar-thumb-hover);
-	}
+svg g text[text-anchor='middle']:last-child {
+	text-anchor: end !important;
 }

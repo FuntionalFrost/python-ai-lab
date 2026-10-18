@@ -3,31 +3,52 @@
 	import favicon from '#lib/assets/favicon.svg';
 	import type { LayoutProps } from './$types';
 	import { page } from '$app/state';
-	import { ALL_TRACKS, searchTracks } from '#lib/data/curriculum/index';
+	import { goto } from '$app/navigation';
+	import { ALL_TRACKS } from '#lib/data/curriculum/index';
+	import { CommandPalette, Kbd, type CommandItem } from 'yaxa-svelte';
 	import { Bot, Activity, Search, Terminal, Menu, X, Layers } from '@lucide/svelte';
 
 	let { children }: LayoutProps = $props();
 
-	let searchQuery = $state('');
 	let isSearchOpen = $state(false);
 	let isMobileSidebarOpen = $state(false);
 
-	const searchResults = $derived.by(() => {
-		if (!searchQuery.trim()) return ALL_TRACKS;
-		return searchTracks(searchQuery);
+	const commandItems = $derived.by<CommandItem[]>(() => {
+		const pages: CommandItem[] = [
+			{
+				id: 'home',
+				label: 'Curriculum Overview',
+				description: 'Explore all 10 production engineering modules',
+				group: 'Navigation',
+				onSelect: () => goto('/')
+			},
+			{
+				id: 'playground',
+				label: 'Live Chat SSE Playground',
+				description: 'Inspect streaming chunks, jitter, and tokens in real time',
+				group: 'Navigation',
+				onSelect: () => goto('/playground/chat')
+			},
+			{
+				id: 'benchmarks',
+				label: 'Telemetry & Benchmarks',
+				description: 'Flask WSGI vs Litestar ASGI latency and evals',
+				group: 'Navigation',
+				onSelect: () => goto('/benchmarks')
+			}
+		];
+
+		const tracks: CommandItem[] = ALL_TRACKS.map((t) => ({
+			id: t.slug,
+			label: `Track ${t.trackNumber}: ${t.title}`,
+			description: `${t.level} · ${t.estimatedMinutes} min · ${t.frameworks.slice(0, 3).join(', ')}`,
+			group: 'Curriculum Tracks',
+			onSelect: () => goto(`/module/${t.slug}`)
+		}));
+
+		return [...pages, ...tracks];
 	});
-
-	function handleKeydown(e: KeyboardEvent) {
-		if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-			e.preventDefault();
-			isSearchOpen = !isSearchOpen;
-		} else if (e.key === 'Escape' && isSearchOpen) {
-			isSearchOpen = false;
-		}
-	}
 </script>
-
-<svelte:window onkeydown={handleKeydown} />
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
@@ -212,11 +233,7 @@
 				>
 					<Search class="h-3.5 w-3.5 text-zinc-400" />
 					<span class="hidden sm:inline">Search Curriculum</span>
-					<kbd
-						class="ml-1 rounded border border-zinc-700 bg-zinc-800 px-1 font-mono text-[10px] text-zinc-400"
-					>
-						⌘K
-					</kbd>
+					<Kbd combo={['meta', 'k']} size="xs" class="ml-1" />
 				</button>
 
 				<a
@@ -236,85 +253,16 @@
 	</div>
 </div>
 
-<!-- Global Quick Search Modal (Cmd+K) -->
-{#if isSearchOpen}
-	<div
-		class="fixed inset-0 z-50 flex items-start justify-center bg-black/80 p-4 pt-20 backdrop-blur-sm"
-		role="dialog"
-		aria-modal="true"
-	>
-		<div
-			class="w-full max-w-2xl overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl"
-		>
-			<!-- Search Bar -->
-			<div class="flex items-center border-b border-zinc-800 px-4 py-3">
-				<Search class="mr-3 h-5 w-5 text-cyan-400" />
-				<input
-					type="text"
-					bind:value={searchQuery}
-					placeholder="Search modules, patterns (e.g. 'Litestar', 'Pydantic', 'RAG', 'pytest')..."
-					class="flex-1 bg-transparent font-sans text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none"
-				/>
-				<button
-					type="button"
-					onclick={() => (isSearchOpen = false)}
-					class="rounded p-1 text-zinc-400 hover:text-white"
-					aria-label="Close search"
-				>
-					<X class="h-4 w-4" />
-				</button>
-			</div>
-
-			<!-- Search Results List -->
-			<div class="max-h-96 space-y-1 overflow-y-auto p-2">
-				{#if searchResults.length === 0}
-					<div class="p-8 text-center text-xs text-zinc-500">
-						No curriculum tracks matching "{searchQuery}".
-					</div>
-				{:else}
-					{#each searchResults as track (track.id)}
-						<a
-							href="/module/{track.slug}"
-							onclick={() => (isSearchOpen = false)}
-							class="group flex flex-col gap-1 rounded-xl border border-transparent p-3 text-left transition-colors hover:border-zinc-800 hover:bg-zinc-900"
-						>
-							<div class="flex items-center justify-between">
-								<div class="flex items-center gap-2">
-									<span
-										class="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px] text-cyan-400"
-									>
-										Track {track.trackNumber}
-									</span>
-									<span class="text-xs font-semibold text-zinc-200 group-hover:text-cyan-300">
-										{track.title}
-									</span>
-								</div>
-								<span class="font-mono text-[10px] text-zinc-500">{track.estimatedMinutes} min</span
-								>
-							</div>
-							<p class="line-clamp-1 text-[11px] text-zinc-400">
-								{track.summary}
-							</p>
-							<div class="mt-1 flex flex-wrap gap-1">
-								{#each track.frameworks as fw (fw)}
-									<span
-										class="py-0.2 rounded bg-zinc-800/60 px-1.5 font-mono text-[9px] text-zinc-400"
-									>
-										{fw}
-									</span>
-								{/each}
-							</div>
-						</a>
-					{/each}
-				{/if}
-			</div>
-
-			<div
-				class="flex items-center justify-between border-t border-zinc-800/80 bg-zinc-900/50 px-4 py-2.5 font-mono text-[11px] text-zinc-500"
-			>
-				<span>Navigate: ↑↓ &nbsp; Select: ↵</span>
-				<span>ESC to close</span>
-			</div>
-		</div>
-	</div>
-{/if}
+<!-- Global Quick Search Command Palette (Cmd+K / Ctrl+K) -->
+<CommandPalette
+	bind:open={isSearchOpen}
+	items={commandItems}
+	placeholder="Search curriculum tracks, patterns (e.g. 'Litestar', 'RAG', 'pytest')..."
+	ui={{
+		overlay: 'bg-black/80 backdrop-blur-sm',
+		content: 'border-zinc-800 bg-zinc-950 text-zinc-100 shadow-2xl',
+		input: 'text-zinc-100 placeholder:text-zinc-500',
+		group: 'text-zinc-500 font-mono text-[10px] tracking-wider uppercase',
+		item: 'text-zinc-300 hover:bg-zinc-900/80 hover:text-cyan-300'
+	}}
+/>

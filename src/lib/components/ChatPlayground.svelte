@@ -280,33 +280,37 @@
 <div class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl">
 	<!-- Top Bar -->
 	<div class="border-b border-zinc-800 bg-zinc-900/80 px-6 py-4">
-		<div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+		<div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
 			<div>
 				<div class="flex items-center gap-2">
 					<Sparkles class="h-5 w-5 text-cyan-400" />
 					<h3 class="text-base font-semibold text-zinc-100">Streaming Chat & SSE Visualizer</h3>
 				</div>
-				<p class="mt-1 text-xs text-zinc-400">
+				<p class="mt-1 max-w-xl text-xs text-zinc-400">
 					Simulate real-time token streaming with configurable latency, inspect raw SSE frames, and
 					observe Pydantic validation.
 				</p>
 			</div>
 
-			<!-- Preset Selector -->
-			<div class="flex flex-wrap items-center gap-2">
-				<span class="font-mono text-xs text-zinc-400">Preset:</span>
-				{#each PRESETS as preset (preset.id)}
-					<button
-						type="button"
-						onclick={() => applyPreset(preset)}
-						class="rounded-lg px-2.5 py-1 text-xs font-medium transition-colors {selectedPreset.id ===
-						preset.id
-							? 'bg-cyan-600 text-white shadow'
-							: 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white'}"
-					>
-						{preset.name}
-					</button>
-				{/each}
+			<!-- Preset Selector Group -->
+			<div class="flex flex-wrap items-center gap-2.5">
+				<span class="shrink-0 font-mono text-xs text-zinc-400">Preset:</span>
+				<div
+					class="flex flex-wrap items-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-950/70 p-1"
+				>
+					{#each PRESETS as preset (preset.id)}
+						<button
+							type="button"
+							onclick={() => applyPreset(preset)}
+							class="rounded-lg px-3 py-1.5 text-xs font-medium transition-all {selectedPreset.id ===
+							preset.id
+								? 'bg-cyan-600 text-white shadow-sm'
+								: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
+						>
+							{preset.name}
+						</button>
+					{/each}
+				</div>
 			</div>
 		</div>
 

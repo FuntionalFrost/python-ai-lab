@@ -7,7 +7,7 @@ export const track04: CurriculumLesson = {
 	title: 'Tool Calling & Unit Testing Tool Executions',
 	shortTitle: 'Tool Calling & Testing',
 	subtitle: 'Pydantic Function Schemas, Dispatch Engines, and Deterministic pytest Mocks',
-	level: 'Advanced',
+	level: 'Intermediate',
 	estimatedMinutes: 40,
 	topics: [
 		'Generating OpenAI Function Schemas from Pydantic Models',

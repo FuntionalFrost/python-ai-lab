@@ -327,7 +327,7 @@
 
 <!-- Pytest Runner Terminal Modal -->
 <PytestRunnerModal
-	isOpen={isPytestModalOpen}
+	bind:isOpen={isPytestModalOpen}
 	testSuite={track.testSuite}
 	onClose={() => (isPytestModalOpen = false)}
 />

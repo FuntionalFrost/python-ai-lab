@@ -7,7 +7,7 @@ export const track01: CurriculumLesson = {
 	title: 'Modern Flask 3.x vs. Litestar Architecture (MVC & DI)',
 	shortTitle: 'Flask vs. Litestar MVC & DI',
 	subtitle: 'Clean Architecture, Dependency Injection, and Async Execution in Modern AI Backends',
-	level: 'Intermediate',
+	level: 'Beginner',
 	estimatedMinutes: 30,
 	topics: [
 		'Application Factory Pattern',
