@@ -268,7 +268,7 @@
 <CommandPalette
 	bind:open={isSearchOpen}
 	items={commandItems}
-	placeholder="Search curriculum tracks, patterns (e.g. 'Litestar', 'RAG', 'pytest')..."
+	placeholder="Search curriculum tracks, patterns (e.g. 'Flask', 'RAG', 'streaming')..."
 	ui={{
 		overlay: 'bg-black/80 backdrop-blur-sm',
 		content: 'border-zinc-800 bg-zinc-950 text-zinc-100 shadow-2xl',

@@ -4,117 +4,118 @@ export const track10: CurriculumLesson = {
 	id: 'track-10',
 	slug: '10-moving-litestar-to-sveltekit',
 	trackNumber: 10,
-	title: 'Moving from Litestar to SvelteKit',
-	shortTitle: 'Litestar to SvelteKit Full-Stack',
+	title: 'Connecting Flask to SvelteKit (Full-Stack AI Integration)',
+	shortTitle: 'Flask to SvelteKit Full-Stack',
 	subtitle:
-		'BFF Architecture, Edge Streaming with ReadableStream, and Server-Side TypeScript for AI Workloads',
+		'Consuming Flask SSE Streams, Type-Safe Pydantic Contracts, and Svelte 5 Reactive Frontends',
 	level: 'Advanced',
 	estimatedMinutes: 45,
 	topics: [
-		'When to Consolidate: Python Microservice vs. SvelteKit BFF',
-		'Litestar ServerSentEvent vs. SvelteKit Web ReadableStream',
-		'Generating TypeScript Interfaces from Pydantic Schemas',
-		'Managing API Secrets: Pydantic SecretStr vs. $env/static/private',
-		'Hybrid Architecture: SvelteKit as Orchestrator / Python as ML Worker',
-		'Testing SvelteKit Server Endpoints with Vitest'
+		'Full-Stack Topology: Flask AI Microservice & SvelteKit UI',
+		'Consuming Flask SSE Streams with Svelte 5 Runes ($state, $derived)',
+		'Generating TypeScript Interfaces from Flask Pydantic v2 Models',
+		'CORS, Reverse Proxying & Streaming Headers (X-Accel-Buffering)',
+		'Hybrid Architecture: SvelteKit BFF vs. Direct Flask Endpoints',
+		'Testing Full-Stack Endpoints with Vitest and pytest'
 	],
-	frameworks: ['SvelteKit 3', 'TypeScript 5.x', 'Litestar 2.24', 'OpenAI Node / Python SDK'],
-	tags: ['Full-Stack', 'SvelteKit', 'BFF', 'Streaming', 'TypeScript', 'Edge'],
+	frameworks: ['SvelteKit 3', 'TypeScript 5.x', 'Flask 3.1.3', 'Pydantic v2'],
+	tags: ['Full-Stack', 'SvelteKit', 'Flask', 'Streaming', 'TypeScript', 'Svelte 5'],
 	summary:
-		'Explore the architectural boundary between Python AI microservices and SvelteKit. Discover when to replace an intermediate Litestar API layer with native SvelteKit server endpoints (+server.ts), how to implement Web-standard ReadableStream SSE pipelines in TypeScript, and how to maintain end-to-end type safety between Python models and Svelte 5 frontends.',
+		'Bridge your Python Flask AI backend with a modern fullstack frontend in SvelteKit. Discover how Svelte 5 runes consume Flask Server-Sent Event streams in real-time, how to synchronize Pydantic schemas to TypeScript types, and how to structure production deployment boundaries.',
 	objectives: [
-		'Evaluate the trade-offs between a dedicated Litestar API gateway and a unified SvelteKit Full-Stack backend.',
-		'Implement high-speed SSE streaming in SvelteKit +server.ts using standard Web ReadableStreams.',
-		'Secure OpenAI API tokens and upstream credentials with SvelteKit’s compile-time private environment modules ($env/static/private).',
-		'Establish automated pipelines to generate type-safe TypeScript interfaces from Pydantic v2 schemas.',
-		'Architect a hybrid production topology where SvelteKit acts as the fast streaming BFF and delegates heavy vector/GPU operations to Python.'
+		'Architect a production boundary between a Flask AI backend service and a SvelteKit user interface.',
+		'Implement resilient client-side SSE readers in Svelte 5 using the Web Streams API and reactive runes.',
+		'Eliminate drift between Python models and TypeScript contracts with automated schema generation.',
+		'Configure CORS and reverse-proxy buffering rules so Flask streams arrive in SvelteKit with zero latency.',
+		'Verify fullstack streaming integrity with Vitest end-to-end and mock test suites.'
 	],
 	architecture: {
-		patternName: 'Backend-for-Frontend (BFF) & Hybrid AI Orchestration',
+		patternName: 'Full-Stack Flask AI Backend & Svelte 5 UI Topology',
 		diagram: `+-------------------------------------------------------------------------+
-|                  SvelteKit Full-Stack Application (Browser + SSR)       |
+|                  SvelteKit Frontend Application (Browser + SSR)         |
 |                                                                         |
-|   [ Svelte 5 UI ] (runes: $state, $derived)                             |
+|   [ Svelte 5 UI: ChatStream.svelte ] (runes: $state, $derived)          |
 |          |                                                              |
-|          | HTTP POST /api/chat (Fetch / SSE Reader)                     |
+|          | HTTP POST /api/chat/stream (SSE Stream Consumer)             |
 |          v                                                              |
-|   [ SvelteKit Server Endpoint: src/routes/api/chat/+server.ts ]         |
-|   - Zero-Cold-Start Node/Bun/Edge execution                             |
-|   - $env/static/private (Secret key never exposed to client)            |
-|   - Streams directly to user via Web ReadableStream                     |
+|   [ SvelteKit Reverse Proxy / Vite Dev Proxy / Nginx Gateway ]          |
 +------------------------------------+------------------------------------+
                                      |
-                                     | (Internal High-Speed RPC / REST)
+                                     | (Server-Sent Events: text/event-stream)
                                      v
 +-------------------------------------------------------------------------+
-|                    Specialized Python Litestar Microservice              |
-|   - Heavy ML / PyTorch / CuPy Operations                                |
-|   - Specialized Embedding & Cosine Re-ranking Pipelines                 |
-|   - Direct PostgreSQL / pgvector connection pool                        |
+|                    Flask 3.x AI Backend Microservice                    |
+|   - Application Factory & Modular Blueprints (create_app)               |
+|   - stream_with_context() Token Generator                               |
+|   - Pydantic v2 Input Validation & Strict DTO Schemas                   |
+|   - Pooled OpenAI Client in current_app.extensions                      |
+|   - Vector DB / RAG / Agent Tool Dispatching Layers                     |
 +-------------------------------------------------------------------------+`,
-		explanation: `In many early-stage AI projects, developers stand up a separate Python web framework (like Flask or Litestar) simply to call the OpenAI SDK. This introduces:
-1. Operational Overhead: Managing two distinct deployments, Dockerfiles, and reverse proxy routing rules.
-2. Serialization Tax: Converting JSON to Pydantic, back to JSON over HTTP, and then into TypeScript.
-3. Latency Penalties: An extra network hop between the frontend server and the Python API.
+		explanation: `The most popular real-world architecture for AI products combines Python's rich data science ecosystem with a fast modern frontend:
 
-By moving standard LLM chat streaming, tool dispatching, and session management directly into SvelteKit server routes ('+server.ts'), you eliminate the intermediate Python web tier for transport while retaining Python strictly where it excels: heavy vector indexing, LangChain/LlamaIndex pipelines, and custom PyTorch model serving.`,
+1. Flask Backend: Owns LLM orchestration, prompt engineering, vector database indexing, and fine-tuned model inferences where Python libraries (Pydantic, LangChain, PyTorch) dominate.
+2. SvelteKit Frontend: Delivers instant page loads, snappy interactive UI, and reactive state management powered by Svelte 5 runes.
+3. Streaming Glue: Flask emits chunks using 'Response(stream_with_context(generate()), mimetype="text/event-stream")' while SvelteKit consumes the stream via the browser's standard 'ReadableStream' API, appending tokens to reactive $state variables with zero UI flicker.`,
 		keyConcepts: [
 			{
-				name: 'Backend-for-Frontend (BFF) Pattern',
+				name: 'Svelte 5 Runes Streaming',
 				description:
-					'The SvelteKit server acts as a tailored API layer optimized specifically for the frontend UI, handling authentication, caching, and stream forwarding.'
+					"Using $state('') to store streaming responses enables fine-grained DOM reactivity: only the text node updates as tokens arrive, preventing unnecessary re-renders."
 			},
 			{
 				name: 'Web-Standard `ReadableStream`',
 				description:
-					'SvelteKit endpoints use standard Fetch API Request/Response primitives, streaming token bytes to the browser with zero external framework dependencies.'
+					'The browser Fetch API provides response.body.getReader(), allowing the client to process incoming token chunks asynchronously as they traverse the network.'
 			},
 			{
-				name: 'Compile-Time Secret Isolation',
+				name: 'Pydantic-to-TypeScript Contract Sync',
 				description:
-					'SvelteKit prevents accidental client leaks by throwing build errors if code in a client file attempts to import from $env/static/private.'
+					'Exporting Pydantic JSON schemas into TypeScript definitions prevents frontend/backend schema desynchronization when API parameters evolve.'
 			}
 		]
 	},
 	comparisons: [
 		{
-			title: 'Streaming Chat Endpoint: Litestar Python vs. SvelteKit TypeScript',
+			title: 'Streaming Pipeline: Flask 3.x Backend vs. SvelteKit Server BFF',
 			description:
-				'Observe the parity between Litestar’s async generator and SvelteKit’s native Web ReadableStream.',
-			leftTitle: 'Litestar 2.24 (Python Async Controller)',
+				'Observe the difference between producing an SSE stream in Flask and proxying/handling it in SvelteKit.',
+			leftTitle: 'Flask 3.x (Python SSE Generator)',
 			leftLanguage: 'python',
-			leftCode: `from collections.abc import AsyncGenerator
-from litestar import Controller, post
-from litestar.response import ServerSentEvent
-from openai import AsyncOpenAI
-from app.schemas.chat import ChatPrompt
+			leftCode: `from flask import Blueprint, Response, stream_with_context, request, current_app
+from openai import OpenAI
+import json
 
-class StreamController(Controller):
-    path = "/api/chat"
+chat_bp = Blueprint("chat", __name__, url_prefix="/api/chat")
 
-    @post("/stream")
-    async def stream_chat(
-        self,
-        data: ChatPrompt,
-        client: AsyncOpenAI
-    ) -> ServerSentEvent:
-        async def event_generator() -> AsyncGenerator[str, None]:
-            stream = await client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": data.prompt}],
-                stream=True
-            )
-            async for chunk in stream:
-                token = chunk.choices[0].delta.content or ""
-                if token:
-                    yield f'{{"token": {token!r}}}'
-            yield "[DONE]"
+@chat_bp.post("/stream")
+def stream_chat():
+    data = request.get_json(silent=True) or {}
+    prompt = data.get("prompt", "")
+    client: OpenAI = current_app.extensions["openai_client"]
 
-        return ServerSentEvent(
-            content=event_generator(),
-            headers={"Cache-Control": "no-cache"}
-        )`,
-			rightTitle: 'SvelteKit 3 (TypeScript +server.ts)',
+    def generate():
+        stream = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            stream=True
+        )
+        for chunk in stream:
+            token = chunk.choices[0].delta.content or ""
+            if token:
+                payload = json.dumps({"token": token})
+                yield f"data: {payload}\\n\\n"
+        yield "data: [DONE]\\n\\n"
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "Access-Control-Allow-Origin": "*"
+        }
+    )`,
+			rightTitle: 'SvelteKit 3 (TypeScript +server.ts BFF)',
 			rightLanguage: 'typescript',
 			rightCode: `import { OPENAI_API_KEY } from '$env/static/private';
 import OpenAI from 'openai';
@@ -156,9 +157,9 @@ export const POST: RequestHandler = async ({ request }) => {
 };`
 		},
 		{
-			title: 'Settings & Secret Management',
+			title: 'Settings & Secret Isolation',
 			description: 'How API keys and secrets are protected in each ecosystem.',
-			leftTitle: 'Litestar / Pydantic (pydantic-settings)',
+			leftTitle: 'Flask / Pydantic (pydantic-settings)',
 			leftLanguage: 'python',
 			leftCode: `from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -167,7 +168,7 @@ class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
     openai_api_key: SecretStr # Prevents accidental print/log leaks
 
-# Usage in Python
+# Usage in Flask factory
 settings = AppSettings()
 raw_key = settings.openai_api_key.get_secret_value()`,
 			rightTitle: 'SvelteKit Private Environment ($env)',
@@ -184,11 +185,11 @@ export const serverOpenAI = new OpenAI({
 	],
 	codeSnippets: [
 		{
-			id: 'sveltekit-sse-consumer',
-			title: 'Consuming SSE Stream in Svelte 5 Component',
+			id: 'svelte5-sse-consumer',
+			title: 'Consuming Flask SSE Stream in Svelte 5 with Runes',
 			filePath: 'src/lib/components/ChatStreamConsumer.svelte',
 			description:
-				'Modern Svelte 5 component reading Web stream chunks with $state and $derived runes.',
+				'Modern Svelte 5 component reading Flask SSE stream chunks with $state and $derived runes.',
 			language: 'typescript',
 			code: `<script lang="ts">
 	let prompt = $state('');
@@ -202,6 +203,7 @@ export const serverOpenAI = new OpenAI({
 		isStreaming = true;
 		answer = '';
 
+		// Connect to Flask backend SSE endpoint
 		const response = await fetch('/api/chat/stream', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -240,7 +242,7 @@ export const serverOpenAI = new OpenAI({
 </script>
 
 <form onsubmit={handleSubmit} class="space-y-3">
-	<input bind:value={prompt} placeholder="Ask SvelteKit AI..." class="w-full rounded-lg bg-zinc-900 p-3 text-sm text-white" />
+	<input bind:value={prompt} placeholder="Ask Flask AI..." class="w-full rounded-lg bg-zinc-900 p-3 text-sm text-white" />
 	<button type="submit" disabled={isStreaming} class="rounded-lg bg-cyan-600 px-4 py-2 text-xs font-semibold text-white">
 		{isStreaming ? 'Streaming...' : 'Generate Stream'}
 	</button>
@@ -253,21 +255,18 @@ export const serverOpenAI = new OpenAI({
 		},
 		{
 			id: 'pydantic-to-typescript-script',
-			title: 'Automated Schema Sync: Pydantic to TypeScript',
+			title: 'Automated Schema Sync: Flask Pydantic to TypeScript',
 			filePath: 'scripts/export_schemas.py',
 			description:
-				'Generates TypeScript definitions from Pydantic v2 schemas to ensure end-to-end type safety between Litestar and SvelteKit.',
+				'Generates TypeScript definitions from Flask Pydantic v2 schemas to ensure end-to-end type safety between Flask and SvelteKit.',
 			language: 'python',
 			code: `import json
 from pathlib import Path
 from pydantic import BaseModel
-from app.schemas.summary import SummaryRequest, SummaryResponse
 from app.schemas.analysis import AnalysisRequest, AnalysisResponse
 
 def export_json_schemas():
     models: list[type[BaseModel]] = [
-        SummaryRequest,
-        SummaryResponse,
         AnalysisRequest,
         AnalysisResponse,
     ]

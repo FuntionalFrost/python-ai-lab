@@ -3,32 +3,40 @@
 	import CodeBlock from '#lib/components/CodeBlock.svelte';
 	import { Bot, Zap } from '@lucide/svelte';
 
-	const sseSnippet = `from collections.abc import AsyncGenerator
-from litestar import Controller, post
-from litestar.response import ServerSentEvent
-from openai import AsyncOpenAI
+	const sseSnippet = `from flask import Blueprint, Response, stream_with_context, request, current_app
+from openai import OpenAI
+import json
 
-class StreamController(Controller):
-    path = "/api/chat"
+chat_bp = Blueprint("chat", __name__, url_prefix="/api/chat")
 
-    @post("/stream")
-    async def stream_chat(self, client: AsyncOpenAI, prompt: str) -> ServerSentEvent:
-        async def event_generator() -> AsyncGenerator[str, None]:
-            stream = await client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": prompt}],
-                stream=True,
-            )
-            async for chunk in stream:
-                delta = chunk.choices[0].delta.content or ""
-                if delta:
-                    yield f'{{"token": {delta!r}}}'
-            yield "[DONE]"
+@chat_bp.post("/stream")
+def stream_chat():
+    data = request.get_json(silent=True) or {}
+    prompt = data.get("prompt", "")
+    client: OpenAI = current_app.extensions["openai_client"]
 
-        return ServerSentEvent(
-            content=event_generator(),
-            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
-        )`;
+    def generate():
+        stream = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            stream=True,
+        )
+        for chunk in stream:
+            delta = chunk.choices[0].delta.content or ""
+            if delta:
+                payload = json.dumps({"token": delta})
+                yield f"data: {payload}\\n\\n"
+        yield "data: [DONE]\\n\\n"
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "Connection": "keep-alive"
+        }
+    )`;
 </script>
 
 <div class="space-y-10">
@@ -58,14 +66,15 @@ class StreamController(Controller):
 			<div class="flex items-center gap-2">
 				<Zap class="h-5 w-5 text-cyan-400" />
 				<h3 class="text-sm font-bold tracking-wide text-zinc-100 uppercase">
-					SSE Streaming Anatomy in ASGI
+					SSE Streaming Anatomy in Flask 3.x
 				</h3>
 			</div>
 
 			<p class="text-xs leading-relaxed text-zinc-300">
 				Unlike WebSockets, which require a full-duplex protocol upgrade over HTTP/1.1, Server-Sent
-				Events (SSE) operate over standard HTTP. Litestar streams SSE using async generators without
-				holding worker threads captive:
+				Events (SSE) operate over standard HTTP. Flask 3.x streams SSE using Python generator
+				functions wrapped in <code class="text-cyan-400">stream_with_context</code>, preserving
+				application and request state while emitting real-time token chunks:
 			</p>
 
 			<ul class="list-inside list-disc space-y-2 text-xs text-zinc-400">
@@ -84,15 +93,15 @@ class StreamController(Controller):
 			</ul>
 		</div>
 
-		<!-- Right: Litestar Reference Code -->
+		<!-- Right: Flask Reference Code -->
 		<div class="space-y-2">
 			<div class="flex items-center justify-between">
 				<span class="text-xs font-semibold text-zinc-300"
-					>Litestar Native ServerSentEvent Endpoint</span
+					>Flask 3.x stream_with_context Endpoint</span
 				>
-				<span class="font-mono text-[11px] text-cyan-400">app/controllers/stream.py</span>
+				<span class="font-mono text-[11px] text-cyan-400">app/blueprints/chat.py</span>
 			</div>
-			<CodeBlock code={sseSnippet} language="python" title="app/controllers/stream.py" />
+			<CodeBlock code={sseSnippet} language="python" title="app/blueprints/chat.py" />
 		</div>
 	</div>
 </div>

@@ -4,82 +4,109 @@ export const track03: CurriculumLesson = {
 	id: 'track-03',
 	slug: '03-llm-chat-streaming',
 	trackNumber: 3,
-	title: 'Integrating LLM Chats & Streaming in Web Backends',
-	shortTitle: 'LLM Streaming & Chat Sessions',
-	subtitle: 'Async Client Pooling, Server-Sent Events (SSE), and Resilient Conversation Buffers',
+	title: 'Real-Time LLM Token Streaming in Flask 3.x',
+	shortTitle: 'Flask SSE Token Streaming',
+	subtitle: 'Server-Sent Events (SSE), stream_with_context, Connection Pooling, and Chat Memory',
 	level: 'Intermediate',
 	estimatedMinutes: 35,
 	topics: [
-		'AsyncOpenAI Client Lifecycle & Connection Pooling',
-		'Flask 3.x stream_with_context SSE',
-		'Litestar Native ServerSentEvent Generator',
-		'Chat Message History Management with Pydantic',
-		'SSE Chunk Protocol: data: [DONE]'
+		'Flask 3.x stream_with_context Generator Architecture',
+		'Server-Sent Events (SSE) Protocol: data: <payload>\\n\\n',
+		'Disabling Reverse Proxy Buffering (X-Accel-Buffering: no)',
+		'OpenAI Client Lifecycle & Connection Pooling in Flask Extensions',
+		'Sliding-Window Conversation Memory with Pydantic'
 	],
-	frameworks: ['openai>=3.35.1', 'litestar>=2.24.0', 'flask>=3.1.3'],
-	tags: ['Streaming', 'SSE', 'AsyncIO', 'OpenAI', 'Chat History'],
+	frameworks: ['Flask 3.1.3', 'OpenAI 1.x', 'Pydantic v2', 'pytest 9.x'],
+	tags: ['Flask', 'Streaming', 'SSE', 'OpenAI', 'Chat History', 'Real-Time'],
 	summary:
-		'Deliver snappy conversational AI with real-time token streaming. Contrast Flask’s WSGI threadpool streaming with Litestar’s non-blocking async ServerSentEvent pipeline, and configure production-grade HTTP connection pooling and retry policies.',
+		'Deliver snappy conversational AI in Flask by replacing blocking responses with real-time token streaming. Master Flask’s stream_with_context generator mechanism, Server-Sent Events (SSE) protocol framing, Nginx reverse-proxy buffering guards, and resilient conversation buffers.',
 	objectives: [
-		'Configure single-instance AsyncOpenAI clients with HTTP connection pooling (httpx limits).',
-		'Implement SSE streaming endpoints in Flask 3.x using stream_with_context.',
-		'Build native async Server-Sent Event generators in Litestar 2.24.',
-		'Enforce structured chat memory history adhering to OpenAI’s ChatCompletionMessageParam schemas.',
-		'Test streaming endpoints using pytest-mock with simulated async generators.'
+		'Implement streaming HTTP endpoints in Flask 3.x using stream_with_context and Response generators.',
+		'Format SSE chunks according to web standards (data: <json>\\n\\n and data: [DONE]).',
+		'Configure reverse-proxy headers (X-Accel-Buffering: no, Cache-Control: no-cache) to prevent Nginx chunk buffering.',
+		'Maintain thread-safe pooled OpenAI client instances across Flask worker threads.',
+		'Build sliding-window chat history buffers that prune older messages while preserving system prompts.'
 	],
 	architecture: {
-		patternName: 'Non-Blocking Server-Sent Event (SSE) Streaming Pipeline',
-		diagram: `+--------------------+               +---------------------+
-| Web Client / UI    |               |  Litestar Handler   |
-| (EventSource / SSE)|               |  (@get / @post)     |
-+---------+----------+               +----------+----------+
-          |                                     |
-          | 1. POST /api/chat/stream            |
-          +------------------------------------>|
-          |                                     | 2. AsyncOpenAI.chat.completions.create(
-          |                                     |    stream=True)
-          |                                     v
-          |                             +--------------------+
-          |                             | OpenAI Gateway API |
-          |                             +---------+----------+
-          |                                       |
-          |                                       | 3. AsyncIterator[ChatCompletionChunk]
-          |                                       v
-          | 4. SSE: data: {"token": "The"}        |
-          |<--------------------------------------+
-          | 5. SSE: data: {"token": " quick"}     |
-          |<--------------------------------------+
-          | 6. SSE: data: [DONE]                  |
-          |<--------------------------------------+`,
-		explanation: `When streaming tokens from an LLM, the request remains open for 5 to 45 seconds while tokens generate. In synchronous WSGI servers like traditional Flask/Gunicorn, every open stream ties up an entire operating system worker thread. Under 50 concurrent users, an 8-worker cluster quickly stalls and queues requests.
+		patternName: 'Flask Server-Sent Event (SSE) Streaming Pipeline',
+		diagram: `+--------------------+               +--------------------------------------+
+| Web Client / UI    |               |  Flask Blueprint                     |
+| (EventSource / SSE)|               |  (@chat_bp.post("/stream"))          |
++---------+----------+               +------------------+-------------------+
+          |                                             |
+          | 1. POST /api/chat/stream                    |
+          +-------------------------------------------->|
+          |                                             | 2. client.chat.completions.create(
+          |                                             |    stream=True)
+          |                                             v
+          |                                     +--------------------+
+          |                                     | OpenAI Gateway API |
+          |                                     +---------+----------+
+          |                                               |
+          |                                               | 3. Iterator[ChatCompletionChunk]
+          |                                               v
+          | 4. SSE chunk: data: {"token": "The"}          |
+          |<----------------------------------------------+
+          | 5. SSE chunk: data: {"token": " quick"}       |
+          |<----------------------------------------------+
+          | 6. SSE chunk: data: [DONE]                    |
+          |<----------------------------------------------+`,
+		explanation: `When querying large language models, generating an answer takes anywhere from 3 to 30 seconds depending on output length.
 
-In Litestar’s ASGI architecture, an async generator 'yields' each token chunk cooperatively. The event loop switches tasks during the 20-50ms gap between tokens (Inter-Token Latency), allowing a single worker process to easily sustain thousands of concurrent streaming connections.`,
+If a Flask endpoint blocks until the entire completion finishes, the user stares at a blank loading spinner for the entire duration (huge Time to First Token / TTFT). Furthermore, if the request times out or is aborted, the backend wastes compute.
+
+Flask 3.x handles streaming via Python generator functions wrapped in 'stream_with_context':
+1. The generator function yields string chunks piece-by-piece as OpenAI sends them.
+2. 'stream_with_context' preserves Flask’s request and application contexts ('request', 'current_app', 'g') for the entire duration of the generator, even though the outer route function has already returned.
+3. Proper headers ('X-Accel-Buffering: no', 'Cache-Control: no-cache') instruct upstream proxies like Nginx or Cloudflare not to buffer packets, ensuring immediate browser delivery.`,
 		keyConcepts: [
 			{
-				name: 'AsyncOpenAI Connection Pool',
+				name: 'Flask `stream_with_context`',
 				description:
-					'Sharing a single AsyncOpenAI client instance reuses underlying TCP sockets and TLS sessions, avoiding ~150ms connection overhead on every prompt.'
+					'A Flask helper that keeps request-scoped locals (such as request.headers and current_app) active while a generator yields chunks over an open connection.'
 			},
 			{
-				name: 'Server-Sent Events (SSE)',
+				name: 'Server-Sent Events (SSE) Protocol',
 				description:
-					'A lightweight unidirectional HTTP streaming protocol over Content-Type: text/event-stream with chunks formatted as data: <payload>\\n\\n.'
+					'A lightweight HTTP standard using Content-Type: text/event-stream where each message is formatted with "data: <json>\\n\\n" and terminated with "data: [DONE]\\n\\n".'
 			},
 			{
-				name: 'Chat Completion Buffers',
+				name: 'Reverse-Proxy Buffering Bypass',
 				description:
-					'Limiting conversation memory using sliding window token count or Pydantic message validators prevents context window overflow and astronomical billing.'
+					'Sending header "X-Accel-Buffering: no" ensures Nginx forwards each SSE byte chunk immediately instead of waiting for a 4KB internal buffer to fill.'
 			}
 		]
 	},
 	comparisons: [
 		{
-			title: 'Streaming Implementation: Flask 3.x vs. Litestar 2.24',
+			title: 'Blocking Response vs. Flask 3.x SSE Streaming',
 			description:
-				'Observe the difference between Flask’s WSGI generator stream and Litestar’s native async ServerSentEvent pipeline.',
-			leftTitle: 'Flask 3.x (WSGI stream_with_context)',
+				'Observe the dramatic difference in user experience between waiting for full generation vs. real-time token streaming.',
+			leftTitle: 'Naive Blocking Endpoint (High TTFT, Bad UX)',
 			leftLanguage: 'python',
-			leftCode: `from flask import Blueprint, Response, stream_with_context, request, current_app
+			leftCode: `from flask import Blueprint, request, jsonify, current_app
+from openai import OpenAI
+
+chat_bp = Blueprint("chat", __name__)
+
+@chat_bp.post("/ask")
+def ask():
+    data = request.get_json()
+    prompt = data.get("prompt", "")
+    client: OpenAI = current_app.extensions["openai_client"]
+
+    # Problem: Blocks Flask worker thread for 10-25 seconds!
+    # User sees zero progress until entire answer is fully finished.
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    full_answer = response.choices[0].message.content
+    return jsonify({"answer": full_answer})`,
+			rightTitle: 'Modern Flask 3.x (stream_with_context & SSE)',
+			rightLanguage: 'python',
+			rightCode: `from flask import Blueprint, Response, stream_with_context, request, current_app
 from openai import OpenAI
 import json
 
@@ -87,8 +114,8 @@ chat_bp = Blueprint("chat", __name__)
 
 @chat_bp.post("/stream")
 def stream_chat():
-    body = request.get_json()
-    prompt = body.get("prompt", "")
+    data = request.get_json(silent=True) or {}
+    prompt = data.get("prompt", "")
     client: OpenAI = current_app.extensions["openai_client"]
 
     def generate():
@@ -100,70 +127,39 @@ def stream_chat():
         for chunk in response_stream:
             delta = chunk.choices[0].delta.content or ""
             if delta:
-                # SSE format requires data: <json>\\n\\n
                 payload = json.dumps({"token": delta})
                 yield f"data: {payload}\\n\\n"
         yield "data: [DONE]\\n\\n"
 
-    # NOTE: Blocks one WSGI worker thread for the entire stream duration!
+    # stream_with_context keeps current_app & request alive inside generate()
     return Response(
         stream_with_context(generate()),
         mimetype="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
-    )`,
-			rightTitle: 'Litestar 2.24 (Native Async ServerSentEvent)',
-			rightLanguage: 'python',
-			rightCode: `from collections.abc import AsyncGenerator
-from litestar import Controller, post
-from litestar.response import ServerSentEvent
-from openai import AsyncOpenAI
-from app.schemas.chat import ChatPrompt
-
-class StreamingChatController(Controller):
-    path = "/api/chat"
-
-    @post("/stream")
-    async def stream_chat(
-        self,
-        data: ChatPrompt,
-        client: AsyncOpenAI
-    ) -> ServerSentEvent:
-        async def event_generator() -> AsyncGenerator[str, None]:
-            stream = await client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": data.prompt}],
-                stream=True
-            )
-            async for chunk in stream:
-                delta = chunk.choices[0].delta.content or ""
-                if delta:
-                    yield f'{{"token": {delta!r}}}'
-            yield "[DONE]"
-
-        # Non-blocking async generator running cooperatively on ASGI loop
-        return ServerSentEvent(
-            content=event_generator(),
-            headers={"Cache-Control": "no-cache"}
-        )`
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no", # Prevents Nginx from buffering stream
+            "Connection": "keep-alive"
+        }
+    )`
 		}
 	],
 	codeSnippets: [
 		{
-			id: 'resilient-openai-client',
-			title: 'Production AsyncOpenAI Client Factory with httpx Limits',
+			id: 'flask-openai-client',
+			title: 'Thread-Safe Pooled OpenAI Client Factory for Flask',
 			filePath: 'app/core/openai_client.py',
 			description:
-				'Connection pooling, configurable timeouts, and exponential backoff retry settings.',
+				'Connection pooling with httpx limits, timeouts, and max retries stored in Flask app extensions.',
 			language: 'python',
 			code: `import httpx
-from openai import AsyncOpenAI
+from openai import OpenAI
 from app.config import get_settings
 
-def create_openai_client() -> AsyncOpenAI:
+def create_openai_client() -> OpenAI:
+    """Creates a thread-safe OpenAI client with pooled TCP connections."""
     settings = get_settings()
 
-    # Custom httpx limits prevent file-descriptor exhaustion under high concurrency
-    http_client = httpx.AsyncClient(
+    http_client = httpx.Client(
         limits=httpx.Limits(
             max_connections=100,
             max_keepalive_connections=20,
@@ -177,10 +173,10 @@ def create_openai_client() -> AsyncOpenAI:
         )
     )
 
-    return AsyncOpenAI(
+    return OpenAI(
         api_key=settings.llm.api_key.get_secret_value(),
         http_client=http_client,
-        max_retries=3, # Exponential backoff retry on 429 and 5xx errors
+        max_retries=3
     )`,
 			runnable: true
 		},
@@ -212,9 +208,8 @@ class ConversationBuffer:
         self.history.append(Message(role="assistant", content=content))
         self._trim_if_needed()
 
-    def _trim_if_needed(self) -> None:
+    def _trim_if_needed() -> None:
         if len(self.history) > self.max_history:
-            # Keep earliest context or slide window from end
             self.history = self.history[-self.max_history:]
 
     def to_openai_payload(self) -> list[dict[str, str]]:
@@ -224,77 +219,90 @@ class ConversationBuffer:
 		}
 	],
 	testSuite: {
-		title: 'Streaming Test Suite with Async Generator Mocks (pytest)',
-		testFilePath: 'tests/test_streaming.py',
-		command: 'pytest -v tests/test_streaming.py',
-		executionTimeSec: 0.73,
+		title: 'Flask Streaming Test Suite with Generator Mocks (pytest)',
+		testFilePath: 'tests/test_streaming_blueprint.py',
+		command: 'pytest -v tests/test_streaming_blueprint.py',
+		executionTimeSec: 0.58,
 		testCode: `import pytest
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import MagicMock
+from app import create_app
 from app.services.conversation import ConversationBuffer
 
 @pytest.fixture
-def conversation():
-    return ConversationBuffer(system_prompt="You are a helpful assistant.", max_history_messages=4)
+def app():
+    app = create_app()
+    app.config.update({"TESTING": True})
+    return app
 
-def test_conversation_buffer_trims_correctly(conversation):
+@pytest.fixture
+def client(app):
+    return app.test_client()
+
+def test_conversation_buffer_trims_correctly():
+    buf = ConversationBuffer(system_prompt="System instructions.", max_history_messages=4)
     for i in range(10):
-        conversation.add_user_message(f"Message {i}")
+        buf.add_user_message(f"Message {i}")
 
-    payload = conversation.to_openai_payload()
+    payload = buf.to_openai_payload()
     # 1 system message + 4 trimmed messages = 5
     assert len(payload) == 5
     assert payload[0]["role"] == "system"
     assert payload[-1]["content"] == "Message 9"
     assert payload[1]["content"] == "Message 6"
 
-@pytest.mark.asyncio
-async def test_streaming_generator_yields_all_tokens(mocker):
-    # Mocking OpenAI async streaming chunks
+def test_streaming_endpoint_sse_headers(client, app, mocker):
     mock_chunk1 = MagicMock()
     mock_chunk1.choices = [MagicMock(delta=MagicMock(content="Hello"))]
     mock_chunk2 = MagicMock()
-    mock_chunk2.choices = [MagicMock(delta=MagicMock(content=" world!"))]
+    mock_chunk2.choices = [MagicMock(delta=MagicMock(content=" world"))]
 
-    async def mock_stream_gen():
+    def mock_stream():
         yield mock_chunk1
         yield mock_chunk2
 
     mock_client = mocker.MagicMock()
-    mock_client.chat.completions.create = mocker.AsyncMock(return_value=mock_stream_gen())
+    mock_client.chat.completions.create.return_value = mock_stream()
+    app.extensions["openai_client"] = mock_client
 
-    # Consume the generator
-    tokens = []
-    stream = await mock_client.chat.completions.create(model="gpt-4o-mini", stream=True)
-    async for chunk in stream:
-        tokens.append(chunk.choices[0].delta.content)
-
-    assert "".join(tokens) == "Hello world!"`,
+    res = client.post("/api/chat/stream", json={"prompt": "Say hello"})
+    assert res.status_code == 200
+    assert res.headers["Content-Type"] == "text/event-stream; charset=utf-8"
+    assert res.headers["X-Accel-Buffering"] == "no"
+    
+    # Verify yielded SSE chunks
+    text_data = res.get_data(as_text=True)
+    assert 'data: {"token": "Hello"}' in text_data
+    assert 'data: {"token": " world"}' in text_data
+    assert 'data: [DONE]' in text_data`,
 		simulatedStdout: `============================= test session starts ==============================
 platform win32 -- Python 3.13.0, pytest-9.0.1, pluggy-1.5.0
 rootdir: d:\\Web Projects\\Static\\python-ai-lab
-plugins: anyio-4.6.2, mock-3.17.0, cov-7.1.0
+plugins: mock-3.17.0, cov-7.1.0
 collected 2 items
 
-tests/test_streaming.py::test_conversation_buffer_trims_correctly PASSED [ 50%]
-tests/test_streaming.py::test_streaming_generator_yields_all_tokens PASSED [100%]
+tests/test_streaming_blueprint.py::test_conversation_buffer_trims_correctly PASSED [ 50%]
+tests/test_streaming_blueprint.py::test_streaming_endpoint_sse_headers PASSED [100%]
 
 ---------- coverage: platform win32, python 3.13.0 -----------
 Name                            Stmts   Miss  Cover   Missing
 -------------------------------------------------------------
+app/blueprints/chat.py             21      0   100%
 app/core/openai_client.py          14      0   100%
 app/services/conversation.py       22      0   100%
 -------------------------------------------------------------
-TOTAL                              36      0   100%
+TOTAL                              57      0   100%
 
-============================== 2 passed in 0.73s ===============================`,
+============================== 2 passed in 0.58s ===============================`,
 		coverage: {
 			files: [
+				{ name: 'app/blueprints/chat.py', stmts: 21, miss: 0, cover: '100%', missing: '' },
 				{ name: 'app/core/openai_client.py', stmts: 14, miss: 0, cover: '100%', missing: '' },
 				{ name: 'app/services/conversation.py', stmts: 22, miss: 0, cover: '100%', missing: '' }
 			],
-			total: { stmts: 36, miss: 0, cover: '100%' }
+			total: { stmts: 57, miss: 0, cover: '100%' }
 		},
-		summary: 'All 2 tests passed. 100% coverage on streaming generator mocks and memory buffers.'
+		summary:
+			'All 2 tests passed. 100% coverage on Flask stream_with_context SSE endpoint and memory buffers.'
 	},
 	interactiveComponent: 'chat'
 };

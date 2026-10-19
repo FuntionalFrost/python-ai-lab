@@ -17,7 +17,7 @@ export const track08: CurriculumLesson = {
 		'Domain Exceptions vs Raw API Leakage',
 		'Modern CI & Deterministic Toolchains (uv + pytest + pytest-cov)'
 	],
-	frameworks: ['litestar>=2.24.0', 'openai>=3.35.1', 'pydantic-settings>=2.16.0', 'tenacity', 'uv'],
+	frameworks: ['Flask 3.1.3', 'OpenAI 1.x', 'pydantic-settings>=2.16.0', 'tenacity', 'uv'],
 	tags: ['Production', 'Refactoring', 'Resilience', 'Tenacity', 'Architecture'],
 	summary:
 		'Transition a fragile "Jupyter notebook / hackathon prototype" into an enterprise-grade AI microservice. Walk through the four architectural pillars: strict settings, pooled asynchronous clients, resilient circuit breakers with exponential retries, and comprehensive CI test suites.',
@@ -106,28 +106,32 @@ def ask():
     )
 
     return jsonify({"answer": response.choices[0].message.content})`,
-			rightTitle: 'Production Architecture (Litestar + DI + Tenacity)',
+			rightTitle: 'Production Architecture (Flask 3.x + Tenacity + Service Layer)',
 			rightLanguage: 'python',
-			rightCode: `from litestar import Controller, post
+			rightCode: `from flask import Blueprint, request, jsonify, current_app
+from pydantic import ValidationError
 from app.schemas.chat import ChatPrompt, ChatResult
 from app.services.resilient_chat import ResilientChatService
 
-class ProductionChatController(Controller):
-    path = "/api/ask"
+ask_bp = Blueprint("ask", __name__)
 
-    @post()
-    async def ask(
-        self,
-        data: ChatPrompt,
-        service: ResilientChatService # Injected singleton with connection pool
-    ) -> ChatResult:
-        """
-        Input validated via ChatPrompt DTO.
-        Client uses shared connection pool.
-        Tenacity retries transient errors with exponential jitter.
-        Returns clean domain response or fallback on failure.
-        """
-        return await service.ask_with_retry(data.prompt)`
+@ask_bp.post("/api/ask")
+def ask():
+    """
+    Input validated via ChatPrompt Pydantic schema.
+    OpenAI client uses shared connection pool from app extensions.
+    Tenacity retries transient 429/5xx errors with exponential jitter.
+    Returns structured domain response or fallback on failure.
+    """
+    json_data = request.get_json(silent=True) or {}
+    try:
+        data = ChatPrompt.model_validate(json_data)
+    except ValidationError as err:
+        return jsonify({"errors": err.errors()}), 422
+
+    service: ResilientChatService = current_app.extensions["resilient_chat_service"]
+    result: ChatResult = service.ask_with_retry(data.prompt)
+    return jsonify(result.model_dump()), 200`
 		},
 		{
 			title: 'Resilience Strategy: Raw Try/Except vs. Tenacity Decorator',

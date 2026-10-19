@@ -35,12 +35,10 @@
 			</h1>
 
 			<p class="text-sm leading-relaxed text-zinc-300 sm:text-base">
-				Move beyond hackathon scripts and untyped prototypes. Learn clean architecture with <strong
-					class="font-semibold text-white">Flask 3.x</strong
-				>
-				and <strong class="font-semibold text-white">Litestar 2.24</strong>, strict configuration
-				with <strong class="font-semibold text-white">Pydantic v2</strong>, streaming SSE pipelines,
-				multi-turn tool calling, RAG retrieval, and 90%+ code coverage with
+				Move beyond hackathon scripts and untyped prototypes. Master production-grade AI engineering
+				with <strong class="font-semibold text-white">Flask 3.x</strong>, strict configuration with
+				<strong class="font-semibold text-white">Pydantic v2</strong>, real-time SSE streaming
+				pipelines, multi-turn tool calling, RAG retrieval, and 90%+ code coverage with
 				<strong class="font-semibold text-white">pytest-mock</strong> and
 				<strong class="font-semibold text-white">uv</strong>.
 			</p>
@@ -51,7 +49,7 @@
 					href="/module/01-frameworks-mvc"
 					class="flex items-center gap-2 rounded-xl bg-linear-to-r from-cyan-500 to-emerald-500 px-5 py-3 text-xs font-semibold text-zinc-950 shadow-lg shadow-cyan-500/20 transition-all hover:opacity-95 sm:text-sm"
 				>
-					<span>Start Track 1: Flask vs. Litestar</span>
+					<span>Start Track 1: Modern Flask Architecture</span>
 					<ArrowRight class="h-4 w-4" />
 				</a>
 
