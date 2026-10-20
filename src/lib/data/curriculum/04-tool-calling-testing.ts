@@ -85,6 +85,11 @@ The backend application is strictly responsible for:
 				name: 'pytest-mock AsyncMock',
 				description:
 					'Simulating AsyncOpenAI.chat.completions.create to verify that the tool call was made with exact expected arguments without network calls.'
+			},
+			{
+				name: 'Human Linguistic Entropy in Tool Calling',
+				description:
+					'Real users never speak like API documentation. They use abbreviations ("lax"), colloquial units ("in C"), and missing parameters. Designing Pydantic schemas with flexible aliases and pre-validators prepares your application for authentic human dialogue.'
 			}
 		]
 	},

@@ -1,11 +1,11 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track09: CurriculumLesson = {
-	id: 'track-09',
-	slug: '09-migrating-flask-to-litestar',
-	trackNumber: 9,
-	title: 'Migrating from Flask to Litestar',
-	shortTitle: 'Flask to Litestar Migration',
+export const track10: CurriculumLesson = {
+	id: 'track-10',
+	slug: '10-migrating-flask-to-litestar',
+	trackNumber: 10,
+	title: 'Scale-Up Architecture: Migrating from Flask to Litestar (ASGI)',
+	shortTitle: 'Scale-Up: Flask to Litestar',
 	subtitle:
 		'Step-by-Step Refactoring: Blueprints to Controllers, Threadpool WSGI to ASGI, and Manual Validation to DTOs',
 	level: 'Advanced',

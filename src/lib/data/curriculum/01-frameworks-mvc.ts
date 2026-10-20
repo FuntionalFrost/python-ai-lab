@@ -4,7 +4,7 @@ export const track01: CurriculumLesson = {
 	id: 'track-01',
 	slug: '01-frameworks-mvc',
 	trackNumber: 1,
-	title: 'Modern Flask 3.x Architecture: Application Factory & Clean MVC',
+	title: 'Application Factory & Clean MVC',
 	shortTitle: 'Modern Flask Architecture',
 	subtitle: 'Application Factories, Modular Blueprints, Service Layering, and Scalable AI APIs',
 	level: 'Beginner',

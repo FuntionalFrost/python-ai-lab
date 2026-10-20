@@ -1,9 +1,9 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track10: CurriculumLesson = {
-	id: 'track-10',
-	slug: '10-moving-litestar-to-sveltekit',
-	trackNumber: 10,
+export const track09: CurriculumLesson = {
+	id: 'track-09',
+	slug: '09-connecting-flask-to-sveltekit',
+	trackNumber: 9,
 	title: 'Connecting Flask to SvelteKit (Full-Stack AI Integration)',
 	shortTitle: 'Flask to SvelteKit Full-Stack',
 	subtitle:

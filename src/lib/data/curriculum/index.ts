@@ -7,8 +7,8 @@ import { track05 } from './05-rag-pipelines';
 import { track06 } from './06-agent-harnesses';
 import { track07 } from './07-evals-benchmarks';
 import { track08 } from './08-prototype-to-production';
-import { track09 } from './09-migrating-flask-to-litestar';
-import { track10 } from './10-moving-litestar-to-sveltekit';
+import { track09 } from './09-connecting-flask-to-sveltekit';
+import { track10 } from './10-migrating-flask-to-litestar';
 
 export const ALL_TRACKS: CurriculumLesson[] = [
 	track01,
