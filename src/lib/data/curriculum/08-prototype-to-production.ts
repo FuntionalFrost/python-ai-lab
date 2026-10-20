@@ -341,5 +341,5 @@ TOTAL                               32      1    96%
 		summary:
 			'All 2 tests passed. 96% coverage validating Gunicorn timeout resilience, Tenacity retries, and multi-model fallback degradation.'
 	},
-	interactiveComponent: 'code-comparison'
+	interactiveComponent: 'benchmark'
 };

@@ -62,7 +62,7 @@ def stream_chat():
 	<!-- Technical Reference Section -->
 	<div class="grid grid-cols-1 gap-6 pt-4 lg:grid-cols-2">
 		<!-- Left: SSE Protocol Guide -->
-		<div class="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+		<div class="min-w-0 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
 			<div class="flex items-center gap-2">
 				<Zap class="h-5 w-5 text-cyan-400" />
 				<h3 class="text-sm font-bold tracking-wide text-zinc-100 uppercase">
@@ -94,8 +94,8 @@ def stream_chat():
 		</div>
 
 		<!-- Right: Flask Reference Code -->
-		<div class="space-y-2">
-			<div class="flex items-center justify-between">
+		<div class="min-w-0 space-y-2">
+			<div class="flex flex-wrap items-center justify-between gap-2">
 				<span class="text-xs font-semibold text-zinc-300"
 					>Flask 3.x stream_with_context Endpoint</span
 				>

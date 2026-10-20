@@ -52,26 +52,28 @@
 			</div>
 
 			<!-- Mobile Tab Switcher -->
-			<div class="flex items-center gap-1 rounded-lg bg-zinc-800/80 p-1 md:hidden">
+			<div class="flex min-w-0 items-center gap-1 rounded-lg bg-zinc-800/80 p-1 md:hidden">
 				<button
 					type="button"
 					onclick={() => (activeMobileTab = 'left')}
-					class="flex-1 rounded-md px-3 py-1 text-xs font-medium transition-colors {activeMobileTab ===
+					class="min-w-0 flex-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors {activeMobileTab ===
 					'left'
 						? 'bg-zinc-700 text-white shadow'
 						: 'text-zinc-400 hover:text-zinc-200'}"
+					title={leftTitle}
 				>
-					{leftTitle}
+					<span class="block truncate">{leftTitle}</span>
 				</button>
 				<button
 					type="button"
 					onclick={() => (activeMobileTab = 'right')}
-					class="flex-1 rounded-md px-3 py-1 text-xs font-medium transition-colors {activeMobileTab ===
+					class="min-w-0 flex-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors {activeMobileTab ===
 					'right'
 						? 'bg-zinc-700 text-white shadow'
 						: 'text-zinc-400 hover:text-zinc-200'}"
+					title={rightTitle}
 				>
-					{rightTitle}
+					<span class="block truncate">{rightTitle}</span>
 				</button>
 			</div>
 		</div>

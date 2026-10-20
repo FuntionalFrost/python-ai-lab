@@ -148,7 +148,9 @@
 			{@const isActive = currentStep === step}
 			{@const isPassed = stepIndex(currentStep) > i}
 			<div
-				class="flex flex-col items-center rounded-xl border p-3 text-center transition-all {isActive
+				class="flex flex-col items-center rounded-xl border p-3 text-center transition-all {i === 4
+					? 'col-span-2 md:col-span-1'
+					: ''} {isActive
 					? 'border-cyan-500 bg-cyan-500/10 text-cyan-300 shadow-md shadow-cyan-500/10'
 					: isPassed
 						? 'border-emerald-500/30 bg-emerald-500/5 text-emerald-400'
@@ -193,7 +195,7 @@
 					<span>Stage 1: User Request Ingested</span>
 				</div>
 				<div
-					class="rounded-lg border border-zinc-800 bg-zinc-950 p-4 font-mono text-xs text-zinc-200"
+					class="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-950 p-4 font-mono text-xs text-zinc-200"
 				>
 					{#if isInjectingError}
 						"What is the current temperature in Vienna in kelvin?"
@@ -213,7 +215,7 @@
 					<span>Stage 2: Model Proposes Tool Call</span>
 				</div>
 				<div
-					class="rounded-lg border border-zinc-800 bg-zinc-950 p-4 font-mono text-xs text-zinc-200"
+					class="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-950 p-4 font-mono text-xs text-zinc-200"
 				>
 					<span class="text-purple-400">tool_calls</span>: [
 					<br />&nbsp;&nbsp;&#123;
@@ -293,7 +295,7 @@
 					<span>Stage 4: Python Function Dispatched</span>
 				</div>
 				<div
-					class="rounded-lg border border-zinc-800 bg-zinc-950 p-4 font-mono text-xs text-zinc-200"
+					class="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-950 p-4 font-mono text-xs text-zinc-200"
 				>
 					{#if isInjectingError}
 						<span class="text-amber-400"># Tool execution bypassed due to validation error</span>

@@ -22,24 +22,26 @@
 				class="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3.5 py-1 text-xs font-semibold text-cyan-400"
 			>
 				<Sparkles class="h-3.5 w-3.5" />
-				<span>Curriculum for Modern Python Web & AI Engineers</span>
+				<span>Rapid Prototyping & Testing Lab for Python AI</span>
 			</div>
 
 			<h1 class="text-3xl leading-tight font-extrabold tracking-tight text-white sm:text-5xl">
-				Master Production-Grade <br />
+				Rapid Prototyping & Testing <br />
 				<span
 					class="bg-linear-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent"
 				>
-					Python AI Architectures
+					for Python AI Backends
 				</span>
 			</h1>
 
 			<p class="text-sm leading-relaxed text-zinc-300 sm:text-base">
-				Move beyond hackathon scripts and untyped prototypes. Master production-grade AI engineering
-				with <strong class="font-semibold text-white">Flask 3.x</strong>, strict configuration with
-				<strong class="font-semibold text-white">Pydantic v2</strong>, real-time SSE streaming
-				pipelines, multi-turn tool calling, RAG retrieval, and 90%+ code coverage with
-				<strong class="font-semibold text-white">pytest-mock</strong> and
+				Build, test, and iterate rapidly on AI prototypes. Master fast prototyping with
+				<strong class="font-semibold text-white">Flask 3.x</strong> and
+				<strong class="font-semibold text-white">Litestar</strong>, instant schema validation with
+				<strong class="font-semibold text-white">Pydantic v2</strong>, real-time streaming
+				playgrounds, and deterministic test harnesses using
+				<strong class="font-semibold text-white">pytest-mock</strong>
+				and
 				<strong class="font-semibold text-white">uv</strong>.
 			</p>
 
@@ -122,7 +124,7 @@
 		<div class="grid grid-cols-1 gap-5 md:grid-cols-2">
 			{#each ALL_TRACKS as track (track.id)}
 				<div
-					class="flex flex-col justify-between rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-lg transition-all hover:border-zinc-700 hover:bg-zinc-900/80"
+					class="group flex min-w-0 flex-col justify-between rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-lg transition-all hover:border-zinc-700 hover:bg-zinc-900/80"
 				>
 					<div class="space-y-4">
 						<!-- Card Header -->

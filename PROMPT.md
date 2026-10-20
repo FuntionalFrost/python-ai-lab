@@ -2,16 +2,16 @@
 
 You are an expert full-stack engineer and curriculum architect specializing in SvelteKit and modern Python web/AI architectures.
 
-Build a modular, interactive self-teaching platform called **"Python AI Lab"** using **SvelteKit**. The platform must provide interactive guides, side-by-side architecture comparisons, executable code patterns, testing suites, and playground interfaces for:
+Build a modular, interactive platform called **"Python AI Lab"** using **SvelteKit**, focused primarily on **prototyping, testing, and rapid iteration** (not production deployment or enterprise infrastructure). The platform must provide interactive guides, side-by-side architecture comparisons, executable code patterns, testing suites, and playground interfaces for:
 
-1. **Modern Python Web Frameworks:** Flask 3.x+ (modern application factory, Blueprints) vs. Litestar (async-first, dependency injection, DTOs, OpenAPI).
-2. **Architecture:** Clean Architecture & MVC patterns adapted for AI-native Python backends.
+1. **Modern Python Web Frameworks:** Rapid prototyping with Flask 3.x+ vs. Litestar (async-first, dependency injection, DTOs, OpenAPI).
+2. **Architecture:** Clean, modular patterns for fast prototyping in AI-native Python backends.
 3. **LLM Integrations:** Direct OpenAI SDK usage, streaming chat interfaces, JSON mode, and structured outputs with Pydantic v2.
 4. **Tool Calling & Testing:** Multi-turn function calling, schema generation, deterministic mock execution, and automated validation.
 5. **RAG & Agent Harnesses:** Vector search, contextual routing, agent evaluation harnesses, and trace testing.
-6. **Testing & Quality Engineering:** Unit and integration testing using `pytest`, `pytest-mock`, and `pytest-cov`.
-7. **Benchmarking & Eval:** Latency, tokens/sec, tool call accuracy, and judge-model scoring.
-8. **Lifecycle Engineering:** Anti-patterns in prototyping vs. production-grade configuration with `pydantic-settings`, connection pooling, retry strategies, and observability.
+6. **Testing & Quality Engineering:** Rapid test harnesses and deterministic unit/integration testing using `pytest`, `pytest-mock`, and `pytest-cov`.
+7. **Benchmarking & Eval:** Latency, tokens/sec, tool call accuracy, and judge-model scoring for prompt/model iterations.
+8. **Lifecycle & Iteration:** Fast prototyping patterns, prototype test harnesses, mock environments, and iterative refinement.
 
 ---
 
@@ -122,15 +122,15 @@ Build detailed, production-accurate technical lessons across 8 specific tracks:
 - Deterministic replay harness using recorded tool fixtures.
 - Integration testing with `pytest-mock` to assert the harness stops when target output is met or error conditions trigger.
 
-### Track 7: Benchmarking, Metrics & Model Evals
+### Track 7: Benchmarking, Metrics & User Satisfaction
 
-- **Latency & Throughput:** Time To First Token (TTFT), Inter-Token Latency (ITL), and total tokens/sec.
-- **Eval Strategies:**
-- Assertion-based checks (exact match, JSON schema validity).
-- Model-graded evaluation (LLM-as-a-Judge) using rubric scoring with structured Pydantic outputs.
-
-- **Code Coverage with `pytest-cov`:**
-- Configuring `.coveragerc` to exclude I/O boundaries while demanding 90%+ coverage on agent harnesses, routers, and prompt templates.
+- **Cross-Model Benchmarking:** Systematic evaluation across candidate LLM models (GPT-4o, GPT-4o-mini, Claude 3.5 Sonnet, Gemma 4, Llama 3.3) for latency, token economics, and qualitative response dynamics.
+- **Same-Model Benchmarking & Ablation:** Evaluating the same model across prompt variations, few-shot exemplars, temperature/hyperparameters, and Pydantic schema guardrails.
+- **Improving User Satisfaction at Prototype/Research Stage:**
+  - Measuring authentic conversational dynamics: ambiguity disambiguation (asking crisp questions vs. hallucinating), conversational repair on user reversal, tone, and empathy.
+  - Psychometric LLM-as-a-Judge rubrics returning structured Pydantic evaluations.
+- **Latency & Telemetry:** Time To First Token (TTFT), Inter-Token Latency (ITL), and perceived responsiveness.
+- **Automated Quality Gates:** Configuring `.coveragerc` and `pytest-mock` suites to enforce strict regression safety without altering frozen test prompts.
 
 ### Track 8: Prototyping vs. Production Engineering
 

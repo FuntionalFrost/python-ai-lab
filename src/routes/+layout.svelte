@@ -19,7 +19,7 @@
 			{
 				id: 'home',
 				label: 'Curriculum Overview',
-				description: 'Explore all 10 production engineering modules',
+				description: 'Explore all 10 prototyping, testing, and iteration modules',
 				icon: Layers,
 				shortcut: 'G H',
 				group: 'Navigation',
@@ -172,7 +172,7 @@
 								? 'border border-cyan-500/20 bg-cyan-500/10 font-semibold text-cyan-300'
 								: 'text-zinc-400 hover:bg-zinc-900/90 hover:text-zinc-200'}"
 						>
-							<div class="flex items-center gap-2 truncate">
+							<div class="flex min-w-0 items-center gap-2">
 								<span
 									class="flex h-5 w-5 shrink-0 items-center justify-center rounded font-mono text-[10px] {isCurrent
 										? 'bg-cyan-500/20 font-bold text-cyan-400'
@@ -184,7 +184,7 @@
 							</div>
 
 							<span
-								class="py-0.2 ml-1 shrink-0 rounded px-1.5 font-mono text-[9px] uppercase {track.level ===
+								class="ml-1 shrink-0 rounded px-1.5 py-0.5 font-mono text-[9px] uppercase {track.level ===
 								'Beginner'
 									? 'text-emerald-400/80'
 									: track.level === 'Intermediate'

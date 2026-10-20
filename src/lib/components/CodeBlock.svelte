@@ -87,7 +87,7 @@
 			<div class="flex min-w-full">
 				<!-- Line Numbers Gutter -->
 				<div
-					class="border-r border-zinc-800/60 bg-zinc-950/60 py-3 text-right text-zinc-600 select-none"
+					class="sticky left-0 z-10 border-r border-zinc-800/60 bg-zinc-950 py-3 text-right text-zinc-600 select-none"
 					aria-hidden="true"
 				>
 					{#each lines as _line, i (i)}

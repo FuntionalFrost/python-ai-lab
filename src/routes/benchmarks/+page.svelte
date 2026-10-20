@@ -98,15 +98,15 @@ exclude_lines =
 	<div class="border-b border-zinc-800/80 pb-6">
 		<div class="mb-1 flex items-center gap-2 font-mono text-xs text-emerald-400">
 			<Activity class="h-4 w-4" />
-			<span>Telemetry, Psychology & Multi-Model Quality Engineering</span>
+			<span>Prototype Benchmarking, Psychology & Model Evaluation</span>
 		</div>
 		<h1 class="text-2xl font-extrabold tracking-tight text-white sm:text-4xl">
-			Evaluations, Latency & Multi-Model Benchmarks
+			Prototype Benchmarks & User Satisfaction Lab
 		</h1>
 		<p class="mt-2 max-w-3xl text-sm text-zinc-300">
-			Move beyond impressionistic "vibe checks" and benchmark laundering. Measure real-world
-			concurrency scaling (WSGI vs ASGI), evaluate candidate models against frozen real-user
-			prompts, and tune system-level engineering levers using
+			Benchmark prototypes across different LLM models and systematically benchmark the same model
+			across prompt and schema variations. Focus on empirical testing to maximize real human
+			satisfaction at the prototype and research stage before committing to production designs using
 			<strong class="font-semibold text-white">openai</strong>,
 			<strong class="font-semibold text-white">pydantic</strong>, and
 			<strong class="font-semibold text-white">pydantic-settings</strong>.
@@ -119,35 +119,36 @@ exclude_lines =
 	<!-- Evaluation Strategy Pillars -->
 	<div class="space-y-6 pt-4">
 		<div>
-			<h2 class="text-lg font-bold text-zinc-100">Core Evaluation & System Hardening Pillars</h2>
+			<h2 class="text-lg font-bold text-zinc-100">Prototype Evaluation & Satisfaction Pillars</h2>
 			<p class="text-xs text-zinc-400">
-				The 4 architectural cornerstones of empirical, real-user AI evaluation and continuous
-				improvement.
+				The 4 architectural cornerstones of empirical, real-user evaluation and iterative model
+				tuning at the prototype stage.
 			</p>
 		</div>
 
 		<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-			<!-- Pillar 1: Multi-Model Evaluation Harness -->
-			<div class="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+			<!-- Pillar 1: Cross-Model & Same-Model Evaluation Harness -->
+			<div class="min-w-0 space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
 				<div class="flex items-center gap-2">
 					<Sliders class="h-5 w-5 text-cyan-400" />
 					<h3 class="text-sm font-bold tracking-wide text-zinc-100 uppercase">
-						Multi-Model Harness with pydantic-settings
+						Cross-Model & Intra-Model Benchmarking
 					</h3>
 				</div>
 				<p class="text-xs leading-relaxed text-zinc-400">
-					Automates side-by-side benchmarking across multiple candidate models using frozen,
-					unlaundered user test cases, logging psychometric satisfaction scores to telemetry stores.
+					Automates side-by-side benchmarking across candidate models (GPT-4o, Claude, Gemma, Llama)
+					and tests the same model across prompt and hyperparameter ablations using frozen real-user
+					test cases.
 				</p>
 				<CodeBlock code={multiModelRunnerSnippet} language="python" title="app/evals/runner.py" />
 			</div>
 
 			<!-- Pillar 2: Psychometric Satisfaction Judge -->
-			<div class="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+			<div class="min-w-0 space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
 				<div class="flex items-center gap-2">
 					<Scale class="h-5 w-5 text-purple-400" />
 					<h3 class="text-sm font-bold tracking-wide text-zinc-100 uppercase">
-						Psychometric User Satisfaction Rubric
+						Research-Stage User Satisfaction Rubric
 					</h3>
 				</div>
 				<p class="text-xs leading-relaxed text-zinc-400">
@@ -163,7 +164,7 @@ exclude_lines =
 			</div>
 
 			<!-- Pillar 3: Hardened Tool Calling with Pydantic -->
-			<div class="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+			<div class="min-w-0 space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
 				<div class="flex items-center gap-2">
 					<Wrench class="h-5 w-5 text-emerald-400" />
 					<h3 class="text-sm font-bold tracking-wide text-zinc-100 uppercase">
@@ -178,7 +179,7 @@ exclude_lines =
 			</div>
 
 			<!-- Pillar 4: CI Quality Gate -->
-			<div class="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+			<div class="min-w-0 space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
 				<div class="flex items-center gap-2">
 					<ShieldCheck class="h-5 w-5 text-amber-400" />
 					<h3 class="text-sm font-bold tracking-wide text-zinc-100 uppercase">

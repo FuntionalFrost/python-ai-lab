@@ -239,12 +239,13 @@
 			<div class="flex items-center gap-2">
 				<Activity class="h-5 w-5 text-cyan-400" />
 				<h3 class="text-base font-semibold text-zinc-100">
-					Telemetry, Multi-Model Evals & Tuning Levers
+					Prototype Benchmarking, Cross-Model Evals & User Satisfaction
 				</h3>
 			</div>
 			<p class="mt-1 text-xs text-zinc-400">
-				Empirical benchmarking comparing WSGI vs ASGI concurrency, multi-model real-user
-				satisfaction, and system hardening levers.
+				Empirical benchmarking comparing WSGI vs ASGI concurrency, evaluating performance across
+				different LLMs, and tuning the same model to maximize user satisfaction at the
+				prototype/research stage.
 			</p>
 		</div>
 
@@ -277,7 +278,7 @@
 					? 'bg-cyan-600 text-white shadow'
 					: 'text-zinc-400 hover:text-zinc-200'}"
 			>
-				Multi-Model Evals
+				Cross-Model Evals
 			</button>
 			<button
 				type="button"
@@ -288,7 +289,7 @@
 					: 'text-emerald-400 hover:text-emerald-300'}"
 			>
 				<Sliders class="h-3.5 w-3.5" />
-				<span>Tuning Levers</span>
+				<span>Same-Model Tuning & Satisfaction</span>
 			</button>
 		</div>
 	</div>
@@ -410,7 +411,7 @@
 			</div>
 
 			<!-- Dynamic LineChart -->
-			<div class="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+			<div class="benchmark-chart rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
 				<div class="mb-3 flex items-center justify-between">
 					<div>
 						<span class="text-xs font-semibold text-zinc-300">Throughput Scaling Curve</span>
@@ -480,7 +481,7 @@
 			</div>
 
 			<!-- Dynamic LineChart -->
-			<div class="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+			<div class="benchmark-chart rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
 				<div class="mb-3 flex items-center justify-between">
 					<div>
 						<span class="text-xs font-semibold text-zinc-300">TTFT Queueing Latency Curve</span>
@@ -510,7 +511,7 @@
 		<!-- Multi-Model Real-User Evals View -->
 		<div class="space-y-6">
 			<!-- Visual BarChart -->
-			<div class="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+			<div class="benchmark-chart rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
 				<div class="mb-3 flex items-center justify-between">
 					<div>
 						<span class="text-xs font-semibold text-zinc-200"
@@ -534,7 +535,7 @@
 
 			<!-- Detailed Breakdown Table -->
 			<div class="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900/30 p-2">
-				<table class="w-full text-left text-xs text-zinc-300">
+				<table class="w-full min-w-[680px] text-left text-xs text-zinc-300">
 					<thead
 						class="border-b border-zinc-800 font-mono text-[11px] tracking-wider text-zinc-500 uppercase"
 					>

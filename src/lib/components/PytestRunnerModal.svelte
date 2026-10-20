@@ -21,6 +21,8 @@
 	let withCoverage = $state(true);
 	let outputLines = $state<string[]>([]);
 
+	const isVitest = $derived(testSuite.command.startsWith('vitest'));
+
 	function startTestExecution() {
 		isRunning = true;
 		isComplete = false;
@@ -29,30 +31,46 @@
 		const rawLines = testSuite.simulatedStdout.split('\n');
 
 		// Modify command line based on flags and runner
-		const runnerPrefix = useUv ? 'uv run pytest' : 'pytest';
-		const flagStr = `${isVerbose ? '-v ' : ''}${withCoverage ? '--cov=app ' : ''}`;
-		outputLines = [`$ ${runnerPrefix} ${flagStr}${testSuite.testFilePath}`];
+		const commandLine = isVitest
+			? `$ pnpm vitest run ${withCoverage ? '--coverage ' : ''}${testSuite.testFilePath}`
+			: `$ ${useUv ? 'uv run pytest' : 'pytest'} ${isVerbose ? '-v ' : ''}${withCoverage ? '--cov=app ' : ''}${testSuite.testFilePath}`;
+		outputLines = [commandLine];
 
 		let lineIndex = 0;
 		const interval = setInterval(() => {
 			if (lineIndex < rawLines.length) {
 				let line = rawLines[lineIndex];
-				if (simulateFailure && line.includes('PASSED [100%]')) {
-					line = line.replace('PASSED [100%]', 'FAILED [100%]');
+				if (simulateFailure) {
+					if (line.includes('PASSED [100%]')) {
+						line = line.replace('PASSED [100%]', 'FAILED [100%]');
+					} else if (line.includes('✓')) {
+						line = line.replace('✓', '✕');
+					}
 				}
 				outputLines = [...outputLines, line];
 				lineIndex++;
 			} else {
 				clearInterval(interval);
 				if (simulateFailure) {
-					outputLines = [
-						...outputLines,
-						'',
-						'============================== FAILURES ==============================',
-						`___ test_edge_case_failure ___`,
-						`AssertionError: Expected status 200, got 422: Validation error on input`,
-						'========================= 1 failed, 1 passed in 0.92s ========================='
-					];
+					if (isVitest) {
+						outputLines = [
+							...outputLines,
+							'',
+							'FAIL tests/server/chat_stream.test.ts > SvelteKit Streaming Endpoint (+server.ts)',
+							'AssertionError: expected status 500 to be 200 // Object.is equality',
+							'Test Files  1 failed (1)',
+							'     Tests  1 failed (1)'
+						];
+					} else {
+						outputLines = [
+							...outputLines,
+							'',
+							'============================== FAILURES ==============================',
+							`___ test_edge_case_failure ___`,
+							`AssertionError: Expected status 200, got 422: Validation error on input`,
+							'========================= 1 failed, 1 passed in 0.92s ========================='
+						];
+					}
 				}
 				isRunning = false;
 				isComplete = true;
@@ -98,7 +116,9 @@
 				</div>
 				<div class="ml-3 flex items-center gap-2 font-mono text-xs text-zinc-300">
 					<Terminal class="h-3.5 w-3.5 text-cyan-400" />
-					<span class="font-semibold text-zinc-200">pytest execution terminal</span>
+					<span class="font-semibold text-zinc-200">
+						{isVitest ? 'vitest execution terminal' : 'pytest execution terminal'}
+					</span>
 					<span class="text-zinc-500">|</span>
 					<span class="max-w-xs truncate text-zinc-400">{testSuite.testFilePath}</span>
 				</div>
@@ -126,26 +146,28 @@
 		<div
 			class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800/80 bg-zinc-900/50 px-4 py-2 text-xs"
 		>
-			<div class="flex items-center gap-4 text-zinc-400">
-				<label class="flex cursor-pointer items-center gap-1.5 select-none">
-					<input
-						type="checkbox"
-						bind:checked={useUv}
-						disabled={isRunning}
-						class="rounded border-zinc-700 bg-zinc-800 text-purple-500 focus:ring-0"
-					/>
-					<span class="font-mono text-xs font-semibold text-purple-300">uv run</span>
-				</label>
+			<div class="flex flex-wrap items-center gap-3 text-zinc-400">
+				{#if !isVitest}
+					<label class="flex cursor-pointer items-center gap-1.5 select-none">
+						<input
+							type="checkbox"
+							bind:checked={useUv}
+							disabled={isRunning}
+							class="rounded border-zinc-700 bg-zinc-800 text-purple-500 focus:ring-0"
+						/>
+						<span class="font-mono text-xs font-semibold text-purple-300">uv run</span>
+					</label>
 
-				<label class="flex cursor-pointer items-center gap-1.5 select-none">
-					<input
-						type="checkbox"
-						bind:checked={isVerbose}
-						disabled={isRunning}
-						class="rounded border-zinc-700 bg-zinc-800 text-cyan-500 focus:ring-0"
-					/>
-					<span class="font-mono text-xs text-zinc-300">-v (Verbose)</span>
-				</label>
+					<label class="flex cursor-pointer items-center gap-1.5 select-none">
+						<input
+							type="checkbox"
+							bind:checked={isVerbose}
+							disabled={isRunning}
+							class="rounded border-zinc-700 bg-zinc-800 text-cyan-500 focus:ring-0"
+						/>
+						<span class="font-mono text-xs text-zinc-300">-v (Verbose)</span>
+					</label>
+				{/if}
 
 				<label class="flex cursor-pointer items-center gap-1.5 select-none">
 					<input
@@ -154,7 +176,9 @@
 						disabled={isRunning}
 						class="rounded border-zinc-700 bg-zinc-800 text-emerald-500 focus:ring-0"
 					/>
-					<span class="font-mono text-xs text-zinc-300">--cov (Coverage)</span>
+					<span class="font-mono text-xs text-zinc-300">
+						{isVitest ? '--coverage' : '--cov (Coverage)'}
+					</span>
 				</label>
 
 				<label class="flex cursor-pointer items-center gap-1.5 select-none">
@@ -181,22 +205,22 @@
 
 		<!-- Terminal Body -->
 		<div
-			class="min-h-75 flex-1 overflow-y-auto bg-zinc-950 p-4 font-mono text-xs leading-relaxed text-zinc-300 select-text"
+			class="min-h-[280px] flex-1 overflow-x-auto overflow-y-auto bg-zinc-950 p-4 font-mono text-xs leading-relaxed text-zinc-300 select-text"
 		>
 			{#each outputLines as line, idx (idx)}
-				{#if line.includes('PASSED')}
+				{#if line.includes('PASSED') || line.includes('✓')}
 					<div class="text-emerald-400">
 						{line}
 					</div>
-				{:else if line.includes('FAILED') || line.includes('AssertionError')}
+				{:else if line.includes('FAILED') || line.includes('AssertionError') || line.includes('FAIL') || line.includes('✕')}
 					<div class="font-semibold text-red-400">
 						{line}
 					</div>
-				{:else if line.startsWith('tests/')}
+				{:else if line.startsWith('tests/') || line.startsWith('src/')}
 					<div class="text-zinc-200">
 						{line}
 					</div>
-				{:else if line.includes('coverage:') || line.includes('TOTAL')}
+				{:else if line.includes('coverage:') || line.includes('TOTAL') || line.includes('All files')}
 					<div class="font-semibold text-cyan-300">
 						{line}
 					</div>
@@ -204,7 +228,7 @@
 					<div class="mb-2 font-bold text-zinc-400">
 						{line}
 					</div>
-				{:else if line.includes('== 2 passed') || line.includes('== 4 passed')}
+				{:else if line.includes('== 2 passed') || line.includes('== 4 passed') || line.includes('Test Files  1 passed') || line.includes('Tests  1 passed')}
 					<div class="my-1 font-bold text-emerald-400">
 						{line}
 					</div>

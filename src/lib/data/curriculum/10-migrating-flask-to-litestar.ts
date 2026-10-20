@@ -306,5 +306,5 @@ TOTAL                              38      1    97%
 		summary:
 			'All 2 tests passed. 97% test coverage confirming complete parity with legacy Flask behavior and enhanced validation guards.'
 	},
-	interactiveComponent: 'code-comparison'
+	interactiveComponent: 'benchmark'
 };

@@ -39,7 +39,7 @@
 				<span class="font-bold text-cyan-400">Track {track.trackNumber} of {ALL_TRACKS.length}</span
 				>
 			</div>
-			<h1 class="text-2xl font-extrabold tracking-tight text-white sm:text-4xl">
+			<h1 class="text-2xl font-extrabold tracking-tight break-words text-white sm:text-4xl">
 				{track.title}
 			</h1>
 			<p class="text-sm text-zinc-300">
@@ -48,14 +48,14 @@
 		</div>
 
 		<div class="flex flex-wrap items-center gap-2">
-			<!-- Run Pytest Action Button -->
+			<!-- Run Test Action Button -->
 			<button
 				type="button"
 				onclick={() => (isPytestModalOpen = true)}
 				class="flex items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20 transition-all hover:from-emerald-500 hover:to-teal-500"
 			>
 				<Terminal class="h-4 w-4" />
-				<span>Run pytest Suite</span>
+				<span>Run {track.testSuite.command.startsWith('vitest') ? 'Vitest' : 'pytest'} Suite</span>
 			</button>
 		</div>
 	</div>
@@ -76,9 +76,12 @@
 		</div>
 		<div>
 			<span class="block text-[10px] text-zinc-500 uppercase">Framework Focus</span>
-			<span class="mt-0.5 inline-block truncate font-bold text-cyan-400"
-				>{track.frameworks.slice(0, 2).join(', ')}</span
+			<span
+				class="mt-0.5 block max-w-full truncate font-bold text-cyan-400"
+				title={track.frameworks.slice(0, 2).join(', ')}
 			>
+				{track.frameworks.slice(0, 2).join(', ')}
+			</span>
 		</div>
 		<div>
 			<span class="block text-[10px] text-zinc-500 uppercase">Test Suite Coverage</span>
@@ -121,7 +124,7 @@
 			<div
 				class="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950 p-5 font-mono text-xs leading-relaxed text-cyan-300 shadow-xl"
 			>
-				<pre class="select-all">{track.architecture.diagram}</pre>
+				<pre class="min-w-fit select-all">{track.architecture.diagram}</pre>
 			</div>
 		{/if}
 
@@ -235,7 +238,7 @@
 
 		{#each track.codeSnippets as snippet (snippet.id)}
 			<div class="space-y-2">
-				<div class="flex items-center justify-between">
+				<div class="flex flex-wrap items-center justify-between gap-2">
 					<span class="text-xs font-semibold text-zinc-200">{snippet.title}</span>
 					<span class="font-mono text-[11px] text-zinc-500">{snippet.filePath}</span>
 				</div>
@@ -253,7 +256,11 @@
 			<div>
 				<h2 class="flex items-center gap-2 text-xl font-bold text-zinc-100">
 					<Terminal class="h-5 w-5 text-emerald-400" />
-					<span>Accompanying Test Suite (pytest + pytest-mock)</span>
+					<span>
+						Accompanying Test Suite ({track.testSuite.command.startsWith('vitest')
+							? 'Vitest + Web Streams'
+							: 'pytest + pytest-mock'})
+					</span>
 				</h2>
 				<p class="mt-1 text-xs text-zinc-400">
 					Deterministic unit & integration tests validating domain invariants without network calls.
@@ -271,7 +278,7 @@
 		</div>
 
 		<div class="space-y-2">
-			<div class="flex items-center justify-between">
+			<div class="flex flex-wrap items-center justify-between gap-2">
 				<span class="text-xs font-semibold text-zinc-200">{track.testSuite.title}</span>
 				<span class="font-mono text-[11px] text-zinc-500">{track.testSuite.testFilePath}</span>
 			</div>
