@@ -205,7 +205,7 @@
 
 		<!-- Terminal Body -->
 		<div
-			class="min-h-[280px] flex-1 overflow-x-auto overflow-y-auto bg-zinc-950 p-4 font-mono text-xs leading-relaxed text-zinc-300 select-text"
+			class="min-h-70 flex-1 overflow-x-auto overflow-y-auto bg-zinc-950 p-4 font-mono text-xs leading-relaxed text-zinc-300 select-text"
 		>
 			{#each outputLines as line, idx (idx)}
 				{#if line.includes('PASSED') || line.includes('✓')}

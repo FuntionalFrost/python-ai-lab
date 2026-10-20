@@ -89,7 +89,7 @@
 	// Multi-Model Real-User Satisfaction & Tool-Calling Rubric Data
 	const multiModelChartData: ChartDataPoint[] = [
 		{
-			label: 'Messy Query Robustness',
+			label: 'Robustness',
 			gpt4o: 98.4,
 			claude35: 97.8,
 			gemma4: 93.2,
@@ -97,7 +97,7 @@
 			untyped: 58.2
 		},
 		{
-			label: 'Tool Parameter Precision',
+			label: 'Tool Precision',
 			gpt4o: 99.1,
 			claude35: 98.9,
 			gemma4: 95.8,
@@ -105,7 +105,7 @@
 			untyped: 64.0
 		},
 		{
-			label: 'Ambiguity Disambiguation',
+			label: 'Disambiguation',
 			gpt4o: 95.8,
 			claude35: 96.5,
 			gemma4: 90.2,
@@ -113,7 +113,7 @@
 			untyped: 51.5
 		},
 		{
-			label: 'Conversational Repair',
+			label: 'Conv. Repair',
 			gpt4o: 97.2,
 			claude35: 97.0,
 			gemma4: 91.5,
@@ -121,7 +121,7 @@
 			untyped: 48.0
 		},
 		{
-			label: 'Tone & De-escalation',
+			label: 'De-escalation',
 			gpt4o: 96.5,
 			claude35: 95.0,
 			gemma4: 91.8,
@@ -535,7 +535,7 @@
 
 			<!-- Detailed Breakdown Table -->
 			<div class="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900/30 p-2">
-				<table class="w-full min-w-[680px] text-left text-xs text-zinc-300">
+				<table class="w-full min-w-170 text-left text-xs text-zinc-300">
 					<thead
 						class="border-b border-zinc-800 font-mono text-[11px] tracking-wider text-zinc-500 uppercase"
 					>
@@ -733,14 +733,6 @@
 
 	:global(.benchmark-chart svg) {
 		overflow: visible !important;
-	}
-
-	:global(.benchmark-chart svg g text[text-anchor='middle']:first-child) {
-		text-anchor: start !important;
-	}
-
-	:global(.benchmark-chart svg g text[text-anchor='middle']:last-child) {
-		text-anchor: end !important;
 	}
 
 	:global(.benchmark-chart div:has(> svg) > div.absolute) {

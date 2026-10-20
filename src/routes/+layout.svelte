@@ -201,7 +201,7 @@
 	</aside>
 
 	<!-- Main Content Wrapper -->
-	<div class="flex flex-1 flex-col lg:pl-72">
+	<div class="flex min-w-0 flex-1 flex-col overflow-x-clip lg:pl-72">
 		<!-- Top Navigation Header -->
 		<header
 			class="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-zinc-800/80 bg-zinc-950/80 px-4 backdrop-blur-md md:px-8"
@@ -258,7 +258,7 @@
 		</header>
 
 		<!-- Page Content -->
-		<main class="mx-auto w-full max-w-7xl flex-1 p-4 md:p-8">
+		<main class="mx-auto w-full max-w-7xl min-w-0 flex-1 p-4 md:p-8">
 			{@render children()}
 		</main>
 	</div>

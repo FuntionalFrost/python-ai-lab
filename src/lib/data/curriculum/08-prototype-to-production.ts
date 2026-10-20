@@ -32,22 +32,22 @@ export const track08: CurriculumLesson = {
 		patternName: 'High-Concurrency Production WSGI & Resilience Architecture',
 		diagram: `+---------------------------------------------------------------------------------------+
 |                    Nginx Reverse Proxy / Load Balancer                                |
-|  - proxy_buffering off;  proxy_read_timeout 120s;  X-Accel-Buffering: no;              |
+|  - proxy_buffering off;  proxy_read_timeout 120s;  X-Accel-Buffering: no;             |
 +---------------------------------------------------------------------------------------+
                                             |
                                             v
 +---------------------------------------------------------------------------------------+
 |                    Gunicorn Master Process (gunicorn.conf.py)                         |
-|  workers = (2 * CPU) + 1 | worker_class = "gthread" | threads = 8 | timeout = 120s   |
+|  workers = (2 * CPU) + 1 | worker_class = "gthread" | threads = 8 | timeout = 120s    |
 +---------------------------------------------------------------------------------------+
-         |                                  |                                  |
-         v (Worker 1)                       v (Worker 2)                       v (Worker 3)
-+------------------+               +------------------+               +------------------+
-| Flask App Instance|              | Flask App Instance|              | Flask App Instance|
-| (8 Active Threads)|              | (8 Active Threads)|              | (8 Active Threads)|
-+--------+---------+               +--------+---------+               +--------+---------+
-         |
-         v
+           |                                  |                                  |
+           v (Worker 1)                       v (Worker 2)                       v (Worker 3)
++---------------------+          +---------------------+          +---------------------+
+|  Flask App Instance |          |  Flask App Instance |          |  Flask App Instance |
+|  (8 Active Threads) |          |  (8 Active Threads) |          |  (8 Active Threads) |
++----------+----------+          +----------+----------+          +----------+----------+
+           |
+           v
 +---------------------------------------------------------------------------------------+
 |                 Resilience & Fallback Layer (Tenacity Circuit Breaker)                |
 |                                                                                       |

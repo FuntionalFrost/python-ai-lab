@@ -32,14 +32,14 @@
 	<div
 		class="flex flex-col gap-4 border-b border-zinc-800/80 pb-6 sm:flex-row sm:items-center sm:justify-between"
 	>
-		<div class="space-y-1">
+		<div class="min-w-0 flex-1 space-y-1">
 			<div class="flex items-center gap-2 font-mono text-xs text-zinc-400">
 				<a href="/" class="transition-colors hover:text-cyan-400">Curriculum</a>
 				<span>/</span>
 				<span class="font-bold text-cyan-400">Track {track.trackNumber} of {ALL_TRACKS.length}</span
 				>
 			</div>
-			<h1 class="text-2xl font-extrabold tracking-tight break-words text-white sm:text-4xl">
+			<h1 class="text-2xl font-extrabold tracking-tight wrap-break-word text-white sm:text-4xl">
 				{track.title}
 			</h1>
 			<p class="text-sm text-zinc-300">
@@ -47,15 +47,17 @@
 			</p>
 		</div>
 
-		<div class="flex flex-wrap items-center gap-2">
+		<div class="flex shrink-0 items-center gap-2">
 			<!-- Run Test Action Button -->
 			<button
 				type="button"
 				onclick={() => (isPytestModalOpen = true)}
-				class="flex items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20 transition-all hover:from-emerald-500 hover:to-teal-500"
+				class="inline-flex shrink-0 items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-semibold whitespace-nowrap text-white shadow-lg shadow-emerald-600/20 transition-all hover:from-emerald-500 hover:to-teal-500"
 			>
-				<Terminal class="h-4 w-4" />
-				<span>Run {track.testSuite.command.startsWith('vitest') ? 'Vitest' : 'pytest'} Suite</span>
+				<Terminal class="h-4 w-4 shrink-0" />
+				<span class="whitespace-nowrap"
+					>Run {track.testSuite.command.startsWith('vitest') ? 'Vitest' : 'pytest'} Suite</span
+				>
 			</button>
 		</div>
 	</div>
@@ -270,10 +272,10 @@
 			<button
 				type="button"
 				onclick={() => (isPytestModalOpen = true)}
-				class="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2 text-xs font-semibold text-white shadow transition-colors hover:bg-cyan-500"
+				class="inline-flex shrink-0 items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2 text-xs font-semibold whitespace-nowrap text-white shadow transition-colors hover:bg-cyan-500"
 			>
-				<Play class="h-3.5 w-3.5 fill-white" />
-				<span>Execute in Terminal</span>
+				<Play class="h-3.5 w-3.5 shrink-0 fill-white" />
+				<span class="whitespace-nowrap">Execute in Terminal</span>
 			</button>
 		</div>
 

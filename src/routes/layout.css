@@ -1,3 +1,9 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 @import 'yaxa-svelte/theme.css';
+
+html,
+body {
+	overflow-x: hidden;
+	max-width: 100vw;
+}

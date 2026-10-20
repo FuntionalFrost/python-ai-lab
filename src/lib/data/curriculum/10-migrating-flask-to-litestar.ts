@@ -48,7 +48,7 @@ export const track10: CurriculumLesson = {
                (Gradually shift routes until Flask is decommissioned)
                                      v
 +-------------------------------------------------------------------------+
-|                  Shared Database & OpenAI Client Infrastructure          |
+|                  Shared Database & OpenAI Client Infrastructure         |
 +-------------------------------------------------------------------------+`,
 		explanation: `Attempting a "big-bang" rewrite from Flask to Litestar is high-risk. The industry standard approach is the Strangler Fig Pattern:
 

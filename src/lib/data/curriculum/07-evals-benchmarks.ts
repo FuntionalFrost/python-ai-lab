@@ -49,7 +49,7 @@ export const track07: CurriculumLesson = {
 		diagram: `+---------------------------------------------------------------------------------+
 |                    IMMUTABLE REAL-USER TEST SUITE (PERMANENT)                   |
 |  Case 1: "hey uh cancel that last thing, show me vienna wthr again in C pls"    |
-|  Case 2: "ugh that didn't work at all... why is my card being charged twice??" |
+|  Case 2: "ugh that didn't work at all... why is my card being charged twice??"  |
 |  Case 3: "need a flight to sfo thurs morning no layovers cheapest possible"     |
 +---------------------------------------------------------------------------------+
                                          |

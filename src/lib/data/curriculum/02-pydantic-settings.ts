@@ -31,7 +31,7 @@ export const track02: CurriculumLesson = {
 		patternName: 'Fail-Fast Configuration & Hierarchical Settings Tree',
 		diagram: `+-------------------------------------------------------------------------+
 |                  Environment Sources (.env / Docker / OS)               |
-|      OPENAI_API_KEY=sk-...    DATABASE_URL=postgresql+asyncpg://...    |
+|      OPENAI_API_KEY=sk-...     DATABASE_URL=postgresql+asyncpg://...    |
 +-------------------------------------------------------------------------+
                                      |
                                      v
