@@ -1,14 +1,13 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track07: CurriculumLesson = {
-	id: 'track-07',
-	slug: '07-evals-benchmarks',
-	trackNumber: 7,
+export const track08: CurriculumLesson = {
+	id: 'track-08',
+	slug: '08-evals-benchmarks',
+	trackNumber: 8,
 	title: 'User Psychology, Multi-Model Evals & Immutable Test Suites',
 	shortTitle: 'Real-User Evals & Benchmarks',
 	subtitle:
 		'Human Conversational Dynamics, Multi-Model Telemetry, and the Iron Rule: Fix the System, Never the Test',
-	level: 'Advanced',
 	estimatedMinutes: 45,
 	topics: [
 		'User Psychology: Linguistic Entropy, Ambiguity, Slang & Frustration Signals',

@@ -1,13 +1,12 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track03: CurriculumLesson = {
-	id: 'track-03',
-	slug: '03-llm-chat-streaming',
-	trackNumber: 3,
+export const track04: CurriculumLesson = {
+	id: 'track-04',
+	slug: '04-llm-chat-streaming',
+	trackNumber: 4,
 	title: 'Real-Time LLM Token Streaming in Flask 3.x',
 	shortTitle: 'Flask SSE Token Streaming',
 	subtitle: 'Server-Sent Events (SSE), stream_with_context, Connection Pooling, and Chat Memory',
-	level: 'Intermediate',
 	estimatedMinutes: 35,
 	topics: [
 		'Flask 3.x stream_with_context Generator Architecture',

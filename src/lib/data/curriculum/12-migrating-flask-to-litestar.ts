@@ -1,14 +1,13 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track10: CurriculumLesson = {
-	id: 'track-10',
-	slug: '10-migrating-flask-to-litestar',
-	trackNumber: 10,
+export const track12: CurriculumLesson = {
+	id: 'track-12',
+	slug: '12-migrating-flask-to-litestar',
+	trackNumber: 12,
 	title: 'Scale-Up Architecture: Migrating from Flask to Litestar (ASGI)',
 	shortTitle: 'Scale-Up: Flask to Litestar',
 	subtitle:
 		'Step-by-Step Refactoring: Blueprints to Controllers, Threadpool WSGI to ASGI, and Manual Validation to DTOs',
-	level: 'Advanced',
 	estimatedMinutes: 40,
 	topics: [
 		'WSGI vs. ASGI Runtime Migration (Gunicorn to Granian/Uvicorn)',

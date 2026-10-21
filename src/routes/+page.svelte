@@ -36,8 +36,11 @@
 
 			<p class="text-sm leading-relaxed text-zinc-300 sm:text-base">
 				Build, test, and iterate rapidly on AI prototypes. Master fast prototyping with
-				<strong class="font-semibold text-white">Flask 3.x</strong> and
-				<strong class="font-semibold text-white">Litestar</strong>, instant schema validation with
+				<strong class="font-semibold text-white">Flask 3.x</strong>,
+				<strong class="font-semibold text-white">Litestar</strong>, and
+				<strong class="font-semibold text-white">htmx</strong>, modern async networking with
+				<strong class="font-semibold text-white">HTTPX</strong> and
+				<strong class="font-semibold text-white">OpenAI</strong>, instant schema validation with
 				<strong class="font-semibold text-white">Pydantic v2</strong>, real-time streaming
 				playgrounds, and deterministic test harnesses using
 				<strong class="font-semibold text-white">pytest-mock</strong>
@@ -87,7 +90,7 @@
 				<Layers class="h-4 w-4 text-cyan-400" />
 			</div>
 			<div class="mt-2 font-mono text-2xl font-bold text-zinc-100">{ALL_TRACKS.length} Tracks</div>
-			<p class="mt-1 text-[11px] text-zinc-500">From MVC to Tenacity & SvelteKit</p>
+			<p class="mt-1 text-[11px] text-zinc-500">From Flask & HTTPX to htmx & Litestar</p>
 		</div>
 
 		<div class="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-5">
@@ -135,18 +138,9 @@
 								>
 									{track.trackNumber}
 								</span>
-								<div>
-									<span
-										class="rounded px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase {track.level ===
-										'Beginner'
-											? 'bg-emerald-500/10 text-emerald-400'
-											: track.level === 'Intermediate'
-												? 'bg-cyan-500/10 text-cyan-400'
-												: 'bg-amber-500/10 text-amber-400'}"
-									>
-										{track.level}
-									</span>
-								</div>
+								<span class="font-mono text-xs font-medium text-zinc-400">
+									Track {track.trackNumber}
+								</span>
 							</div>
 
 							<div class="flex items-center gap-1.5 font-mono text-xs text-zinc-400">
@@ -184,7 +178,9 @@
 
 					<!-- Card Footer Action -->
 					<div class="mt-6 flex items-center justify-between border-t border-zinc-800/80 pt-4">
-						<span class="font-mono text-xs text-zinc-500">{track.level} Track</span>
+						<span class="font-mono text-xs text-zinc-500"
+							>{track.testSuite.coverage.total.cover} Cov</span
+						>
 
 						<a
 							href="/module/{track.slug}"

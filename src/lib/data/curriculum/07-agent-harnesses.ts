@@ -1,13 +1,12 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track06: CurriculumLesson = {
-	id: 'track-06',
-	slug: '06-agent-harnesses',
-	trackNumber: 6,
+export const track07: CurriculumLesson = {
+	id: 'track-07',
+	slug: '07-agent-harnesses',
+	trackNumber: 7,
 	title: 'Building & Testing Agent Harnesses',
 	shortTitle: 'Agent Harnesses & Replay Testing',
 	subtitle: 'Decoupled Orchestration Loops, Loop Guards, and Deterministic Replay Fixtures',
-	level: 'Advanced',
 	estimatedMinutes: 45,
 	topics: [
 		'Decoupling Orchestration Loops from Web Transport',

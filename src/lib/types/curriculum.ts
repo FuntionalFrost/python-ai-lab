@@ -1,5 +1,3 @@
-export type Level = 'Beginner' | 'Intermediate' | 'Advanced';
-
 export interface KeyConcept {
 	name: string;
 	description: string;
@@ -68,7 +66,6 @@ export interface CurriculumLesson {
 	title: string;
 	shortTitle: string;
 	subtitle: string;
-	level: Level;
 	estimatedMinutes: number;
 	topics: string[];
 	frameworks: string[];
@@ -89,7 +86,6 @@ export interface TrackSummary {
 	title: string;
 	shortTitle: string;
 	subtitle: string;
-	level: Level;
 	estimatedMinutes: number;
 	topics: string[];
 	frameworks: string[];

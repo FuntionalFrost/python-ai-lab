@@ -1,13 +1,12 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track04: CurriculumLesson = {
-	id: 'track-04',
-	slug: '04-tool-calling-testing',
-	trackNumber: 4,
+export const track05: CurriculumLesson = {
+	id: 'track-05',
+	slug: '05-tool-calling-testing',
+	trackNumber: 5,
 	title: 'Tool Calling & Unit Testing Tool Executions',
 	shortTitle: 'Tool Calling & Testing',
 	subtitle: 'Pydantic Function Schemas, Dispatch Engines, and Deterministic pytest Mocks',
-	level: 'Intermediate',
 	estimatedMinutes: 40,
 	topics: [
 		'Generating OpenAI Function Schemas from Pydantic Models',

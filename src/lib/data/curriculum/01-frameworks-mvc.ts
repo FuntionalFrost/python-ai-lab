@@ -7,7 +7,6 @@ export const track01: CurriculumLesson = {
 	title: 'Application Factory & Clean MVC',
 	shortTitle: 'Modern Flask Architecture',
 	subtitle: 'Application Factories, Modular Blueprints, Service Layering, and Scalable AI APIs',
-	level: 'Beginner',
 	estimatedMinutes: 30,
 	topics: [
 		'Application Factory Pattern (create_app)',

@@ -67,8 +67,10 @@
 		class="grid grid-cols-2 gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 font-mono text-xs md:grid-cols-4"
 	>
 		<div>
-			<span class="block text-[10px] text-zinc-500 uppercase">Difficulty Level</span>
-			<span class="mt-0.5 inline-block font-bold text-zinc-200">{track.level}</span>
+			<span class="block text-[10px] text-zinc-500 uppercase">Curriculum Position</span>
+			<span class="mt-0.5 inline-block font-bold text-zinc-200"
+				>Track {track.trackNumber} of {ALL_TRACKS.length}</span
+			>
 		</div>
 		<div>
 			<span class="block text-[10px] text-zinc-500 uppercase">Estimated Duration</span>
@@ -175,7 +177,7 @@
 					rightTitle={comparison.rightTitle}
 					rightLanguage={comparison.rightLanguage}
 					rightCode={comparison.rightCode}
-					isPrototypeVsProduction={track.slug === '08-prototype-to-production' ||
+					isPrototypeVsProduction={track.slug === '11-prototype-to-production' ||
 						track.slug === '02-pydantic-settings'}
 				/>
 			{/each}

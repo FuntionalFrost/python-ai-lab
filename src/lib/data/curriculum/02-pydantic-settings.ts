@@ -7,7 +7,6 @@ export const track02: CurriculumLesson = {
 	title: 'Settings, Schemas & Configuration with Pydantic v2',
 	shortTitle: 'Pydantic Settings & Schemas',
 	subtitle: 'Environment Validation, Secret Masking, and Type-Safe Configuration Management',
-	level: 'Beginner',
 	estimatedMinutes: 25,
 	topics: [
 		'pydantic-settings BaseSettings',

@@ -1,14 +1,13 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track08: CurriculumLesson = {
-	id: 'track-08',
-	slug: '08-prototype-to-production',
-	trackNumber: 8,
+export const track11: CurriculumLesson = {
+	id: 'track-11',
+	slug: '11-prototype-to-production',
+	trackNumber: 11,
 	title: 'Production WSGI Deployment, Worker Concurrency & Resilience',
 	shortTitle: 'Production WSGI & Hardening',
 	subtitle:
 		'Gunicorn Worker Engines (Sync vs gthread vs gevent), Streaming Timeouts, and Tenacity Circuit Breakers',
-	level: 'Advanced',
 	estimatedMinutes: 45,
 	topics: [
 		'Gunicorn Worker Engines: sync vs. gthread vs. gevent Concurrency Models',

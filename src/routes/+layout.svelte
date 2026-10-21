@@ -19,7 +19,7 @@
 			{
 				id: 'home',
 				label: 'Curriculum Overview',
-				description: 'Explore all 10 prototyping, testing, and iteration modules',
+				description: `Explore all ${ALL_TRACKS.length} prototyping, testing, and iteration modules`,
 				icon: Layers,
 				shortcut: 'G H',
 				group: 'Navigation',
@@ -48,7 +48,7 @@
 		const tracks: CommandItem[] = ALL_TRACKS.map((t) => ({
 			id: t.slug,
 			label: `Track ${t.trackNumber}: ${t.title}`,
-			description: `${t.level} · ${t.estimatedMinutes} min · ${t.frameworks.slice(0, 3).join(', ')}`,
+			description: `${t.estimatedMinutes} min · ${t.frameworks.slice(0, 3).join(', ')}`,
 			icon: Terminal,
 			shortcut: `T${t.trackNumber}`,
 			group: 'Curriculum Tracks',
@@ -184,14 +184,9 @@
 							</div>
 
 							<span
-								class="ml-1 shrink-0 rounded px-1.5 py-0.5 font-mono text-[9px] uppercase {track.level ===
-								'Beginner'
-									? 'text-emerald-400/80'
-									: track.level === 'Intermediate'
-										? 'text-cyan-400/80'
-										: 'text-amber-400/80'}"
+								class="ml-1 shrink-0 rounded px-1.5 py-0.5 font-mono text-[9px] text-zinc-500 transition-colors group-hover:text-zinc-400"
 							>
-								{track.level}
+								{track.estimatedMinutes}m
 							</span>
 						</a>
 					{/each}

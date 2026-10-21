@@ -1,13 +1,12 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track05: CurriculumLesson = {
-	id: 'track-05',
-	slug: '05-rag-pipelines',
-	trackNumber: 5,
+export const track06: CurriculumLesson = {
+	id: 'track-06',
+	slug: '06-rag-pipelines',
+	trackNumber: 6,
 	title: 'Retrieval-Augmented Generation (RAG) Architecture',
 	shortTitle: 'RAG Pipelines & Testing',
 	subtitle: 'Document Chunking, Vector Retrieval, Context Re-ranking, and Ground-Truth Evaluation',
-	level: 'Intermediate',
 	estimatedMinutes: 35,
 	topics: [
 		'Semantic Chunking & Overlap Strategies',

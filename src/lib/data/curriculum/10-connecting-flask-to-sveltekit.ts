@@ -1,14 +1,13 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track09: CurriculumLesson = {
-	id: 'track-09',
-	slug: '09-connecting-flask-to-sveltekit',
-	trackNumber: 9,
+export const track10: CurriculumLesson = {
+	id: 'track-10',
+	slug: '10-connecting-flask-to-sveltekit',
+	trackNumber: 10,
 	title: 'Connecting Flask to SvelteKit (Full-Stack AI Integration)',
 	shortTitle: 'Flask to SvelteKit Full-Stack',
 	subtitle:
 		'Consuming Flask SSE Streams, Type-Safe Pydantic Contracts, and Svelte 5 Reactive Frontends',
-	level: 'Advanced',
 	estimatedMinutes: 45,
 	topics: [
 		'Full-Stack Topology: Flask AI Microservice & SvelteKit UI',

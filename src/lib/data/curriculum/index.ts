@@ -1,14 +1,16 @@
 import type { CurriculumLesson, TrackSummary } from '../../types/curriculum';
 import { track01 } from './01-frameworks-mvc';
 import { track02 } from './02-pydantic-settings';
-import { track03 } from './03-llm-chat-streaming';
-import { track04 } from './04-tool-calling-testing';
-import { track05 } from './05-rag-pipelines';
-import { track06 } from './06-agent-harnesses';
-import { track07 } from './07-evals-benchmarks';
-import { track08 } from './08-prototype-to-production';
-import { track09 } from './09-connecting-flask-to-sveltekit';
-import { track10 } from './10-migrating-flask-to-litestar';
+import { track03 } from './03-httpx-async-migration';
+import { track04 } from './04-llm-chat-streaming';
+import { track05 } from './05-tool-calling-testing';
+import { track06 } from './06-rag-pipelines';
+import { track07 } from './07-agent-harnesses';
+import { track08 } from './08-evals-benchmarks';
+import { track09 } from './09-htmx-hypermedia-prototypes';
+import { track10 } from './10-connecting-flask-to-sveltekit';
+import { track11 } from './11-prototype-to-production';
+import { track12 } from './12-migrating-flask-to-litestar';
 
 export const ALL_TRACKS: CurriculumLesson[] = [
 	track01,
@@ -20,7 +22,9 @@ export const ALL_TRACKS: CurriculumLesson[] = [
 	track07,
 	track08,
 	track09,
-	track10
+	track10,
+	track11,
+	track12
 ];
 
 export const TRACK_SUMMARIES: TrackSummary[] = ALL_TRACKS.map((t) => ({
@@ -30,7 +34,6 @@ export const TRACK_SUMMARIES: TrackSummary[] = ALL_TRACKS.map((t) => ({
 	title: t.title,
 	shortTitle: t.shortTitle,
 	subtitle: t.subtitle,
-	level: t.level,
 	estimatedMinutes: t.estimatedMinutes,
 	topics: t.topics,
 	frameworks: t.frameworks,
