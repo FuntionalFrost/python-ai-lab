@@ -87,10 +87,10 @@ An Agent Harness pattern encapsulates the loop into an isolated stateful coordin
 			leftTitle: 'Unsafe Agent Loop (Infinite Loop Risk)',
 			leftLanguage: 'python',
 			leftCode: `# Anti-pattern: Unbounded while loop inside web request
-async def run_agent_forever(prompt: str):
+def run_agent_forever(prompt: str):
     messages = [{"role": "user", "content": prompt}]
     while True: # HAZARD: If model hallucinates, loops forever!
-        resp = await client.chat.completions.create(
+        resp = client.chat.completions.create(
             model="gpt-4o",
             messages=messages,
             tools=tools
@@ -103,15 +103,15 @@ async def run_agent_forever(prompt: str):
 			rightTitle: 'Guarded Agent Harness (Production)',
 			rightLanguage: 'python',
 			rightCode: `class AgentHarness:
-    def __init__(self, client: AsyncOpenAI, max_steps: int = 5) -> None:
+    def __init__(self, client: OpenAI, max_steps: int = 5) -> None:
         self.client = client
         self.max_steps = max_steps
 
-    async def run(self, prompt: str) -> HarnessResult:
+    def run(self, prompt: str) -> HarnessResult:
         state = HarnessState(initial_prompt=prompt)
         for step in range(1, self.max_steps + 1):
             state.increment_step()
-            action = await self._step(state)
+            action = self._step(state)
             if action.is_terminal:
                 return state.finalize_success(action.final_output)
 
@@ -133,7 +133,7 @@ async def run_agent_forever(prompt: str):
 			code: `from typing import Any
 from dataclasses import dataclass, field
 from pydantic import BaseModel
-from openai import AsyncOpenAI
+from openai import OpenAI
 
 class MaxIterationsExceededError(RuntimeError):
     def __init__(self, message: str, trace: list[dict[str, Any]]) -> None:
@@ -157,7 +157,7 @@ class HarnessResult(BaseModel):
 class AgentHarness:
     def __init__(
         self,
-        client: AsyncOpenAI,
+        client: OpenAI,
         tools_map: dict[str, Any],
         tool_schemas: list[dict[str, Any]],
         max_steps: int = 5,
@@ -169,7 +169,7 @@ class AgentHarness:
         self.max_steps = max_steps
         self.model = model
 
-    async def run(self, prompt: str) -> HarnessResult:
+    def run(self, prompt: str) -> HarnessResult:
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": "You are a methodical problem-solving assistant."},
             {"role": "user", "content": prompt}
@@ -177,7 +177,7 @@ class AgentHarness:
         trace: list[StepTrace] = []
 
         for step_idx in range(1, self.max_steps + 1):
-            response = await self.client.chat.completions.create(
+            response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
                 tools=self.tool_schemas if self.tool_schemas else None,
@@ -217,7 +217,7 @@ class AgentHarness:
                 tool_output = f"Error: Tool {fn_name} does not exist."
             else:
                 try:
-                    tool_output = str(await handler(fn_args))
+                    tool_output = str(handler(fn_args))
                 except Exception as e:
                     tool_output = f"Execution error: {str(e)}"
 
@@ -242,12 +242,11 @@ class AgentHarness:
 		command: 'pytest -v --cov=app/services/harness tests/test_agent_harness.py',
 		executionTimeSec: 0.81,
 		testCode: `import pytest
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import MagicMock
 from app.services.harness import AgentHarness, MaxIterationsExceededError
 
-@pytest.mark.asyncio
-async def test_harness_completes_within_bounds(mocker):
-    mock_client = mocker.AsyncMock()
+def test_harness_completes_within_bounds(mocker):
+    mock_client = mocker.MagicMock()
 
     # Turn 1: tool call
     tool_call = MagicMock()
@@ -261,7 +260,7 @@ async def test_harness_completes_within_bounds(mocker):
 
     mock_client.chat.completions.create.side_effect = [step1, step2]
 
-    async def mock_calculate(args):
+    def mock_calculate(args):
         return "42"
 
     harness = AgentHarness(
@@ -271,15 +270,14 @@ async def test_harness_completes_within_bounds(mocker):
         max_steps=3
     )
 
-    result = await harness.run("What is 40 + 2?")
+    result = harness.run("What is 40 + 2?")
     assert result.status == "completed"
     assert result.total_steps == 2
     assert result.final_output == "The answer is 42."
     assert len(result.trace) == 2
 
-@pytest.mark.asyncio
-async def test_harness_triggers_max_iterations_circuit_breaker(mocker):
-    mock_client = mocker.AsyncMock()
+def test_harness_triggers_max_iterations_circuit_breaker(mocker):
+    mock_client = mocker.MagicMock()
 
     # Simulate an infinite loop where the model repeatedly calls the same tool
     tool_call = MagicMock()
@@ -290,7 +288,7 @@ async def test_harness_triggers_max_iterations_circuit_breaker(mocker):
     repeating_response = MagicMock(choices=[MagicMock(message=MagicMock(tool_calls=[tool_call], content=None))])
     mock_client.chat.completions.create.return_value = repeating_response
 
-    async def mock_search(args):
+    def mock_search(args):
         return "Still searching..."
 
     harness = AgentHarness(
@@ -301,7 +299,7 @@ async def test_harness_triggers_max_iterations_circuit_breaker(mocker):
     )
 
     with pytest.raises(MaxIterationsExceededError) as exc_info:
-        await harness.run("Find infinite loop")
+        harness.run("Find infinite loop")
 
     assert "reached maximum limit of 2 iterations" in str(exc_info.value)
     assert len(exc_info.value.trace) == 2`,

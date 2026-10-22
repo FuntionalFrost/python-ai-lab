@@ -14,11 +14,19 @@ export const track09: CurriculumLesson = {
 		'Zero-Build Chat Interfaces with hx-post and hx-swap',
 		'Real-Time Token Streaming with htmx SSE Extension (hx-ext="sse")',
 		'Active Search & Benchmark Filtering with Debounced Server Triggers',
+		'Template Quality & Formatting with djlint (--profile jinja)',
 		'Testing Hypermedia Endpoints with pytest and BeautifulSoup4',
 		'Decision Matrix: When to Choose htmx vs SvelteKit / React'
 	],
-	frameworks: ['htmx 2.x', 'Flask 3.1.3', 'Jinja2', 'SSE', 'pytest 9.x', 'BeautifulSoup4'],
-	tags: ['htmx', 'Flask', 'Hypermedia', 'Prototyping', 'SSE', 'Jinja2', 'Zero-Build', 'Testing'],
+	frameworks: [
+		'htmx 2.x',
+		'Flask 3.1.3',
+		'Jinja2 3.1+',
+		'djlint 1.36+',
+		'pytest 9.x',
+		'BeautifulSoup4'
+	],
+	tags: ['htmx', 'Flask', 'Jinja2', 'djlint', 'Hypermedia', 'Prototyping', 'SSE', 'Testing'],
 	summary:
 		'Ditch the JavaScript build step when rapidly testing AI concepts. Master the hypermedia paradigm using Flask and htmx to create interactive streaming chat UIs, live prompt-eval filtering, and tool-execution dashboards in pure HTML. Learn how htmx SSE extensions dynamically append streaming AI tokens straight into the DOM, and write rock-solid pytest test suites that assert on semantic HTML fragments.',
 	objectives: [
@@ -48,7 +56,7 @@ export const track09: CurriculumLesson = {
          |                                                       |
          v                                                       v
 +---------------------------------+     +---------------------------------+
-|   AI Engine (OpenAI + HTTPX)    |     |   Jinja2 Partial Fragment Cache |
+|   AI Engine (OpenAI + Requests) |     |   Jinja2 Partial Fragment Cache |
 |   Streaming Generator via SSE   |     |   Componentized HTML Templates  |
 |   hx-ext="sse" Live DOM Append  |     |   _message.html, _metric.html   |
 +---------------------------------+     +---------------------------------+`,
@@ -97,6 +105,16 @@ The Hypermedia Advantage for AI Prototyping:
        hx-trigger="keyup changed delay:300ms" 
        hx-target="#eval-table-body" 
        hx-indicator="#search-spinner" />`
+			},
+			{
+				name: 'Template Quality & Formatting with djlint',
+				description:
+					'djlint enforces consistent indentation, HTML accessibility, and Jinja2 syntax standards across server-rendered partials. Run djlint in CI to guarantee clean templates.',
+				pythonCode: `# Lint Jinja2 templates in CI
+# djlint app/templates/ --profile=jinja --check
+
+# Auto-format templates with consistent indentation
+# djlint app/templates/ --profile=jinja --reformat`
 			},
 			{
 				name: 'Decision Framework: htmx vs SvelteKit',
@@ -282,7 +300,6 @@ import time
 from typing import Iterator
 from flask import Blueprint, request, render_template, Response, stream_with_context
 from app.services.ai_gateway import AIGatewayService
-from app.services.http_client import http_manager
 
 htmx_bp = Blueprint("htmx_chat", __name__, url_prefix="/htmx")
 

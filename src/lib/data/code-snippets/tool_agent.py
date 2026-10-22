@@ -4,14 +4,14 @@ Demonstrates schema generation from Pydantic, tool dispatching, and multi-turn e
 """
 from typing import Any
 from pydantic import BaseModel, Field
-from openai import AsyncOpenAI
+from openai import OpenAI
 
 class WeatherQuery(BaseModel):
     location: str = Field(description="City and country, e.g. Vienna, Austria")
     unit: str = Field(default="celsius", pattern="^(celsius|fahrenheit)$")
 
 class AgentService:
-    def __init__(self, client: AsyncOpenAI, model: str = "gpt-4o-mini") -> None:
+    def __init__(self, client: OpenAI, model: str = "gpt-4o-mini") -> None:
         self.client = client
         self.model = model
 
@@ -27,8 +27,8 @@ class AgentService:
             }
         ]
 
-    async def execute_query(self, prompt: str) -> dict[str, Any]:
-        resp = await self.client.chat.completions.create(
+    def execute_query(self, prompt: str) -> dict[str, Any]:
+        resp = self.client.chat.completions.create(
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
             tools=self.tool_definitions(),

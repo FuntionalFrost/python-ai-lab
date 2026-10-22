@@ -303,7 +303,7 @@
 						<br />&#123;"error": "Invalid unit 'kelvin'. Supported units are celsius or
 						fahrenheit."&#125;
 					{:else}
-						<span class="text-emerald-400">await get_current_weather(query=WeatherQuery(...))</span>
+						<span class="text-emerald-400">get_current_weather(query=WeatherQuery(...))</span>
 						<br />Output: &#123;"location": "Vienna, Austria", "temperature": 18.5, "unit":
 						"celsius", "condition": "Sunny"&#125;
 					{/if}

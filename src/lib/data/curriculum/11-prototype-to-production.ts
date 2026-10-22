@@ -16,7 +16,7 @@ export const track11: CurriculumLesson = {
 		'Graceful Degradation: Secondary Fallback Models (GPT-4o -> GPT-4o-Mini)',
 		'Cost & Quota Defense: Redis Token-Bucket Rate Limiting & Response Caching'
 	],
-	frameworks: ['Flask 3.1.3', 'Gunicorn 23.x', 'Tenacity 9.x', 'OpenAI 1.x', 'uv'],
+	frameworks: ['Flask 3.1.3', 'Gunicorn 23.x', 'Tenacity 9.x', 'OpenAI 3.x', 'uv'],
 	tags: ['Production', 'WSGI', 'Gunicorn', 'Concurrency', 'Resilience', 'Tenacity', 'Caching'],
 	summary:
 		'Take your Flask AI service to production. Learn how to configure Gunicorn for high-concurrency streaming, contrast synchronous workers with threadpools (gthread) and greenlets (gevent), prevent silent 30-second worker timeout kills during long token generations, and implement Tenacity circuit breakers with automatic fallback degradation.',

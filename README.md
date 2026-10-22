@@ -9,8 +9,9 @@
 [![Litestar](https://img.shields.io/badge/Litestar-2.24%2B-edb641)](https://litestar.dev)
 [![Flask](https://img.shields.io/badge/Flask-3.x-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com)
 [![Pydantic](https://img.shields.io/badge/Pydantic-v2.14%2B-E92063?logo=pydantic&logoColor=white)](https://docs.pydantic.dev)
-[![HTTPX](https://img.shields.io/badge/HTTPX-0.28%2B-11998e)](https://www.python-httpx.org)
+[![Requests](https://img.shields.io/badge/Requests-2.32%2B-2b5b84?logo=python&logoColor=white)](https://requests.readthedocs.io)
 [![htmx](https://img.shields.io/badge/htmx-2.x-3366cc?logo=htmx&logoColor=white)](https://htmx.org)
+[![djlint](https://img.shields.io/badge/linted%20with-djlint-10b981)](https://www.djlint.com)
 [![pytest](https://img.shields.io/badge/tested%20with-pytest-0A9EDC?logo=pytest&logoColor=white)](https://pytest.org)
 
 **An interactive lab for rapidly prototyping, testing, benchmarking, and iterating on modern Python Web & AI backend architectures.**
@@ -54,20 +55,20 @@ The platform is not just static documentation—it includes live interactive sim
 
 The platform features 12 comprehensive tracks organized into rapid prototyping/testing foundations (Tracks 01–09) followed by full-stack, production deployment, and ASGI scaling (Tracks 10–12):
 
-| #      | Track                                      | Focus & Architectural Concepts                                                                                                                          | Stack                                           |
-| :----- | :----------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :---------------------------------------------- |
-| **01** | **Application Factory & Clean MVC**        | Flask 3.x `create_app` factory, modular Blueprints, Clean Architecture Service/Repository layering, and Pydantic DTO request validation.                | Flask 3.1, Pydantic v2, pytest-mock             |
-| **02** | **Settings & Schemas with Pydantic v2**    | `pydantic-settings` `BaseSettings`, `SecretStr` key masking, fail-fast environment validation, and `@lru_cache` dependency injection.                   | Pydantic v2, pydantic-settings                  |
-| **03** | **Modern HTTP & Async I/O (HTTPX)**        | Migrating from blocking `requests` to `httpx.Client` & `AsyncClient`, HTTP/2 multiplexing, custom OpenAI transports, and `httpx.MockTransport` testing. | HTTPX 0.28+, OpenAI 1.65+, pytest               |
-| **04** | **LLM Chats & Streaming Backends**         | Flask `stream_with_context` Server-Sent Events (SSE), connection pooling, chunk delimiters, and sliding-window conversational memory.                   | Flask 3.1, OpenAI SDK, SSE                      |
-| **05** | **Tool Calling & Unit Testing**            | Generating OpenAI function schemas from Pydantic models, multi-turn dispatch engine, self-healing recovery, and `pytest-mock` parameter assertions.     | OpenAI, Pydantic v2, pytest-mock                |
-| **06** | **RAG Pipelines & Testing**                | Semantic chunking, cosine vector similarity, in-memory vector store protocols, grounded context injection, and deterministic fixtures.                  | OpenAI Embeddings, Pydantic v2                  |
-| **07** | **Building & Testing Agent Harnesses**     | Decoupling LLM loops from web transports, state machine controllers, step-count circuit breakers (`MaxIterationsExceededError`), and replay fixtures.   | OpenAI SDK, pytest-mock                         |
-| **08** | **Real-User Evals & Benchmarks**           | Psychometric user satisfaction rubrics (ambiguity, repair, de-escalation), frozen test suites ("Fix System, Never the Test"), and judge telemetry.      | pytest-cov, OpenAI Structured Outputs, Pydantic |
-| **09** | **Hypermedia AI Prototypes (htmx)**        | Zero-build-step AI interfaces, `hx-post` chat feeds, declarative token streaming with `hx-ext="sse"`, and debounced active search for evals.            | htmx 2.x, Flask 3.1, Jinja2, BeautifulSoup4     |
-| **10** | **Connecting Flask to SvelteKit**          | Full-Stack AI Integration: SvelteKit BFF, consuming Flask SSE streams with Svelte 5 runes (`$state`, `$derived`), and type-safe contracts.              | SvelteKit 3, Svelte 5, TypeScript               |
-| **11** | **Production WSGI & Hardening**            | Gunicorn worker concurrency (`gthread` vs. `gevent`), long-running streaming timeouts, Tenacity exponential jitter backoff, and Nginx proxying.         | Gunicorn, Tenacity, Nginx                       |
-| **12** | **Scale-Up: Migrating to Litestar (ASGI)** | Strangler Fig gateway cutover, converting Blueprints to Controllers, eliminating `current_app` globals, and `AsyncTestClient` testing.                  | Flask 3.x, Litestar 2.24, Granian/Uvicorn       |
+| #      | Track                                        | Focus & Architectural Concepts                                                                                                                        | Stack                                           |
+| :----- | :------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------- |
+| **01** | **Application Factory & Clean MVC**          | Flask 3.x `create_app` factory, modular Blueprints, Clean Architecture Service/Repository layering, and Pydantic DTO request validation.              | Flask 3.1, Pydantic v2, pytest-mock             |
+| **02** | **Settings & Schemas with Pydantic v2**      | `pydantic-settings` `BaseSettings`, `SecretStr` key masking, fail-fast environment validation, and `@lru_cache` dependency injection.                 | Pydantic v2, pydantic-settings                  |
+| **03** | **Resilient HTTP with Requests**             | `requests.Session` connection pooling, `urllib3.util.Retry` exponential backoff, granular tuple timeouts, and `pytest-mock` testing.                  | Requests 2.32+, urllib3, pytest-mock            |
+| **04** | **LLM Chats & Streaming Backends**           | Flask `stream_with_context` Server-Sent Events (SSE), connection pooling, chunk delimiters, and sliding-window conversational memory.                 | Flask 3.1, OpenAI SDK, SSE                      |
+| **05** | **Tool Calling & Unit Testing**              | Generating OpenAI function schemas from Pydantic models, multi-turn dispatch engine, self-healing recovery, and `pytest-mock` parameter assertions.   | OpenAI, Pydantic v2, pytest-mock                |
+| **06** | **RAG Pipelines & Testing**                  | Semantic chunking, cosine vector similarity, in-memory vector store protocols, grounded context injection, and deterministic fixtures.                | OpenAI Embeddings, Pydantic v2                  |
+| **07** | **Building & Testing Agent Harnesses**       | Decoupling LLM loops from web transports, state machine controllers, step-count circuit breakers (`MaxIterationsExceededError`), and replay fixtures. | OpenAI SDK, pytest-mock                         |
+| **08** | **Real-User Evals & Benchmarks**             | Psychometric user satisfaction rubrics (ambiguity, repair, de-escalation), frozen test suites ("Fix System, Never the Test"), and judge telemetry.    | pytest-cov, OpenAI Structured Outputs, Pydantic |
+| **09** | **Hypermedia AI Prototypes (htmx & Jinja2)** | Zero-build AI interfaces, `hx-post` chat feeds, declarative `hx-ext="sse"` token streaming, Jinja2 partials, and `djlint` template quality gates.     | htmx 2.x, Flask 3.1, Jinja2, djlint, pytest     |
+| **10** | **Connecting Flask to SvelteKit**            | Full-Stack AI Integration: SvelteKit BFF, consuming Flask SSE streams with Svelte 5 runes (`$state`, `$derived`), and type-safe contracts.            | SvelteKit 3, Svelte 5, TypeScript               |
+| **11** | **Production WSGI & Hardening**              | Gunicorn worker concurrency (`gthread` vs. `gevent`), long-running streaming timeouts, Tenacity exponential jitter backoff, and Nginx proxying.       | Gunicorn, Tenacity, Nginx                       |
+| **12** | **Scale-Up: Migrating to Litestar (ASGI)**   | Strangler Fig gateway cutover, converting Blueprints to Controllers, eliminating `current_app` globals, and `AsyncTestClient` testing.                | Flask 3.x, Litestar 2.24, Granian/Uvicorn       |
 
 ---
 
@@ -164,9 +165,9 @@ python-ai-lab/
 ## Tech Stack
 
 - **Frontend & Hypermedia:** [SvelteKit 3](https://kit.svelte.dev) + [Svelte 5](https://svelte.dev) (Runes `$state`, `$derived`, `$props`), [htmx 2.x](https://htmx.org), [Tailwind CSS v4](https://tailwindcss.com), [Lucide Svelte](https://lucide.dev), [PrismJS](https://prismjs.com).
-- **Python Backends:** Python 3.13+, [Flask 3.1](https://flask.palletsprojects.com), [Litestar 2.24](https://litestar.dev).
-- **HTTP & AI Networking:** [HTTPX](https://www.python-httpx.org) (sync/async/HTTP2), [OpenAI Python SDK](https://github.com/openai/openai-python), [Pydantic v2](https://docs.pydantic.dev), [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/), [tenacity](https://tenacity.readthedocs.io/).
-- **Testing & Quality:** [pytest 9](https://pytest.org), [pytest-mock](https://github.com/pytest-dev/pytest-mock), [pytest-cov](https://pytest-cov.readthedocs.io/), [BeautifulSoup4](https://beautiful-soup-4.readthedocs.io/).
+- **Python Backends:** Python 3.13+, [Flask 3.1](https://flask.palletsprojects.com), [Jinja2 3.1](https://jinja.palletsprojects.com), [Litestar 2.24](https://litestar.dev).
+- **HTTP & AI Networking:** [Requests](https://requests.readthedocs.io) (`requests.Session` + `urllib3.util.Retry`), [OpenAI Python SDK](https://github.com/openai/openai-python), [Pydantic v2](https://docs.pydantic.dev), [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/), [tenacity](https://tenacity.readthedocs.io/).
+- **Testing, Linting & Quality:** [pytest 9](https://pytest.org), [pytest-mock](https://github.com/pytest-dev/pytest-mock), [pytest-cov](https://pytest-cov.readthedocs.io/), [djlint](https://www.djlint.com), [BeautifulSoup4](https://beautiful-soup-4.readthedocs.io/).
 
 ---
 

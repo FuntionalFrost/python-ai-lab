@@ -15,7 +15,7 @@ export const track12: CurriculumLesson = {
 		'Automating Validation: request.json to Pydantic DTOs',
 		'Eliminating Global Context (current_app) with Litestar Provide DI',
 		'Strangler Fig Migration Pattern for Zero-Downtime Cutover',
-		'Migrating Test Suites: FlaskClient to AsyncTestClient'
+		'Migrating Test Suites: FlaskClient to TestClient'
 	],
 	frameworks: ['Flask 3.1.3', 'Litestar 2.24.0', 'Granian / Uvicorn', 'Pydantic v2'],
 	tags: ['Migration', 'Refactoring', 'ASGI', 'Architecture', 'Clean Code'],
@@ -26,7 +26,7 @@ export const track12: CurriculumLesson = {
 		'Convert imperative Flask route functions into declarative, object-oriented Litestar Controllers.',
 		'Replace manual request.get_json() parsing and boilerplate 422 error handlers with automatic Pydantic DTO validation.',
 		'Migrate state from current_app.extensions and g into Litestar’s compile-time Provide dependency injection graph.',
-		'Rewrite synchronous test suites using Litestar’s AsyncTestClient with dependency overrides.'
+		'Rewrite test suites using Litestar’s TestClient with dependency overrides.'
 	],
 	architecture: {
 		patternName: 'Strangler Fig Migration Architecture (WSGI to ASGI Gateway)',
@@ -240,7 +240,7 @@ class SummaryResponse(BaseModel):
 		executionTimeSec: 0.79,
 		testCode: `import pytest
 from unittest.mock import AsyncMock, MagicMock
-from litestar.testing import AsyncTestClient
+from litestar.testing import TestClient
 from app.main import app
 from app.services.llm import AsyncLLMService
 
@@ -250,12 +250,11 @@ def mock_llm_service(mocker):
     service.summarize_text_async = mocker.AsyncMock(return_value="Concise AI generated summary.")
     return service
 
-@pytest.mark.asyncio
-async def test_migrated_summary_controller_success(mock_llm_service):
+def test_migrated_summary_controller_success(mock_llm_service):
     # Override Litestar dependency injection in test scope without monkeypatching globals
     with app.override_dependencies(dependencies={"llm_service": lambda: mock_llm_service}):
-        async with AsyncTestClient(app=app) as client:
-            res = await client.post(
+        with TestClient(app=app) as client:
+            res = client.post(
                 "/api/summary",
                 json={"text": "This is a comprehensive document describing modern microservice architecture.", "max_tokens": 100}
             )
@@ -265,11 +264,10 @@ async def test_migrated_summary_controller_success(mock_llm_service):
             assert data["summary"] == "Concise AI generated summary."
             assert mock_llm_service.summarize_text_async.await_count == 1
 
-@pytest.mark.asyncio
-async def test_migrated_summary_controller_validates_short_text():
-    async with AsyncTestClient(app=app) as client:
+def test_migrated_summary_controller_validates_short_text():
+    with TestClient(app=app) as client:
         # Text shorter than min_length=20 triggers 400 Bad Request automatically in Litestar
-        res = await client.post(
+        res = client.post(
             "/api/summary",
             json={"text": "too short", "max_tokens": 50}
         )

@@ -97,19 +97,19 @@ def answer_user_query(user_question: str, all_documents: list[str]):
     )`,
 			rightTitle: 'Production RAG Pipeline (Chunked + Scored)',
 			rightLanguage: 'python',
-			rightCode: `async def answer_user_query_rag(
+			rightCode: `def answer_user_query_rag(
     user_question: str,
     rag_service: RAGService,
     top_k: int = 3
 ) -> RAGAnswer:
     # 1. Retrieve only high-relevance chunks (top 3)
-    relevant_chunks = await rag_service.retrieve_context(
+    relevant_chunks = rag_service.retrieve_context(
         query=user_question,
         top_k=top_k,
         min_similarity=0.75
     )
     # 2. Synthesize with grounded citation prompt
-    return await rag_service.synthesize_answer(
+    return rag_service.synthesize_answer(
         question=user_question,
         context=relevant_chunks
     )`
@@ -125,7 +125,7 @@ def answer_user_query(user_question: str, all_documents: list[str]):
 			code: `import math
 from typing import NamedTuple, Protocol
 from pydantic import BaseModel, Field
-from openai import AsyncOpenAI
+from openai import OpenAI
 
 class DocumentChunk(NamedTuple):
     id: str
@@ -164,19 +164,19 @@ class InMemoryVectorStore:
         return filtered[:top_k]
 
 class RAGService:
-    def __init__(self, client: AsyncOpenAI, store: InMemoryVectorStore) -> None:
+    def __init__(self, client: OpenAI, store: InMemoryVectorStore) -> None:
         self.client = client
         self.store = store
 
-    async def get_embedding(self, text: str) -> list[float]:
-        resp = await self.client.embeddings.create(
+    def get_embedding(self, text: str) -> list[float]:
+        resp = self.client.embeddings.create(
             model="text-embedding-3-small",
             input=text
         )
         return resp.data[0].embedding
 
-    async def query_and_answer(self, question: str) -> RAGAnswer:
-        q_emb = await self.get_embedding(question)
+    def query_and_answer(self, question: str) -> RAGAnswer:
+        q_emb = self.get_embedding(question)
         chunks = self.store.search(q_emb, top_k=3, threshold=0.6)
 
         if not chunks:
@@ -193,7 +193,7 @@ class RAGService:
             f"Context:\\n{context_str}"
         )
 
-        resp = await self.client.chat.completions.create(
+        resp = self.client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -216,7 +216,7 @@ class RAGService:
 		command: 'pytest -v --cov=app/services/rag tests/test_rag_pipeline.py',
 		executionTimeSec: 0.95,
 		testCode: `import pytest
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import MagicMock
 from app.services.rag import (
     DocumentChunk,
     InMemoryVectorStore,
@@ -249,9 +249,8 @@ def test_in_memory_vector_store_ranking():
     assert results[0].chunk.id == "doc_1"
     assert results[0].score > 0.98
 
-@pytest.mark.asyncio
-async def test_rag_service_returns_fallback_when_no_chunks_match(mocker):
-    mock_client = mocker.AsyncMock()
+def test_rag_service_returns_fallback_when_no_chunks_match(mocker):
+    mock_client = mocker.MagicMock()
     # Mock embedding creation
     mock_client.embeddings.create.return_value = MagicMock(
         data=[MagicMock(embedding=[0.0, 0.0, 1.0])]
@@ -259,7 +258,7 @@ async def test_rag_service_returns_fallback_when_no_chunks_match(mocker):
 
     empty_store = InMemoryVectorStore()
     rag = RAGService(client=mock_client, store=empty_store)
-    result = await rag.query_and_answer("How to configure Litestar?")
+    result = rag.query_and_answer("How to configure Litestar?")
 
     assert result.confidence == 0.0
     assert "No relevant documentation found" in result.answer

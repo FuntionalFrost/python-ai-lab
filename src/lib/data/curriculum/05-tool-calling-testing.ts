@@ -23,7 +23,7 @@ export const track05: CurriculumLesson = {
 		'Generate standards-compliant OpenAI tool schemas directly from Pydantic v2 models.',
 		'Implement a type-safe tool dispatch registry that auto-validates raw LLM arguments.',
 		'Gracefully recover from malformed tool call arguments by sending validation feedback back to the LLM.',
-		'Mock OpenAI tool completions deterministically using pytest-mock and AsyncMock.',
+		'Mock OpenAI tool completions deterministically using pytest-mock and MagicMock.',
 		'Verify parallel tool execution and error handling under external API failure scenarios.'
 	],
 	architecture: {
@@ -81,9 +81,9 @@ The backend application is strictly responsible for:
 					'A dictionary registry mapping tool names to callable handlers and Pydantic validator schemas.'
 			},
 			{
-				name: 'pytest-mock AsyncMock',
+				name: 'pytest-mock MagicMock',
 				description:
-					'Simulating AsyncOpenAI.chat.completions.create to verify that the tool call was made with exact expected arguments without network calls.'
+					'Simulating OpenAI.chat.completions.create to verify that the tool call was made with exact expected arguments without network calls.'
 			},
 			{
 				name: 'Human Linguistic Entropy in Tool Calling',
@@ -141,7 +141,7 @@ def safe_dispatch_weather(raw_arguments: str) -> dict:
 			language: 'python',
 			code: `from typing import Any, Callable
 from pydantic import BaseModel, Field
-from openai import AsyncOpenAI
+from openai import OpenAI
 from app.config import Settings
 
 class WeatherQuery(BaseModel):
@@ -152,15 +152,15 @@ class StockQuery(BaseModel):
     ticker: str = Field(description="Stock ticker symbol, e.g. AAPL, MSFT", max_length=5)
 
 # Tool implementations
-async def get_current_weather(query: WeatherQuery) -> dict[str, Any]:
+def get_current_weather(query: WeatherQuery) -> dict[str, Any]:
     # Mocked or real external API call
     return {"location": query.location, "temperature": 18.5, "unit": query.unit, "condition": "Sunny"}
 
-async def get_stock_price(query: StockQuery) -> dict[str, Any]:
+def get_stock_price(query: StockQuery) -> dict[str, Any]:
     return {"ticker": query.ticker.upper(), "price": 224.50, "currency": "USD"}
 
 class AgentService:
-    def __init__(self, client: AsyncOpenAI, settings: Settings) -> None:
+    def __init__(self, client: OpenAI, settings: Settings) -> None:
         self.client = client
         self.model = settings.llm.model
         self._tools = {
@@ -188,12 +188,12 @@ class AgentService:
             },
         ]
 
-    async def execute_query(self, prompt: str) -> dict[str, Any]:
+    def execute_query(self, prompt: str) -> dict[str, Any]:
         messages = [{"role": "user", "content": prompt}]
         tools = self.get_tool_definitions()
 
         # Turn 1: LLM selects tool
-        first_resp = await self.client.chat.completions.create(
+        first_resp = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
             tools=tools,
@@ -215,7 +215,7 @@ class AgentService:
         schema_cls, handler = self._tools[fn_name]
         try:
             validated_args = schema_cls.model_validate_json(fn_args)
-            tool_result = await handler(validated_args)
+            tool_result = handler(validated_args)
         except Exception as exc:
             tool_result = {"error": f"Execution error: {str(exc)}"}
 
@@ -227,7 +227,7 @@ class AgentService:
             "content": str(tool_result),
         })
 
-        final_resp = await self.client.chat.completions.create(
+        final_resp = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
         )
@@ -248,7 +248,7 @@ class AgentService:
 		executionTimeSec: 0.89,
 		testCode: `import pytest
 import json
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import MagicMock
 from app.services.agent import AgentService, WeatherQuery
 from app.config import Settings, LLMSettings
 
@@ -259,10 +259,9 @@ def mock_settings():
     settings.llm.model = "gpt-4o-mini"
     return settings
 
-@pytest.mark.asyncio
-async def test_agent_dispatches_tool_call(mocker, mock_settings):
+def test_agent_dispatches_tool_call(mocker, mock_settings):
     # 1. Setup mock tool call response from OpenAI
-    mock_client = mocker.AsyncMock()
+    mock_client = mocker.MagicMock()
 
     mock_tool_call = MagicMock()
     mock_tool_call.id = "call_abc123"
@@ -283,18 +282,17 @@ async def test_agent_dispatches_tool_call(mocker, mock_settings):
 
     # 2. Run agent execution
     agent = AgentService(client=mock_client, settings=mock_settings)
-    result = await agent.execute_query("What's the weather in Vienna?")
+    result = agent.execute_query("What's the weather in Vienna?")
 
     # 3. Assertions
     assert result["type"] == "tool_executed"
     assert result["tool"] == "get_current_weather"
     assert result["tool_result"]["location"] == "Vienna, Austria"
     assert result["content"] == "The weather in Vienna is 18.5°C and Sunny."
-    assert mock_client.chat.completions.create.await_count == 2
+    assert mock_client.chat.completions.create.call_count == 2
 
-@pytest.mark.asyncio
-async def test_agent_handles_invalid_arguments_gracefully(mocker, mock_settings):
-    mock_client = mocker.AsyncMock()
+def test_agent_handles_invalid_arguments_gracefully(mocker, mock_settings):
+    mock_client = mocker.MagicMock()
 
     mock_tool_call = MagicMock()
     mock_tool_call.id = "call_err456"
@@ -315,11 +313,11 @@ async def test_agent_handles_invalid_arguments_gracefully(mocker, mock_settings)
     mock_client.chat.completions.create.side_effect = [first_completion, second_completion]
 
     agent = AgentService(client=mock_client, settings=mock_settings)
-    result = await agent.execute_query("Weather in Vienna in kelvin")
+    result = agent.execute_query("Weather in Vienna in kelvin")
 
     # Assert error was caught and tool result captured error message
     assert "error" in result["tool_result"]
-    assert mock_client.chat.completions.create.await_count == 2`,
+    assert mock_client.chat.completions.create.call_count == 2`,
 		simulatedStdout: `============================= test session starts ==============================
 platform win32 -- Python 3.13.0, pytest-9.0.1, pluggy-1.5.0
 rootdir: d:\\Web Projects\\Static\\python-ai-lab

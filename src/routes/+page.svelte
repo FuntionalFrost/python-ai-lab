@@ -37,12 +37,13 @@
 			<p class="text-sm leading-relaxed text-zinc-300 sm:text-base">
 				Build, test, and iterate rapidly on AI prototypes. Master fast prototyping with
 				<strong class="font-semibold text-white">Flask 3.x</strong>,
-				<strong class="font-semibold text-white">Litestar</strong>, and
-				<strong class="font-semibold text-white">htmx</strong>, modern async networking with
-				<strong class="font-semibold text-white">HTTPX</strong> and
+				<strong class="font-semibold text-white">Jinja2</strong>, and
+				<strong class="font-semibold text-white">htmx</strong>, resilient HTTP integrations with
+				<strong class="font-semibold text-white">requests</strong> and
 				<strong class="font-semibold text-white">OpenAI</strong>, instant schema validation with
-				<strong class="font-semibold text-white">Pydantic v2</strong>, real-time streaming
-				playgrounds, and deterministic test harnesses using
+				<strong class="font-semibold text-white">Pydantic v2</strong>, template quality gates with
+				<strong class="font-semibold text-white">djlint</strong>, real-time streaming playgrounds,
+				and deterministic test harnesses using
 				<strong class="font-semibold text-white">pytest-mock</strong>
 				and
 				<strong class="font-semibold text-white">uv</strong>.
@@ -90,7 +91,7 @@
 				<Layers class="h-4 w-4 text-cyan-400" />
 			</div>
 			<div class="mt-2 font-mono text-2xl font-bold text-zinc-100">{ALL_TRACKS.length} Tracks</div>
-			<p class="mt-1 text-[11px] text-zinc-500">From Flask & HTTPX to htmx & Litestar</p>
+			<p class="mt-1 text-[11px] text-zinc-500">From Flask & requests to htmx & Litestar</p>
 		</div>
 
 		<div class="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-5">

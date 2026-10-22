@@ -15,7 +15,7 @@ export const track04: CurriculumLesson = {
 		'OpenAI Client Lifecycle & Connection Pooling in Flask Extensions',
 		'Sliding-Window Conversation Memory with Pydantic'
 	],
-	frameworks: ['Flask 3.1.3', 'OpenAI 1.x', 'Pydantic v2', 'pytest 9.x'],
+	frameworks: ['Flask 3.1.3', 'OpenAI 3.x', 'Pydantic v2', 'pytest 9.x'],
 	tags: ['Flask', 'Streaming', 'SSE', 'OpenAI', 'Chat History', 'Real-Time'],
 	summary:
 		'Deliver snappy conversational AI in Flask by replacing blocking responses with real-time token streaming. Master Flask’s stream_with_context generator mechanism, Server-Sent Events (SSE) protocol framing, Nginx reverse-proxy buffering guards, and resilient conversation buffers.',
@@ -148,33 +148,18 @@ def stream_chat():
 			title: 'Thread-Safe Pooled OpenAI Client Factory for Flask',
 			filePath: 'app/core/openai_client.py',
 			description:
-				'Connection pooling with httpx limits, timeouts, and max retries stored in Flask app extensions.',
+				'Thread-safe OpenAI client instance with timeouts and retry policies stored in Flask app extensions.',
 			language: 'python',
-			code: `import httpx
-from openai import OpenAI
+			code: `from openai import OpenAI
 from app.config import get_settings
 
 def create_openai_client() -> OpenAI:
-    """Creates a thread-safe OpenAI client with pooled TCP connections."""
+    """Creates a thread-safe OpenAI client stored in current_app.extensions."""
     settings = get_settings()
-
-    http_client = httpx.Client(
-        limits=httpx.Limits(
-            max_connections=100,
-            max_keepalive_connections=20,
-            keepalive_expiry=30.0
-        ),
-        timeout=httpx.Timeout(
-            connect=5.0,
-            read=settings.llm.request_timeout,
-            write=10.0,
-            pool=5.0
-        )
-    )
 
     return OpenAI(
         api_key=settings.llm.api_key.get_secret_value(),
-        http_client=http_client,
+        timeout=settings.llm.request_timeout,
         max_retries=3
     )`,
 			runnable: true

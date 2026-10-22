@@ -91,7 +91,7 @@ Build detailed, production-accurate technical lessons across 8 specific tracks:
 
 ### Track 3: Integrating LLM Chats & Streaming in Web Backends
 
-- **OpenAI Client:** Async client usage (`AsyncOpenAI`), connection reuse, timeout settings, and exponential backoff retry configuration.
+- **OpenAI Client:** Synchronous client usage (`OpenAI`) for Flask and resilient connection reuse, timeout settings, and exponential backoff retry configuration.
 - **Streaming in Flask:** `Response(stream_with_context(generate()), mimetype='text/event-stream')`.
 - **Streaming in Litestar:** Native `ServerSentEvent` and `Stream` handlers with async generators.
 - **Session & Memory:** Managing chat message history with Pydantic schemas (`ChatCompletionMessageParam`).
@@ -152,8 +152,7 @@ Every lesson file in `src/lib/data/curriculum/` must contain valid, idiomatic Py
 ```python
 from typing import Any
 from pydantic import BaseModel, Field
-from litestar import Controller, post
-from openai import AsyncOpenAI
+from openai import OpenAI
 from app.config import Settings
 
 class WeatherQuery(BaseModel):
@@ -161,11 +160,11 @@ class WeatherQuery(BaseModel):
     unit: str = Field(default="celsius", pattern="^(celsius|fahrenheit)$")
 
 class AgentService:
-    def __init__(self, client: AsyncOpenAI, settings: Settings) -> None:
+    def __init__(self, client: OpenAI, settings: Settings) -> None:
         self.client = client
         self.model = settings.openai_model
 
-    async def execute_query(self, prompt: str) -> dict[str, Any]:
+    def execute_query(self, prompt: str) -> dict[str, Any]:
         # Tool call registration, dispatch, and schema enforcement
         ...
 
@@ -175,13 +174,12 @@ class AgentService:
 
 ```python
 import pytest
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import MagicMock
 from app.services.agent import AgentService, WeatherQuery
 
-@pytest.mark.asyncio
-async def test_agent_dispatches_tool_call(mocker):
+def test_agent_dispatches_tool_call(mocker):
     # Setup mock OpenAI client and verify parsing with WeatherQuery model
-    mock_client = mocker.AsyncMock()
+    mock_client = mocker.MagicMock()
     ...
 
 ```
