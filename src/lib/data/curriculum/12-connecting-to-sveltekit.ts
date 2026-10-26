@@ -78,7 +78,7 @@ export const track12: CurriculumLesson = {
 			title: 'Streaming Pipeline: Flask 3.x Backend vs. SvelteKit Server BFF',
 			description:
 				'Observe the difference between producing an SSE stream in Flask and proxying/handling it in SvelteKit.',
-			leftTitle: 'Flask 3.x (Python SSE Generator)',
+			leftTitle: 'Flask 3.x (SSE Generator)',
 			leftLanguage: 'python',
 			leftCode: `from flask import Blueprint, Response, stream_with_context, request, current_app
 from openai import OpenAI
@@ -114,7 +114,7 @@ def stream_chat():
             "Access-Control-Allow-Origin": "*"
         }
     )`,
-			rightTitle: 'SvelteKit 3 (TypeScript +server.ts BFF)',
+			rightTitle: 'SvelteKit 3 (+server.ts BFF)',
 			rightLanguage: 'typescript',
 			rightCode: `import { OPENAI_API_KEY } from '$env/static/private';
 import OpenAI from 'openai';
@@ -158,19 +158,20 @@ export const POST: RequestHandler = async ({ request }) => {
 		{
 			title: 'Settings & Secret Isolation',
 			description: 'How API keys and secrets are protected in each ecosystem.',
-			leftTitle: 'Flask / Pydantic (pydantic-settings)',
+			leftTitle: 'app/config.py (pydantic-settings)',
 			leftLanguage: 'python',
-			leftCode: `from pydantic import SecretStr
+			leftCode: `# app/config.py
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-class AppSettings(BaseSettings):
+class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
     openai_api_key: SecretStr # Prevents accidental print/log leaks
 
-# Usage in Flask factory
-settings = AppSettings()
+# Module-level singleton
+settings = Settings()
 raw_key = settings.openai_api_key.get_secret_value()`,
-			rightTitle: 'SvelteKit Private Environment ($env)',
+			rightTitle: 'src/lib/server/openai.ts ($env)',
 			rightLanguage: 'typescript',
 			rightCode: `// src/lib/server/openai.ts
 // Compile-time guard: Build FAILS if imported into browser code!
@@ -189,7 +190,7 @@ export const serverOpenAI = new OpenAI({
 			filePath: 'src/lib/components/ChatStreamConsumer.svelte',
 			description:
 				'Modern Svelte 5 component reading Flask SSE stream chunks with $state and $derived runes.',
-			language: 'typescript',
+			language: 'svelte',
 			code: `<script lang="ts">
 	let prompt = $state('');
 	let answer = $state('');

@@ -30,10 +30,15 @@
 
 	const highlightedHtml = $derived.by(() => {
 		const lang = language.toLowerCase();
-		const grammar = Prism.languages[lang] || Prism.languages.python || Prism.languages.plain;
+		const grammar =
+			Prism.languages[lang] ||
+			(lang === 'svelte' ? Prism.languages.markup : null) ||
+			Prism.languages.python ||
+			Prism.languages.plain;
+		const prismLang = Prism.languages[lang] ? lang : lang === 'svelte' ? 'markup' : 'plain';
 		const cleanCode = code.trim();
 		try {
-			return Prism.highlight(cleanCode, grammar, lang);
+			return Prism.highlight(cleanCode, grammar, prismLang);
 		} catch {
 			return cleanCode;
 		}

@@ -139,13 +139,12 @@ class SummaryController(Controller):
 			leftTitle: 'Flask 3.x: Imperative Bootstrap (app.py)',
 			leftLanguage: 'python',
 			leftCode: `from flask import Flask
-from app.config import get_settings
+from app.config import settings
 from app.services.llm import SyncLLMService
 from app.blueprints.summary import summary_bp
 
 def create_app():
     app = Flask(__name__)
-    settings = get_settings()
 
     # Bound imperatively via dictionary
     app.extensions["llm_service"] = SyncLLMService(settings)
@@ -160,12 +159,11 @@ def create_app():
 			rightLanguage: 'python',
 			rightCode: `from litestar import Litestar
 from litestar.di import Provide
-from app.config import get_settings, Settings
+from app.config import settings
 from app.services.llm import AsyncLLMService
 from app.controllers.summary import SummaryController
 
 async def provide_llm_service() -> AsyncLLMService:
-    settings = get_settings()
     return AsyncLLMService(settings)
 
 # Litestar validates dependencies ahead of time at startup

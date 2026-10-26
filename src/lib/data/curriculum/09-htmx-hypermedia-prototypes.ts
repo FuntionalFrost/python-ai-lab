@@ -136,12 +136,12 @@ The Hypermedia Advantage for AI Prototyping:
 			description:
 				'Compare the code footprint required to send a user prompt and append the AI reply.',
 			leftTitle: 'Client-Side JSON SPA (Heavy State Boilerplate)',
-			leftLanguage: 'typescript',
+			leftLanguage: 'javascript',
 			leftCode: `// ❌ Requires node_modules, build pipeline, state stores
 import { useState } from 'react';
 
 export function ChatWidget() {
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 

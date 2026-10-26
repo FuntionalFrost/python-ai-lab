@@ -155,13 +155,12 @@ import app_routes`,
 			rightLanguage: 'python',
 			rightCode: `from flask import Flask
 from openai import OpenAI
-from app.config import get_settings
+from app.config import settings
 from app.blueprints.analysis import analysis_bp
 
 def create_app() -> Flask:
     """Application factory for Flask 3.x. Enables isolated testing per suite."""
     app = Flask(__name__)
-    settings = get_settings()
 
     # Store configured OpenAI client in Flask extensions registry
     app.extensions["openai_client"] = OpenAI(

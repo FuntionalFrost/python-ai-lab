@@ -151,12 +151,10 @@ def stream_chat():
 				'Thread-safe OpenAI client instance with timeouts and retry policies stored in Flask app extensions.',
 			language: 'python',
 			code: `from openai import OpenAI
-from app.config import get_settings
+from app.config import settings
 
 def create_openai_client() -> OpenAI:
     """Creates a thread-safe OpenAI client stored in current_app.extensions."""
-    settings = get_settings()
-
     return OpenAI(
         api_key=settings.llm.api_key.get_secret_value(),
         timeout=settings.llm.request_timeout,

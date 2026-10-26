@@ -23,7 +23,7 @@ export const track02: CurriculumLesson = {
 		'Construct type-safe settings classes using BaseSettings and SettingsConfigDict.',
 		'Protect API keys from log leaking using SecretStr and get_secret_value().',
 		'Implement custom field and model validators for cross-field validation.',
-		'Avoid circular imports using dependency-injected cached settings (@lru_cache).',
+		'Avoid circular imports and redundant disk reads using a module-level singleton (settings = Settings()).',
 		'Write unit tests that assert startup halts on invalid environment configurations.'
 	],
 	architecture: {
@@ -48,7 +48,7 @@ export const track02: CurriculumLesson = {
                Validated at Startup -> Halts run if invalid
                                      v
 +-------------------------------------------------------------------------+
-|            Injected into Services via @lru_cache get_settings()         |
+|           Imported across Services as Module Singleton: settings        |
 +-------------------------------------------------------------------------+`,
 		explanation: `Relying on raw 'os.getenv()' or untyped globals is an anti-pattern that leads to runtime crashes during benchmarking or testing when an environment variable is misspelled, missing, or has an invalid type (e.g. timeout='60' parsed as string instead of int).
 
@@ -95,10 +95,9 @@ def get_client():
     # If OPENAI_KEY is missing, fails later during network call, not at boot!
     from openai import OpenAI
     return OpenAI(api_key=CONFIG["OPENAI_KEY"])`,
-			rightTitle: 'Validated Prototype Pattern (pydantic-settings + SecretStr)',
+			rightTitle: 'app/config.py (pydantic-settings + SecretStr)',
 			rightLanguage: 'python',
-			rightCode: `from functools import lru_cache
-from pydantic import BaseModel, Field, SecretStr
+			rightCode: `from pydantic import BaseModel, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class OpenAISettings(BaseModel):
@@ -117,10 +116,8 @@ class AppSettings(BaseSettings):
     environment: str = Field(default="dev", pattern="^(dev|test|benchmark)$")
     openai: OpenAISettings
 
-@lru_cache(maxsize=1)
-def get_settings() -> AppSettings:
-    """Cached singleton prevents reading filesystem repeatedly."""
-    return AppSettings()`
+# Module-level singleton: validated once on import and cached in sys.modules
+settings = AppSettings()`
 		}
 	],
 	codeSnippets: [
@@ -131,8 +128,7 @@ def get_settings() -> AppSettings:
 			description:
 				'Complete settings module featuring cross-field model validation, benchmark concurrency bounds, and secret masking.',
 			language: 'python',
-			code: `from functools import lru_cache
-from typing import Literal
+			code: `from typing import Literal
 from pydantic import BaseModel, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -167,9 +163,8 @@ class Settings(BaseSettings):
                 raise ValueError("Benchmark mode requires BENCHMARK__USE_LIVE_NETWORK=True!")
         return self
 
-@lru_cache(maxsize=1)
-def get_settings() -> Settings:
-    return Settings()`,
+# Module-level singleton: validated once on import and reused across the app
+settings = Settings()`,
 			runnable: true
 		}
 	],
