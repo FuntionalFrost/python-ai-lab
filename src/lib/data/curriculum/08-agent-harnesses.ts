@@ -1,9 +1,9 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track07: CurriculumLesson = {
-	id: 'track-07',
-	slug: '07-agent-harnesses',
-	trackNumber: 7,
+export const track08: CurriculumLesson = {
+	id: 'track-08',
+	slug: '08-agent-harnesses',
+	trackNumber: 8,
 	title: 'Building & Testing Agent Harnesses',
 	shortTitle: 'Agent Harnesses & Replay Testing',
 	subtitle: 'Decoupled Orchestration Loops, Loop Guards, and Deterministic Replay Fixtures',
@@ -15,10 +15,10 @@ export const track07: CurriculumLesson = {
 		'Deterministic Agent Replay Harnesses',
 		'Testing Agent Convergence with Recorded Fixtures'
 	],
-	frameworks: ['openai>=3.35.1', 'pydantic>=2.14.1', 'pytest>=9.0', 'pytest-mock>=3.17'],
+	frameworks: ['openai>=3.36.1', 'pydantic>=2.14.1', 'pytest>=9.0', 'pytest-mock>=3.17'],
 	tags: ['Autonomous Agents', 'Harness', 'Replay Testing', 'Safety Rails', 'State Machine'],
 	summary:
-		'Autonomous agent loops without strict termination bounds will burn API budgets and lock worker threads in infinite reasoning cycles. Build a production-grade Agent Harness that decouples loop control, enforces maximum iterations, and allows 100% deterministic replay testing using fixture recording.',
+		'Autonomous agent loops without strict termination bounds will burn API budgets and lock worker threads in infinite reasoning cycles. Build a guarded Agent Harness that decouples loop control, enforces maximum iterations, and allows 100% deterministic replay testing using fixture recording.',
 	objectives: [
 		'Separate agent decision loops from web controllers into a testable standalone harness.',
 		'Implement hard circuit breakers (MaxIterationsExceeded, TokenBudgetExceeded).',
@@ -91,7 +91,7 @@ def run_agent_forever(prompt: str):
     messages = [{"role": "user", "content": prompt}]
     while True: # HAZARD: If model hallucinates, loops forever!
         resp = client.chat.completions.create(
-            model="gpt-4o",
+            model="gemma-4-e4b-it",
             messages=messages,
             tools=tools
         )
@@ -100,7 +100,7 @@ def run_agent_forever(prompt: str):
             return msg.content # Might never reach here!
         # Execute tool and append...
         messages.append(msg)`,
-			rightTitle: 'Guarded Agent Harness (Production)',
+			rightTitle: 'Guarded Agent Harness (Bounded)',
 			rightLanguage: 'python',
 			rightCode: `class AgentHarness:
     def __init__(self, client: OpenAI, max_steps: int = 5) -> None:
@@ -125,7 +125,7 @@ def run_agent_forever(prompt: str):
 	codeSnippets: [
 		{
 			id: 'agent-harness-implementation',
-			title: 'Production Agent Harness with Circuit Breakers & Trace Logs',
+			title: 'Bounded Agent Harness with Circuit Breakers & Trace Logs',
 			filePath: 'app/services/harness.py',
 			description:
 				'Type-safe agent harness tracking execution traces, loop limits, and tool dispatching.',
@@ -161,7 +161,7 @@ class AgentHarness:
         tools_map: dict[str, Any],
         tool_schemas: list[dict[str, Any]],
         max_steps: int = 5,
-        model: str = "gpt-4o-mini"
+        model: str = "gemma-4-e4b-it"
     ) -> None:
         self.client = client
         self.tools_map = tools_map

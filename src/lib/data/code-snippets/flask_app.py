@@ -25,7 +25,7 @@ def generate_completion():
 
     client: OpenAI = current_app.extensions["openai_client"]
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gemma-4-e4b-it",
         messages=[{"role": "user", "content": payload.prompt}],
         temperature=payload.temperature,
     )

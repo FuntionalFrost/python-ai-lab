@@ -124,7 +124,7 @@ Build detailed, production-accurate technical lessons across 8 specific tracks:
 
 ### Track 7: Benchmarking, Metrics & User Satisfaction
 
-- **Cross-Model Benchmarking:** Systematic evaluation across candidate LLM models (GPT-4o, GPT-4o-mini, Claude 3.5 Sonnet, Gemma 4, Llama 3.3) for latency, token economics, and qualitative response dynamics.
+- **Cross-Model Benchmarking:** Systematic evaluation across open-weight instruction-tuned LLM models with $\le 4\text{B}$ total/effective parameters (`gemma-4-e4b-it`, `gemma-4-e2b-it`, `gemma-3-1b-it`, `functiongemma-270m-it`) for latency, token economics, and qualitative response dynamics.
 - **Same-Model Benchmarking & Ablation:** Evaluating the same model across prompt variations, few-shot exemplars, temperature/hyperparameters, and Pydantic schema guardrails.
 - **Improving User Satisfaction at Prototype/Research Stage:**
   - Measuring authentic conversational dynamics: ambiguity disambiguation (asking crisp questions vs. hallucinating), conversational repair on user reversal, tone, and empathy.

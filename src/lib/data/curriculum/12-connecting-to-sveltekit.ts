@@ -1,13 +1,13 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track10: CurriculumLesson = {
-	id: 'track-10',
-	slug: '10-connecting-flask-to-sveltekit',
-	trackNumber: 10,
-	title: 'Connecting Flask to SvelteKit (Full-Stack AI Integration)',
-	shortTitle: 'Flask to SvelteKit Full-Stack',
+export const track12: CurriculumLesson = {
+	id: 'track-12',
+	slug: '12-connecting-to-sveltekit',
+	trackNumber: 12,
+	title: 'Connecting Python AI Backends to SvelteKit (Full-Stack AI Integration)',
+	shortTitle: 'Connecting to SvelteKit',
 	subtitle:
-		'Consuming Flask SSE Streams, Type-Safe Pydantic Contracts, and Svelte 5 Reactive Frontends',
+		'Consuming Streaming AI Backends, Type-Safe Pydantic Contracts, and Svelte 5 Reactive Frontends',
 	estimatedMinutes: 45,
 	topics: [
 		'Full-Stack Topology: Flask AI Microservice & SvelteKit UI',
@@ -94,7 +94,7 @@ def stream_chat():
 
     def generate():
         stream = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gemma-4-e4b-it",
             messages=[{"role": "user", "content": prompt}],
             stream=True
         )
@@ -126,7 +126,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const { prompt } = await request.json();
 
 	const stream = await openai.chat.completions.create({
-		model: 'gpt-4o-mini',
+		model: 'gemma-4-e4b-it',
 		messages: [{ role: 'user', content: prompt }],
 		stream: true
 	});

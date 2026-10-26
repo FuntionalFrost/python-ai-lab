@@ -3,43 +3,50 @@
 	import CodeBlock from '#lib/components/CodeBlock.svelte';
 	import { Activity, ShieldCheck, Scale, Wrench, Sliders } from '@lucide/svelte';
 
-	const multiModelRunnerSnippet = `from pydantic_settings import BaseSettings, SettingsConfigDict
-from openai import OpenAI
+	const multiModelRunnerSnippet = `import asyncio
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from openai import AsyncOpenAI
 from app.schemas.eval_rubric import UserSatisfactionEval
 
+# /benchmarks runs live concurrent LLM evaluations via AsyncOpenAI,
+# whereas /tests runs deterministic synchronous unit tests via pytest.
 class EvalSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
     openai_api_key: str
-    judge_model: str = "gpt-4o"
+    judge_model: str = "gemma-4-e4b-it"
     candidate_models: list[str] = [
-        "gpt-4o",
-        "gpt-4o-mini",
-        "gemma-4-26b-a4b",
-        "gemma-4-27b",
-        "gemma-4-e4b",
-        "gemma-4-e2b"
+        "gemma-4-e4b-it",
+        "gemma-4-e2b-it",
+        "gemma-3-1b-it",
+        "functiongemma-270m-it"
     ]
     default_temperature: float = 0.1
 
-def benchmark_models_on_frozen_cases(client: OpenAI, settings: EvalSettings, frozen_test_cases: list[dict]):
+sem = asyncio.Semaphore(10)
+
+async def evaluate_case(client: AsyncOpenAI, settings: EvalSettings, model: str, case: dict) -> float:
+    async with sem:
+        response = await client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": HARDENED_SYSTEM_PROMPT},
+                {"role": "user", "content": case["prompt"]}
+            ],
+            temperature=settings.default_temperature
+        )
+        rubric = await grade_with_judge(client, settings.judge_model, case["prompt"], response.choices[0].message.content)
+        return rubric.overall_satisfaction
+
+async def benchmark_models_on_frozen_cases(settings: EvalSettings, frozen_test_cases: list[dict]):
+    client = AsyncOpenAI(api_key=settings.openai_api_key)
     results = {}
     for model in settings.candidate_models:
-        model_scores = []
-        for case in frozen_test_cases:
-            # Execute model on frozen unlaundered user prompt
-            response = client.chat.completions.create(
-                model=model,
-                messages=[
-                    {"role": "system", "content": HARDENED_SYSTEM_PROMPT},
-                    {"role": "user", "content": case["prompt"]}
-                ],
-                temperature=settings.default_temperature
-            )
-            # Grade with structured psychometric satisfaction rubric
-            rubric = grade_with_judge(client, settings.judge_model, case["prompt"], response.choices[0].message.content)
-            model_scores.append(rubric.overall_satisfaction)
-        results[model] = sum(model_scores) / len(model_scores)
-    return results`;
+        scores = await asyncio.gather(*(evaluate_case(client, settings, model, c) for c in frozen_test_cases))
+        results[model] = sum(scores) / len(scores)
+    return results
+
+if __name__ == "__main__":
+    asyncio.run(benchmark_models_on_frozen_cases(EvalSettings(), FROZEN_CASES))`;
 
 	const hardenedToolSchemaSnippet = `from typing import Literal
 from pydantic import BaseModel, Field, field_validator
@@ -136,11 +143,17 @@ exclude_lines =
 					</h3>
 				</div>
 				<p class="text-xs leading-relaxed text-zinc-400">
-					Automates side-by-side benchmarking across candidate models (GPT-4o, Claude, Gemma, Llama)
-					and tests the same model across prompt and hyperparameter ablations using frozen real-user
-					test cases.
+					Runs live concurrent benchmarks in <code class="text-zinc-300">/benchmarks</code> via
+					<code class="text-zinc-300">AsyncOpenAI</code> &amp;
+					<code class="text-zinc-300">asyncio.gather</code> across candidate models and prompt
+					ablations, while keeping automated unit tests in <code class="text-zinc-300">/tests</code>
+					synchronous.
 				</p>
-				<CodeBlock code={multiModelRunnerSnippet} language="python" title="app/evals/runner.py" />
+				<CodeBlock
+					code={multiModelRunnerSnippet}
+					language="python"
+					title="benchmarks/run_evals.py"
+				/>
 			</div>
 
 			<!-- Pillar 2: Psychometric Satisfaction Judge -->

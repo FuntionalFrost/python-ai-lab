@@ -11,16 +11,16 @@ export const track02: CurriculumLesson = {
 	topics: [
 		'pydantic-settings BaseSettings',
 		'SecretStr & Accidental Leak Prevention',
-		'Nested Configurations (OpenAI, DB, Cache)',
+		'Nested Configurations (OpenAI, Benchmark, Cache)',
 		'@field_validator & @model_validator',
-		'Prototype os.getenv() vs Production Settings'
+		'Ad-Hoc os.getenv() vs Validated Typed Settings'
 	],
 	frameworks: ['pydantic>=2.14.1', 'pydantic-settings>=2.16.0', 'pytest>=9.0'],
 	tags: ['Pydantic', 'Configuration', 'Security', 'Validation', 'Best Practices'],
 	summary:
-		'Tackle the most frequent operational failure in AI apps: configuration drift and leaked keys. Master pydantic-settings, nested environment loading, custom Pydantic v2 validators, and automated testing of invalid settings.',
+		'Tackle the most frequent failure in AI prototypes and benchmarks: configuration drift and leaked keys. Master pydantic-settings, nested environment loading, custom Pydantic v2 validators, and automated testing of invalid settings.',
 	objectives: [
-		'Construct enterprise-ready settings classes using BaseSettings and SettingsConfigDict.',
+		'Construct type-safe settings classes using BaseSettings and SettingsConfigDict.',
 		'Protect API keys from log leaking using SecretStr and get_secret_value().',
 		'Implement custom field and model validators for cross-field validation.',
 		'Avoid circular imports using dependency-injected cached settings (@lru_cache).',
@@ -29,8 +29,8 @@ export const track02: CurriculumLesson = {
 	architecture: {
 		patternName: 'Fail-Fast Configuration & Hierarchical Settings Tree',
 		diagram: `+-------------------------------------------------------------------------+
-|                  Environment Sources (.env / Docker / OS)               |
-|      OPENAI_API_KEY=sk-...     DATABASE_URL=postgresql+asyncpg://...    |
+|                  Environment Sources (.env / CLI / OS)                  |
+|      OPENAI_API_KEY=sk-...     BENCHMARK__MAX_CONCURRENCY=10            |
 +-------------------------------------------------------------------------+
                                      |
                                      v
@@ -38,26 +38,26 @@ export const track02: CurriculumLesson = {
 |                       AppSettings (BaseSettings)                        |
 |                                                                         |
 |   +-------------------+  +-------------------+  +--------------------+  |
-|   |   OpenAISettings  |  |  DatabaseSettings |  |    RedisSettings   |  |
-|   |  - api_key (Secret|  |  - url (Postgres) |  |  - host: str       |  |
-|   |  - model: str     |  |  - pool_size: int |  |  - port: int       |  |
-|   |  - max_retries    |  |  - max_overflow   |  |  - ssl: bool       |  |
+|   |   OpenAISettings  |  | BenchmarkSettings |  |   SessionSettings  |  |
+|   |  - api_key (Secret|  |  - concurrency    |  |  - connect_timeout |  |
+|   |  - model: str     |  |  - judge_model    |  |  - read_timeout    |  |
+|   |  - max_retries    |  |  - candidates     |  |  - pool_maxsize    |  |
 |   +-------------------+  +-------------------+  +--------------------+  |
 +-------------------------------------------------------------------------+
                                      |
-               Validated at Startup -> Halts app if invalid
+               Validated at Startup -> Halts run if invalid
                                      v
 +-------------------------------------------------------------------------+
 |            Injected into Services via @lru_cache get_settings()         |
 +-------------------------------------------------------------------------+`,
-		explanation: `Relying on raw 'os.getenv()' or untyped globals is an anti-pattern that leads to runtime crashes in production when an environment variable is misspelled, missing, or has an invalid type (e.g. timeout='60' parsed as string instead of int).
+		explanation: `Relying on raw 'os.getenv()' or untyped globals is an anti-pattern that leads to runtime crashes during benchmarking or testing when an environment variable is misspelled, missing, or has an invalid type (e.g. timeout='60' parsed as string instead of int).
 
-Pydantic-settings validates every key upon application startup (Fail-Fast principle). It automatically casts data types, validates URL formats, masks secrets in tracebacks and print statements, and groups configuration into nested, domain-specific namespaces.`,
+Pydantic-settings validates every key upon startup (Fail-Fast principle). It automatically casts data types, validates bounds, masks secrets in tracebacks and print statements, and groups configuration into nested, domain-specific namespaces.`,
 		keyConcepts: [
 			{
 				name: 'SecretStr',
 				description:
-					'Wraps sensitive secrets. Printing or logging the object outputs ********** instead of the plaintext key, preventing accidental exposure in Datadog/Sentry.'
+					'Wraps sensitive secrets. Printing or logging the object outputs ********** instead of the plaintext key, preventing accidental exposure in logs.'
 			},
 			{
 				name: 'SettingsConfigDict',
@@ -67,25 +67,25 @@ Pydantic-settings validates every key upon application startup (Fail-Fast princi
 			{
 				name: '@model_validator(mode="after")',
 				description:
-					'Executes after individual fields are validated to enforce multi-field business invariants (e.g., if env is "production", ssl must be enabled).'
+					'Executes after individual fields are validated to enforce multi-field invariants (e.g., if env is "benchmark", mock keys must be rejected).'
 			}
 		]
 	},
 	comparisons: [
 		{
-			title: 'Prototype (Naive os.getenv) vs Production (pydantic-settings)',
+			title: 'Ad-Hoc os.getenv() vs. Validated Settings (pydantic-settings)',
 			description:
 				'Observe how raw environment access leads to silent bugs, while pydantic-settings guarantees type safety and fail-fast startup.',
-			leftTitle: 'Prototype Anti-Pattern (Untyped & Fragile)',
+			leftTitle: 'Ad-Hoc Anti-Pattern (Untyped & Fragile)',
 			leftLanguage: 'python',
 			leftCode: `import os
 
 # Anti-pattern: Missing keys default to None or empty string
-# No type validation: port is a string, not an integer
+# No type validation: max_retries is a string if passed via env
 # Leaked secrets: printing CONFIG exposes raw API tokens
 CONFIG = {
     "OPENAI_KEY": os.getenv("OPENAI_KEY"),
-    "MODEL": os.getenv("MODEL", "gpt-4o"),
+    "MODEL": os.getenv("MODEL", "gemma-4-e4b-it"),
     "MAX_RETRIES": os.getenv("MAX_RETRIES", 3), # BUG: string "3" if passed in env!
     "TIMEOUT": float(os.getenv("TIMEOUT", 30)),
     "DEBUG": os.getenv("DEBUG", "False") == "True",
@@ -95,15 +95,15 @@ def get_client():
     # If OPENAI_KEY is missing, fails later during network call, not at boot!
     from openai import OpenAI
     return OpenAI(api_key=CONFIG["OPENAI_KEY"])`,
-			rightTitle: 'Production Pattern (pydantic-settings + SecretStr)',
+			rightTitle: 'Validated Prototype Pattern (pydantic-settings + SecretStr)',
 			rightLanguage: 'python',
 			rightCode: `from functools import lru_cache
-from pydantic import BaseModel, Field, SecretStr, field_validator
+from pydantic import BaseModel, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class OpenAISettings(BaseModel):
     api_key: SecretStr = Field(..., description="OpenAI API secret token")
-    model: str = Field(default="gpt-4o-mini")
+    model: str = Field(default="gemma-4-e4b-it")
     timeout_seconds: float = Field(default=30.0, ge=1.0, le=300.0)
     max_retries: int = Field(default=3, ge=0, le=10)
 
@@ -114,7 +114,7 @@ class AppSettings(BaseSettings):
         case_sensitive=False,
         extra="ignore"
     )
-    environment: str = Field(default="development", pattern="^(development|staging|production)$")
+    environment: str = Field(default="dev", pattern="^(dev|test|benchmark)$")
     openai: OpenAISettings
 
 @lru_cache(maxsize=1)
@@ -126,32 +126,24 @@ def get_settings() -> AppSettings:
 	codeSnippets: [
 		{
 			id: 'complete-settings-model',
-			title: 'Production Settings Tree with Nested Configuration',
+			title: 'Hierarchical Settings Tree with Cross-Field Validation',
 			filePath: 'app/config.py',
 			description:
-				'Complete settings module featuring cross-field model validation, database URL validation, and secret masking.',
+				'Complete settings module featuring cross-field model validation, benchmark concurrency bounds, and secret masking.',
 			language: 'python',
 			code: `from functools import lru_cache
 from typing import Literal
 from pydantic import BaseModel, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-class DatabaseSettings(BaseModel):
-    host: str = Field(default="localhost")
-    port: int = Field(default=5432, ge=1, le=65535)
-    user: str = Field(default="postgres")
-    password: SecretStr = Field(default=SecretStr("postgres"))
-    name: str = Field(default="ai_lab")
-    pool_size: int = Field(default=10, ge=1, le=50)
-
-    @property
-    def async_dsn(self) -> str:
-        pwd = self.password.get_secret_value()
-        return f"postgresql+asyncpg://{self.user}:{pwd}@{self.host}:{self.port}/{self.name}"
+class BenchmarkConfig(BaseModel):
+    judge_model: str = Field(default="gemma-4-e4b-it")
+    max_concurrency: int = Field(default=10, ge=1, le=50)
+    use_live_network: bool = Field(default=False)
 
 class LLMSettings(BaseModel):
     api_key: SecretStr
-    model: str = "gpt-4o"
+    model: str = "gemma-4-e4b-it"
     temperature: float = Field(default=0.2, ge=0.0, le=2.0)
     request_timeout: float = Field(default=30.0, ge=2.0, le=120.0)
 
@@ -162,17 +154,17 @@ class Settings(BaseSettings):
         extra="forbid" # Catch misspelled env vars immediately
     )
 
-    env: Literal["dev", "test", "prod"] = "dev"
-    db: DatabaseSettings = Field(default_factory=DatabaseSettings)
+    env: Literal["dev", "test", "benchmark"] = "dev"
+    benchmark: BenchmarkConfig = Field(default_factory=BenchmarkConfig)
     llm: LLMSettings
 
     @model_validator(mode="after")
-    def validate_production_invariants(self) -> "Settings":
-        if self.env == "prod":
+    def validate_benchmark_invariants(self) -> "Settings":
+        if self.env == "benchmark":
             if self.llm.api_key.get_secret_value().startswith("mock-"):
-                raise ValueError("Production environment cannot use mock API keys!")
-            if self.db.host in ("localhost", "127.0.0.1"):
-                raise ValueError("Production environment cannot target localhost database!")
+                raise ValueError("Live benchmark mode cannot use mock API keys!")
+            if not self.benchmark.use_live_network:
+                raise ValueError("Benchmark mode requires BENCHMARK__USE_LIVE_NETWORK=True!")
         return self
 
 @lru_cache(maxsize=1)
@@ -188,18 +180,18 @@ def get_settings() -> Settings:
 		executionTimeSec: 0.62,
 		testCode: `import pytest
 from pydantic import ValidationError
-from app.config import Settings, DatabaseSettings, LLMSettings
+from app.config import Settings, BenchmarkConfig, LLMSettings
 
 def test_settings_loads_valid_configuration(monkeypatch):
-    monkeypatch.setenv("LLM__API_KEY", "sk-proj-valid-prod-key-12345678")
+    monkeypatch.setenv("LLM__API_KEY", "sk-proj-valid-key-12345678")
     monkeypatch.setenv("ENV", "dev")
 
     settings = Settings()
     assert settings.env == "dev"
-    assert settings.llm.model == "gpt-4o"
+    assert settings.llm.model == "gemma-4-e4b-it"
     # Verify secret masking
     assert str(settings.llm.api_key) == "**********"
-    assert settings.llm.api_key.get_secret_value() == "sk-proj-valid-prod-key-12345678"
+    assert settings.llm.api_key.get_secret_value() == "sk-proj-valid-key-12345678"
 
 def test_settings_fails_fast_on_missing_api_key(monkeypatch):
     monkeypatch.delenv("LLM__API_KEY", raising=False)
@@ -207,23 +199,23 @@ def test_settings_fails_fast_on_missing_api_key(monkeypatch):
         Settings()
     assert "llm.api_key" in str(exc_info.value)
 
-def test_production_validator_blocks_localhost_db(monkeypatch):
-    monkeypatch.setenv("LLM__API_KEY", "sk-live-production-secret")
-    monkeypatch.setenv("ENV", "prod")
-    monkeypatch.setenv("DB__HOST", "127.0.0.1")
+def test_benchmark_validator_requires_live_network(monkeypatch):
+    monkeypatch.setenv("LLM__API_KEY", "sk-live-secret-key")
+    monkeypatch.setenv("ENV", "benchmark")
+    monkeypatch.setenv("BENCHMARK__USE_LIVE_NETWORK", "false")
 
     with pytest.raises(ValidationError) as exc_info:
         Settings()
-    assert "Production environment cannot target localhost database!" in str(exc_info.value)
+    assert "Benchmark mode requires BENCHMARK__USE_LIVE_NETWORK=True!" in str(exc_info.value)
 
-def test_production_validator_blocks_mock_key(monkeypatch):
+def test_benchmark_validator_blocks_mock_key(monkeypatch):
     monkeypatch.setenv("LLM__API_KEY", "mock-key-for-tests")
-    monkeypatch.setenv("ENV", "prod")
-    monkeypatch.setenv("DB__HOST", "db.internal.aws.com")
+    monkeypatch.setenv("ENV", "benchmark")
+    monkeypatch.setenv("BENCHMARK__USE_LIVE_NETWORK", "true")
 
     with pytest.raises(ValidationError) as exc_info:
         Settings()
-    assert "Production environment cannot use mock API keys!" in str(exc_info.value)`,
+    assert "Live benchmark mode cannot use mock API keys!" in str(exc_info.value)`,
 		simulatedStdout: `============================= test session starts ==============================
 platform win32 -- Python 3.13.0, pytest-9.0.1, pluggy-1.5.0
 rootdir: d:\\Web Projects\\Static\\python-ai-lab
@@ -232,8 +224,8 @@ collected 4 items
 
 tests/test_config.py::test_settings_loads_valid_configuration PASSED     [ 25%]
 tests/test_config.py::test_settings_fails_fast_on_missing_api_key PASSED [ 50%]
-tests/test_config.py::test_production_validator_blocks_localhost_db PASSED [ 75%]
-tests/test_config.py::test_production_validator_blocks_mock_key PASSED   [100%]
+tests/test_config.py::test_benchmark_validator_requires_live_network PASSED [ 75%]
+tests/test_config.py::test_benchmark_validator_blocks_mock_key PASSED    [100%]
 
 ---------- coverage: platform win32, python 3.13.0 -----------
 Name             Stmts   Miss  Cover   Missing

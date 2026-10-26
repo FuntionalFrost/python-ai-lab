@@ -177,7 +177,7 @@
 					rightTitle={comparison.rightTitle}
 					rightLanguage={comparison.rightLanguage}
 					rightCode={comparison.rightCode}
-					isPrototypeVsProduction={track.slug === '11-prototype-to-production' ||
+					isPrototypeVsProduction={track.slug === '10-prototype-to-production' ||
 						track.slug === '02-pydantic-settings'}
 				/>
 			{/each}

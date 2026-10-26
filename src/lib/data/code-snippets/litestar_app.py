@@ -25,13 +25,13 @@ class AIController(Controller):
         client: AsyncOpenAI,
     ) -> CompletionResult:
         response = await client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gemma-4-e4b-it",
             messages=[{"role": "user", "content": data.prompt}],
             temperature=data.temperature,
         )
         return CompletionResult(
             result=response.choices[0].message.content or "",
-            model="gpt-4o-mini",
+            model="gemma-4-e4b-it",
         )
 
 async def provide_openai() -> AsyncOpenAI:

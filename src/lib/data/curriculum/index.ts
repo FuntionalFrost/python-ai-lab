@@ -3,14 +3,14 @@ import { track01 } from './01-frameworks-mvc';
 import { track02 } from './02-pydantic-settings';
 import { track03 } from './03-resilient-requests-sessions';
 import { track04 } from './04-llm-chat-streaming';
-import { track05 } from './05-tool-calling-testing';
-import { track06 } from './06-rag-pipelines';
-import { track07 } from './07-agent-harnesses';
-import { track08 } from './08-evals-benchmarks';
+import { track05 } from './05-evals-benchmarks';
+import { track06 } from './06-tool-calling-testing';
+import { track07 } from './07-rag-pipelines';
+import { track08 } from './08-agent-harnesses';
 import { track09 } from './09-htmx-hypermedia-prototypes';
-import { track10 } from './10-connecting-flask-to-sveltekit';
-import { track11 } from './11-prototype-to-production';
-import { track12 } from './12-migrating-flask-to-litestar';
+import { track10 } from './10-prototype-to-production';
+import { track11 } from './11-migrating-flask-to-litestar';
+import { track12 } from './12-connecting-to-sveltekit';
 
 export const ALL_TRACKS: CurriculumLesson[] = [
 	track01,

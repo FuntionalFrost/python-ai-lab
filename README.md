@@ -30,7 +30,7 @@ Building AI backends requires fast feedback loops: quickly constructing prototyp
 
 - **Rapid Prototyping:** Lean architectures in Flask 3.x and Litestar with Pydantic v2.
 - **Deterministic Testing:** Test harnesses using `pytest-mock`, deterministic mocks, and replay fixtures.
-- **Cross-Model Benchmarking:** Comparing candidate models (GPT-4o, GPT-4o-mini, Claude, Gemma, Llama) on latency, throughput, token cost, and tool precision.
+- **Cross-Model Benchmarking:** Comparing open-weight instruction-tuned candidate models with $\le 4\text{B}$ total/effective parameters (`gemma-4-e4b-it`, `gemma-4-e2b-it`, `gemma-3-1b-it`, `functiongemma-270m-it`) on latency, throughput, token cost, and tool precision.
 - **Same-Model Benchmarking & Tuning:** Ablating prompts, few-shot exemplars, temperature, and schema guardrails on the same model to uncover optimal prototype configurations.
 - **User Satisfaction at Prototype Stage:** Measuring and boosting real human satisfaction using psychometric LLM-as-a-judge rubrics (ambiguity resolution, conversational repair, empathy, and perceived latency).
 
@@ -41,7 +41,7 @@ Building AI backends requires fast feedback loops: quickly constructing prototyp
 The platform is not just static documentation—it includes live interactive simulators and execution harnesses:
 
 - **Simulated SSE Streaming Chat:** Configurable Time-To-First-Token (TTFT) and Inter-Token Latency (ITL) sliders, live chunk monitor, and Pydantic validation status indicators.
-- **Cross-Model & Intra-Model Benchmark Explorer:** Dynamic bar and line charts comparing cross-model performance (GPT-4o, Claude 3.5 Sonnet, Gemma 4, GPT-4o-Mini) and interactive system levers to evaluate the impact of prompt guardrails, few-shot examples, and Pydantic schemas on the same model.
+- **Cross-Model & Intra-Model Benchmark Explorer:** Dynamic bar and line charts comparing cross-model performance (`gemma-4-e4b-it`, `gemma-4-e2b-it`, `gemma-3-1b-it`, `functiongemma-270m-it`) and interactive system levers to evaluate the impact of prompt guardrails, few-shot examples, and Pydantic schemas on the same model.
 - **Psychometric User Satisfaction Evaluator:** Interactive rubrics measuring authentic conversational dynamics (ambiguity disambiguation, conversational repair on user reversal, tone de-escalation, tool precision).
 - **Closed-Loop Tool Call Visualizer:** Step through the 5-stage LLM function calling lifecycle (Prompt $\to$ LLM Tool Proposal $\to$ Pydantic Validation $\to$ Python Execution $\to$ Synthesis) with interactive schema error injection (`unit="kelvin"`).
 - **Realistic Pytest Terminal Modal:** Watch animated test suites execute line-by-line with ANSI highlights, `--cov` coverage breakdowns, `-v` verbose flags, and failure simulations.
@@ -55,20 +55,20 @@ The platform is not just static documentation—it includes live interactive sim
 
 The platform features 12 comprehensive tracks organized into rapid prototyping/testing foundations (Tracks 01–09) followed by full-stack, production deployment, and ASGI scaling (Tracks 10–12):
 
-| #      | Track                                        | Focus & Architectural Concepts                                                                                                                        | Stack                                           |
-| :----- | :------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------- |
-| **01** | **Application Factory & Clean MVC**          | Flask 3.x `create_app` factory, modular Blueprints, Clean Architecture Service/Repository layering, and Pydantic DTO request validation.              | Flask 3.1, Pydantic v2, pytest-mock             |
-| **02** | **Settings & Schemas with Pydantic v2**      | `pydantic-settings` `BaseSettings`, `SecretStr` key masking, fail-fast environment validation, and `@lru_cache` dependency injection.                 | Pydantic v2, pydantic-settings                  |
-| **03** | **Resilient HTTP with Requests**             | `requests.Session` connection pooling, `urllib3.util.Retry` exponential backoff, granular tuple timeouts, and `pytest-mock` testing.                  | Requests 2.32+, urllib3, pytest-mock            |
-| **04** | **LLM Chats & Streaming Backends**           | Flask `stream_with_context` Server-Sent Events (SSE), connection pooling, chunk delimiters, and sliding-window conversational memory.                 | Flask 3.1, OpenAI SDK, SSE                      |
-| **05** | **Tool Calling & Unit Testing**              | Generating OpenAI function schemas from Pydantic models, multi-turn dispatch engine, self-healing recovery, and `pytest-mock` parameter assertions.   | OpenAI, Pydantic v2, pytest-mock                |
-| **06** | **RAG Pipelines & Testing**                  | Semantic chunking, cosine vector similarity, in-memory vector store protocols, grounded context injection, and deterministic fixtures.                | OpenAI Embeddings, Pydantic v2                  |
-| **07** | **Building & Testing Agent Harnesses**       | Decoupling LLM loops from web transports, state machine controllers, step-count circuit breakers (`MaxIterationsExceededError`), and replay fixtures. | OpenAI SDK, pytest-mock                         |
-| **08** | **Real-User Evals & Benchmarks**             | Psychometric user satisfaction rubrics (ambiguity, repair, de-escalation), frozen test suites ("Fix System, Never the Test"), and judge telemetry.    | pytest-cov, OpenAI Structured Outputs, Pydantic |
-| **09** | **Hypermedia AI Prototypes (htmx & Jinja2)** | Zero-build AI interfaces, `hx-post` chat feeds, declarative `hx-ext="sse"` token streaming, Jinja2 partials, and `djlint` template quality gates.     | htmx 2.x, Flask 3.1, Jinja2, djlint, pytest     |
-| **10** | **Connecting Flask to SvelteKit**            | Full-Stack AI Integration: SvelteKit BFF, consuming Flask SSE streams with Svelte 5 runes (`$state`, `$derived`), and type-safe contracts.            | SvelteKit 3, Svelte 5, TypeScript               |
-| **11** | **Production WSGI & Hardening**              | Gunicorn worker concurrency (`gthread` vs. `gevent`), long-running streaming timeouts, Tenacity exponential jitter backoff, and Nginx proxying.       | Gunicorn, Tenacity, Nginx                       |
-| **12** | **Scale-Up: Migrating to Litestar (ASGI)**   | Strangler Fig gateway cutover, converting Blueprints to Controllers, eliminating `current_app` globals, and `AsyncTestClient` testing.                | Flask 3.x, Litestar 2.24, Granian/Uvicorn       |
+| #      | Track                                                 | Focus & Architectural Concepts                                                                                                                        | Stack                                          |
+| :----- | :---------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------- |
+| **01** | **Application Factory & Clean MVC**                   | Flask 3.x `create_app` factory, modular Blueprints, Clean Architecture Service/Repository layering, and Pydantic DTO request validation.              | Flask 3.1, Pydantic v2, pytest-mock            |
+| **02** | **Settings & Schemas with Pydantic v2**               | `pydantic-settings` `BaseSettings`, `SecretStr` key masking, fail-fast environment validation, and `@lru_cache` dependency injection.                 | Pydantic v2, pydantic-settings                 |
+| **03** | **Resilient HTTP with Requests**                      | `requests.Session` connection pooling, `urllib3.util.Retry` exponential backoff, granular tuple timeouts, and `pytest-mock` testing.                  | Requests 2.32+, urllib3, pytest-mock           |
+| **04** | **LLM Chats & Streaming Backends**                    | Flask `stream_with_context` Server-Sent Events (SSE), connection pooling, chunk delimiters, and sliding-window conversational memory.                 | Flask 3.1, OpenAI SDK, SSE                     |
+| **05** | **Live Async Benchmarks (`/benchmarks`) vs `/tests`** | Separating sync unit tests (`/tests`) from concurrent live evals (`/benchmarks`) with `AsyncOpenAI`, `asyncio.gather`, TTFT/TPS, and judge rubrics.   | AsyncOpenAI, asyncio, Pydantic v2, pytest-mock |
+| **06** | **Tool Calling & Unit Testing**                       | Generating OpenAI function schemas from Pydantic models, multi-turn dispatch engine, self-healing recovery, and `pytest-mock` parameter assertions.   | OpenAI, Pydantic v2, pytest-mock               |
+| **07** | **RAG Pipelines & Testing**                           | Semantic chunking, cosine vector similarity, in-memory vector store protocols, grounded context injection, and deterministic fixtures.                | OpenAI Embeddings, Pydantic v2                 |
+| **08** | **Building & Testing Agent Harnesses**                | Decoupling LLM loops from web transports, state machine controllers, step-count circuit breakers (`MaxIterationsExceededError`), and replay fixtures. | OpenAI SDK, pytest-mock                        |
+| **09** | **Hypermedia AI Prototypes (htmx & Jinja2)**          | Zero-build AI interfaces, `hx-post` chat feeds, declarative `htmx-ext-sse` token streaming, Jinja2 partials, and `djlint` template quality gates.     | htmx 2.x, Flask 3.1, Jinja2, djlint, pytest    |
+| **10** | **Production WSGI & Hardening**                       | Gunicorn worker concurrency (`gthread` vs. `gevent`), long-running streaming timeouts, Tenacity exponential jitter backoff, and Nginx proxying.       | Gunicorn, Tenacity, Nginx                      |
+| **11** | **Scale-Up: Migrating to Litestar (ASGI)**            | Strangler Fig gateway cutover, converting Blueprints to Controllers, eliminating `current_app` globals, and `TestClient` testing.                     | Flask 3.x, Litestar 2.24, Granian/Uvicorn      |
+| **12** | **Connecting to SvelteKit**                           | Full-Stack AI Integration: SvelteKit BFF, consuming backend SSE streams with Svelte 5 runes (`$state`, `$derived`), and type-safe contracts.          | SvelteKit 3, Svelte 5, TypeScript              |
 
 ---
 

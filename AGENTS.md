@@ -15,7 +15,7 @@
 1. **Prototype First**: Build fast, testable, and lean prototypes of AI backends and web interfaces. Avoid premature optimization, heavy DevOps/orchestration, or over-engineered enterprise setups.
 2. **Deterministic & Fast Testing**: Emphasize automated test harnesses (`pytest`, `pytest-mock`, deterministic mocks, replay fixtures) that enable instant validation of prototypes without flaky network calls or LLM API costs.
 3. **Cross-Model & Intra-Model Benchmarking**:
-   - **Cross-Model Benchmarking**: Systematically benchmark prototypes across different LLM models (e.g., GPT-4o, GPT-4o-mini, Claude, Gemma, Llama) on latency, TTFT, token throughput, parameter precision, and cost.
+   - **Cross-Model Benchmarking**: Systematically benchmark prototypes across open-weight instruction-tuned LLM models with $\le 4\text{B}$ total/effective parameters (`gemma-4-e4b-it`, `gemma-4-e2b-it`, `gemma-3-1b-it`, `functiongemma-270m-it`) on latency, TTFT, token throughput, parameter precision, and cost.
    - **Same-Model Benchmarking**: Benchmark and ablate the _same_ LLM model across prompt variants, few-shot exemplars, temperature/hyperparameters, and Pydantic schema guardrails.
 4. **User Satisfaction at Prototype & Research Stage**:
    - Focus testing and benchmarking on metrics that directly impact real user satisfaction early in development: ambiguity disambiguation, conversational repair on corrections, concise empathetic tone, and low latency streaming responsiveness.

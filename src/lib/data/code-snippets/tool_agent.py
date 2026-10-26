@@ -11,7 +11,7 @@ class WeatherQuery(BaseModel):
     unit: str = Field(default="celsius", pattern="^(celsius|fahrenheit)$")
 
 class AgentService:
-    def __init__(self, client: OpenAI, model: str = "gpt-4o-mini") -> None:
+    def __init__(self, client: OpenAI, model: str = "functiongemma-270m-it") -> None:
         self.client = client
         self.model = model
 

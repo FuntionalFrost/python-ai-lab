@@ -97,7 +97,7 @@ def ask():
     # Problem: Blocks Flask worker thread for 10-25 seconds!
     # User sees zero progress until entire answer is fully finished.
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gemma-4-e4b-it",
         messages=[{"role": "user", "content": prompt}]
     )
 
@@ -119,7 +119,7 @@ def stream_chat():
 
     def generate():
         response_stream = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gemma-4-e4b-it",
             messages=[{"role": "user", "content": prompt}],
             stream=True
         )

@@ -90,52 +90,46 @@
 	const multiModelChartData: ChartDataPoint[] = [
 		{
 			label: 'Robustness',
-			gpt4o: 98.4,
-			claude35: 97.8,
-			gemma4: 93.2,
-			gpt4oMini: 94.6,
-			untyped: 58.2
+			gemma4E4B: 93.8,
+			gemma4E2B: 86.4,
+			gemma3_1B: 79.4,
+			funcGemma270M: 88.6
 		},
 		{
 			label: 'Tool Precision',
-			gpt4o: 99.1,
-			claude35: 98.9,
-			gemma4: 95.8,
-			gpt4oMini: 96.2,
-			untyped: 64.0
+			gemma4E4B: 96.5,
+			gemma4E2B: 89.8,
+			gemma3_1B: 82.5,
+			funcGemma270M: 96.8
 		},
 		{
 			label: 'Disambiguation',
-			gpt4o: 95.8,
-			claude35: 96.5,
-			gemma4: 90.2,
-			gpt4oMini: 91.4,
-			untyped: 51.5
+			gemma4E4B: 91.2,
+			gemma4E2B: 83.6,
+			gemma3_1B: 76.0,
+			funcGemma270M: 74.5
 		},
 		{
 			label: 'Conv. Repair',
-			gpt4o: 97.2,
-			claude35: 97.0,
-			gemma4: 91.5,
-			gpt4oMini: 93.0,
-			untyped: 48.0
+			gemma4E4B: 92.4,
+			gemma4E2B: 85.0,
+			gemma3_1B: 77.2,
+			funcGemma270M: 75.0
 		},
 		{
 			label: 'De-escalation',
-			gpt4o: 96.5,
-			claude35: 95.0,
-			gemma4: 91.8,
-			gpt4oMini: 92.5,
-			untyped: 62.0
+			gemma4E4B: 92.8,
+			gemma4E2B: 85.5,
+			gemma3_1B: 78.8,
+			funcGemma270M: 76.2
 		}
 	];
 
 	const multiModelSeries: BarSeries[] = [
-		{ key: 'gpt4o', label: 'GPT-4o', color: '#06b6d4' },
-		{ key: 'claude35', label: 'Claude 3.5 Sonnet', color: '#8b5cf6' },
-		{ key: 'gemma4', label: 'Gemma 4 (26B-A4B)', color: '#38bdf8' },
-		{ key: 'gpt4oMini', label: 'GPT-4o-Mini', color: '#10b981' },
-		{ key: 'untyped', label: 'Untuned Baseline', color: '#71717a' }
+		{ key: 'gemma4E4B', label: 'gemma-4-e4b-it (4B Eff.)', color: '#06b6d4' },
+		{ key: 'gemma4E2B', label: 'gemma-4-e2b-it (2B Eff.)', color: '#8b5cf6' },
+		{ key: 'gemma3_1B', label: 'gemma-3-1b-it (1B)', color: '#10b981' },
+		{ key: 'funcGemma270M', label: 'functiongemma-270m-it (270M)', color: '#f59e0b' }
 	];
 
 	const multiModelDetails = [
@@ -143,64 +137,52 @@
 			category: 'Messy Real-User Query Robustness',
 			description:
 				'Resilience against typos, slang, ellipsis, and informal human speech without test mutation',
-			gpt4o: 98.4,
-			claude35: 97.8,
-			gemma4: 93.2,
-			gpt4oMini: 94.6,
-			untyped: 58.2
+			gemma4E4B: 93.8,
+			gemma4E2B: 86.4,
+			gemma3_1B: 79.4,
+			funcGemma270M: 88.6
 		},
 		{
 			category: 'Tool Call Argument Precision (Pydantic)',
 			description:
 				'Valid coercion of messy parameters into Pydantic v2 schemas without hallucinated keys',
-			gpt4o: 99.1,
-			claude35: 98.9,
-			gemma4: 95.8,
-			gpt4oMini: 96.2,
-			untyped: 64.0
+			gemma4E4B: 96.5,
+			gemma4E2B: 89.8,
+			gemma3_1B: 82.5,
+			funcGemma270M: 96.8
 		},
 		{
 			category: 'Ambiguity Disambiguation Efficiency',
 			description:
 				'Asks 1 crisp clarifying question instead of dumping speculative 400-word hallucinations',
-			gpt4o: 95.8,
-			claude35: 96.5,
-			gemma4: 90.2,
-			gpt4oMini: 91.4,
-			untyped: 51.5
+			gemma4E4B: 91.2,
+			gemma4E2B: 83.6,
+			gemma3_1B: 76.0,
+			funcGemma270M: 74.5
 		},
 		{
 			category: 'Conversational Repair on User Correction',
 			description:
 				'Gracefully accepts user reversals ("no, cancel that and do X") without defensive loops',
-			gpt4o: 97.2,
-			claude35: 97.0,
-			gemma4: 91.5,
-			gpt4oMini: 93.0,
-			untyped: 48.0
+			gemma4E4B: 92.4,
+			gemma4E2B: 85.0,
+			gemma3_1B: 77.2,
+			funcGemma270M: 75.0
 		},
 		{
 			category: 'Tone & Frustration De-escalation',
 			description: 'Calm, empathetic, concise problem resolution free of robotic bot boilerplate',
-			gpt4o: 96.5,
-			claude35: 95.0,
-			gemma4: 91.8,
-			gpt4oMini: 92.5,
-			untyped: 62.0
+			gemma4E4B: 92.8,
+			gemma4E2B: 85.5,
+			gemma3_1B: 78.8,
+			funcGemma270M: 76.2
 		}
 	];
 
 	// Interactive System Tuning Levers State (Simulating tweaking a model without touching tests)
 	let tuningModel = $state<
-		| 'gemma-4-26b-a4b'
-		| 'gemma-4-27b'
-		| 'gemma-4-9b'
-		| 'gemma-4-e4b'
-		| 'gemma-4-e2b'
-		| 'gpt-4o-mini'
-		| 'gpt-4o'
-		| 'llama-3.3-70b'
-	>('gemma-4-26b-a4b');
+		'gemma-4-e4b-it' | 'gemma-4-e2b-it' | 'gemma-3-1b-it' | 'functiongemma-270m-it'
+	>('gemma-4-e4b-it');
 	let leverPromptGuardrails = $state(true);
 	let leverPydanticSchemas = $state(true);
 	let leverFewShotExemplars = $state(true);
@@ -208,14 +190,10 @@
 
 	const tuningScore = $derived.by(() => {
 		const baseScores: Record<string, number> = {
-			'gemma-4-26b-a4b': 66.0,
-			'gemma-4-27b': 64.5,
-			'gemma-4-9b': 56.0,
-			'gemma-4-e4b': 51.5,
-			'gemma-4-e2b': 44.0,
-			'gpt-4o-mini': 68.0,
-			'gpt-4o': 81.0,
-			'llama-3.3-70b': 74.0
+			'gemma-4-e4b-it': 64.0,
+			'gemma-4-e2b-it': 54.0,
+			'gemma-3-1b-it': 48.0,
+			'functiongemma-270m-it': 58.5
 		};
 		let score = baseScores[tuningModel];
 
@@ -542,11 +520,10 @@
 						<tr>
 							<th class="px-3 py-2.5">Behavioral Criterion</th>
 							<th class="px-3 py-2.5">Psychological Context</th>
-							<th class="px-3 py-2.5 text-cyan-400">GPT-4o</th>
-							<th class="px-3 py-2.5 text-purple-400">Claude 3.5</th>
-							<th class="px-3 py-2.5 text-sky-400">Gemma 4 (27B)</th>
-							<th class="px-3 py-2.5 text-emerald-400">GPT-4o-Mini</th>
-							<th class="px-3 py-2.5 text-zinc-500">Untuned Baseline</th>
+							<th class="px-3 py-2.5 text-cyan-400">Gemma 4 (E4B)</th>
+							<th class="px-3 py-2.5 text-purple-400">Gemma 4 (E2B)</th>
+							<th class="px-3 py-2.5 text-emerald-400">Gemma 3 (1B)</th>
+							<th class="px-3 py-2.5 text-amber-400">FunctionGemma (270M)</th>
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-zinc-800/60 font-mono">
@@ -554,11 +531,10 @@
 							<tr>
 								<td class="px-3 py-3 font-sans font-medium text-zinc-200">{item.category}</td>
 								<td class="px-3 py-3 font-sans text-[11px] text-zinc-400">{item.description}</td>
-								<td class="px-3 py-3 font-bold text-cyan-300">{item.gpt4o}%</td>
-								<td class="px-3 py-3 font-bold text-purple-300">{item.claude35}%</td>
-								<td class="px-3 py-3 font-bold text-sky-300">{item.gemma4}%</td>
-								<td class="px-3 py-3 font-bold text-emerald-300">{item.gpt4oMini}%</td>
-								<td class="px-3 py-3 text-zinc-500">{item.untyped}%</td>
+								<td class="px-3 py-3 font-bold text-cyan-300">{item.gemma4E4B}%</td>
+								<td class="px-3 py-3 font-bold text-purple-300">{item.gemma4E2B}%</td>
+								<td class="px-3 py-3 font-bold text-emerald-300">{item.gemma3_1B}%</td>
+								<td class="px-3 py-3 font-bold text-amber-300">{item.funcGemma270M}%</td>
 							</tr>
 						{/each}
 					</tbody>
@@ -576,21 +552,21 @@
 						<label
 							for="model-select"
 							class="block text-xs font-semibold tracking-wider text-zinc-300 uppercase"
-							>Candidate Model</label
+							>Candidate Model (&le; 4B Total Parameters)</label
 						>
 						<select
 							id="model-select"
 							bind:value={tuningModel}
 							class="mt-2 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 font-mono text-xs text-zinc-200 focus:border-cyan-500 focus:outline-hidden"
 						>
-							<option value="gemma-4-26b-a4b">Gemma 4 26B-A4B (MoE: 4B Active / 26B Total)</option>
-							<option value="gemma-4-27b">Gemma 4 27B (Dense Open Weights)</option>
-							<option value="gemma-4-9b">Gemma 4 9B (Mid-Size Local Deployment)</option>
-							<option value="gemma-4-e4b">Gemma 4 E4B (Edge Optimized 4B)</option>
-							<option value="gemma-4-e2b">Gemma 4 E2B (Ultra-Lightweight On-Device 2B)</option>
-							<option value="gpt-4o-mini">GPT-4o-Mini (Cloud Fast / Cost-Effective)</option>
-							<option value="gpt-4o">GPT-4o (Frontier Model)</option>
-							<option value="llama-3.3-70b">Llama 3.3 70B (Open Weights via vLLM)</option>
+							<option value="gemma-4-e4b-it">gemma-4-e4b-it (Edge Optimized 4B Effective)</option>
+							<option value="gemma-4-e2b-it"
+								>gemma-4-e2b-it (Ultra-Lightweight On-Device 2B Effective)</option
+							>
+							<option value="gemma-3-1b-it">gemma-3-1b-it (Compact 1B Dense)</option>
+							<option value="functiongemma-270m-it"
+								>functiongemma-270m-it (270M Tool-Calling Specialist)</option
+							>
 						</select>
 					</div>
 

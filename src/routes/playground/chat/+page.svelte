@@ -17,7 +17,7 @@ def stream_chat():
 
     def generate():
         stream = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gemma-4-e4b-it",
             messages=[{"role": "user", "content": prompt}],
             stream=True,
         )

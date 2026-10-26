@@ -12,11 +12,11 @@ export const track09: CurriculumLesson = {
 	topics: [
 		'Hypermedia-Driven Architecture for Rapid AI Prototyping',
 		'Zero-Build Chat Interfaces with hx-post and hx-swap',
-		'Real-Time Token Streaming with htmx SSE Extension (hx-ext="sse")',
+		'Real-Time Token Streaming with htmx SSE Extension (htmx-ext-sse)',
 		'Active Search & Benchmark Filtering with Debounced Server Triggers',
 		'Template Quality & Formatting with djlint (--profile jinja)',
 		'Testing Hypermedia Endpoints with pytest and BeautifulSoup4',
-		'Decision Matrix: When to Choose htmx vs SvelteKit / React'
+		'Decision Matrix: When to Choose Hypermedia (htmx) vs Client-Side SPAs'
 	],
 	frameworks: [
 		'htmx 2.x',
@@ -32,9 +32,9 @@ export const track09: CurriculumLesson = {
 	objectives: [
 		'Understand the Hypermedia Architecture (HATEOAS) advantage for prototype velocity: validate ideas in hours without npm or bundlers.',
 		'Build responsive AI chat streams with hx-post, hx-target, and hx-swap="beforeend".',
-		'Integrate the htmx SSE extension (hx-ext="sse") to push live LLM token fragments directly into DOM containers.',
+		'Integrate the htmx SSE extension (htmx-ext-sse) to push live LLM token fragments directly into DOM containers.',
 		'Create live evaluation exploration tables using debounced active search (hx-trigger="keyup changed delay:300ms").',
-		'Evaluate the architectural trade-offs: when to leverage lightweight htmx vs full-featured reactive SPAs like SvelteKit.',
+		'Evaluate the architectural trade-offs: when to leverage lightweight hypermedia (htmx + Jinja2) vs heavy client-side SPAs.',
 		'Test server-rendered HTML partials deterministically with pytest and BeautifulSoup4.'
 	],
 	architecture: {
@@ -60,13 +60,13 @@ export const track09: CurriculumLesson = {
 |   Streaming Generator via SSE   |     |   Componentized HTML Templates  |
 |   hx-ext="sse" Live DOM Append  |     |   _message.html, _metric.html   |
 +---------------------------------+     +---------------------------------+`,
-		explanation: `When testing a novel AI workflow—such as prompt disambiguation, RAG chunking variants, or multi-turn conversational repair—building a complex single-page application (SPA) with Vite, TypeScript, and state management stores is often massive overkill.
+		explanation: `When testing a novel AI workflow—such as prompt disambiguation, RAG chunking variants, or multi-turn conversational repair—building a complex single-page application (SPA) with bundlers and client state stores is often massive overkill.
 
 The Hypermedia Advantage for AI Prototyping:
-1. Zero Tooling Friction: By adding a single <script src="https://unpkg.com/htmx.org"> tag to your Jinja2 template, your backend Python engineer can deliver dynamic, asynchronous UI interactions in under 15 minutes.
+1. Zero Tooling Friction: By adding <script src="https://unpkg.com/htmx.org@2.0.4"> and <script src="https://unpkg.com/htmx-ext-sse@2.2.2/sse.js"> to your Jinja2 base template, your backend Python engineer can deliver dynamic, streaming UI interactions in under 15 minutes.
 2. Server as Source of Truth: In hypermedia architecture, the server renders HTML fragments rather than raw JSON. The server dictates styling, error badges, token formatting, and layout. There are no client-side state synchronization bugs.
-3. Live Token Streaming with SSE: With the 'sse' extension ('hx-ext="sse"'), htmx connects to a standard Flask SSE endpoint and streams incoming token spans directly into a message container ('sse-swap="message"').
-4. Pragmatic Transition Path: Start with Flask + htmx to iterate on prompts, evals, and tool calling within 24 hours. When the product model stabilizes and demands intricate client-side interactions, migrate the front-end to SvelteKit or React without touching the core Python AI service layer.`,
+3. Live Token Streaming with SSE: With the 'htmx-ext-sse' extension ('hx-ext="sse"'), htmx connects to a standard Flask SSE endpoint and streams incoming token spans directly into a message container ('sse-swap="token"').
+4. Rapid Iteration Loop: Use Flask + htmx + Jinja2 to iterate on prompts, evals, and tool calling within hours while keeping all template rendering verifiable with pytest, BeautifulSoup4, and djlint.`,
 		keyConcepts: [
 			{
 				name: 'hx-post & hx-swap for AI Chat',
@@ -82,10 +82,14 @@ The Hypermedia Advantage for AI Prototyping:
 </form>`
 			},
 			{
-				name: 'Real-Time Streaming with hx-ext="sse"',
+				name: 'Real-Time Streaming with htmx-ext-sse',
 				description:
 					'The htmx SSE extension consumes server-sent events and updates the target element on each token event, achieving real-time typewriter effects without writing JavaScript.',
-				pythonCode: `<!-- Connect to Flask SSE generator -->
+				pythonCode: `<!-- Load htmx 2.x + SSE extension in <head> -->
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+<script src="https://unpkg.com/htmx-ext-sse@2.2.2/sse.js"></script>
+
+<!-- Connect to Flask SSE generator -->
 <div hx-ext="sse" 
      sse-connect="/chat/stream?session_id=123" 
      sse-swap="token" 
@@ -117,21 +121,21 @@ The Hypermedia Advantage for AI Prototyping:
 # djlint app/templates/ --profile=jinja --reformat`
 			},
 			{
-				name: 'Decision Framework: htmx vs SvelteKit',
+				name: 'Decision Framework: Hypermedia vs. Client SPA',
 				description:
-					'Use htmx for rapid AI validation, internal test dashboards, and eval viewers. Migrate to SvelteKit when offline state, canvas graphs, or complex optimistic UI are required.',
+					'Use htmx + Jinja2 for rapid AI validation, interactive chat prototypes, internal test dashboards, and eval viewers without maintaining a separate frontend build pipeline.',
 				pythonCode: `# Architectural Rule of Thumb:
-# Prototype Day 1-7 (Hypothesis testing): Flask + htmx (Velocity: 10x)
-# Scale & Rich UX (Consumer product): Flask/Litestar API + SvelteKit 5 (Control: 10x)`
+# Rapid AI Prototyping & Eval Viewers: Flask + Jinja2 + htmx (Zero JS build step)
+# Template Quality Gate: djlint --profile=jinja + pytest + BeautifulSoup4`
 			}
 		]
 	},
 	comparisons: [
 		{
-			title: 'Prototype UI: Client-Side SPA vs Server-Rendered htmx',
+			title: 'Prototype UI: Client-Side JSON SPA vs Server-Rendered htmx',
 			description:
 				'Compare the code footprint required to send a user prompt and append the AI reply.',
-			leftTitle: 'Client SPA (React/Vue/Svelte boilerplate)',
+			leftTitle: 'Client-Side JSON SPA (Heavy State Boilerplate)',
 			leftLanguage: 'typescript',
 			leftCode: `// ❌ Requires node_modules, build pipeline, state stores
 import { useState } from 'react';
@@ -313,7 +317,7 @@ def handle_chat_message() -> tuple[str, int]:
 
     start_time = time.perf_counter()
     ai_service = AIGatewayService(api_key="sk-mock-or-env")
-    reply = ai_service.complete_sync(prompt, model="gpt-4o-mini")
+    reply = ai_service.complete_sync(prompt, model="gemma-4-e4b-it")
     latency_ms = round((time.perf_counter() - start_time) * 1000)
 
     # Render purely server-side HTML fragment for hx-swap="beforeend"
@@ -321,7 +325,7 @@ def handle_chat_message() -> tuple[str, int]:
         "_chat_bubble.html",
         user_prompt=prompt,
         assistant_reply=reply,
-        model_name="gpt-4o-mini",
+        model_name="gemma-4-e4b-it",
         latency_ms=latency_ms,
         token_count=len(reply.split()),
     )
@@ -381,7 +385,7 @@ def test_handle_chat_message_success(app: Flask, monkeypatch: pytest.MonkeyPatch
     monkeypatch.setattr(
         AIGatewayService,
         "complete_sync",
-        lambda self, p, model="gpt-4o-mini": f"Echo: {p}"
+        lambda self, p, model="gemma-4-e4b-it": f"Echo: {p}"
     )
 
     client = app.test_client()

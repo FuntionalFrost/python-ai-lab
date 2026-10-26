@@ -1,9 +1,9 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track11: CurriculumLesson = {
-	id: 'track-11',
-	slug: '11-prototype-to-production',
-	trackNumber: 11,
+export const track10: CurriculumLesson = {
+	id: 'track-10',
+	slug: '10-prototype-to-production',
+	trackNumber: 10,
 	title: 'Production WSGI Deployment, Worker Concurrency & Resilience',
 	shortTitle: 'Production WSGI & Hardening',
 	subtitle:
@@ -13,7 +13,7 @@ export const track11: CurriculumLesson = {
 		'Gunicorn Worker Engines: sync vs. gthread vs. gevent Concurrency Models',
 		'Long-Lived Streaming Timeout Management (--timeout 120 vs. 30s Worker Kills)',
 		'Circuit Breakers & Exponential Backoff with Tenacity (RateLimitError & 503)',
-		'Graceful Degradation: Secondary Fallback Models (GPT-4o -> GPT-4o-Mini)',
+		'Graceful Degradation: Secondary Fallback Models (gemma-4-e4b-it -> gemma-4-e2b-it)',
 		'Cost & Quota Defense: Redis Token-Bucket Rate Limiting & Response Caching'
 	],
 	frameworks: ['Flask 3.1.3', 'Gunicorn 23.x', 'Tenacity 9.x', 'OpenAI 3.x', 'uv'],
@@ -50,20 +50,20 @@ export const track11: CurriculumLesson = {
 +---------------------------------------------------------------------------------------+
 |                 Resilience & Fallback Layer (Tenacity Circuit Breaker)                |
 |                                                                                       |
-|  1. Try Primary Model: gpt-4o (3 retries with exponential jitter)                     |
-|  2. If 429/503 exhausted: Fallback to gpt-4o-mini                                     |
+|  1. Try Primary Model: gemma-4-e4b-it (3 retries with exponential jitter)             |
+|  2. If 429/503 exhausted: Fallback to gemma-4-e2b-it                                  |
 |  3. If API down: Serve cached semantic response from Redis                            |
 +---------------------------------------------------------------------------------------+`,
 		explanation: `Deploying an AI backend under standard web server settings almost always causes immediate outages in production:
 
 1. The Worker Starvation Trap: By default, Gunicorn runs in 'sync' mode where 1 worker process handles 1 connection. If an LLM stream takes 20 seconds, a 4-worker cluster is completely paralyzed by just 4 concurrent users!
 2. The 30-Second Silent Worker Kill: Gunicorn's default 'timeout = 30' monitors worker activity. Because an LLM connection is held open waiting for stream chunks, Gunicorn assumes the worker is hung and issues a SIGKILL mid-stream!
-3. The Rate Limit Thundering Herd: When OpenAI returns a 429 RateLimitError, naive retry loops without random jitter hammer the API simultaneously, prolonging the outage.
+3. The Rate Limit Thundering Herd: When an inference server returns a 429 RateLimitError, naive retry loops without random jitter hammer the API simultaneously, prolonging the outage.
 
 The Production Fix:
 - Use 'gthread' (threaded worker) or 'gevent' (greenlets) so each Gunicorn worker handles 8-16 concurrent streaming connections without blocking the process.
 - Configure 'timeout = 120' and 'graceful_timeout = 30' in gunicorn.conf.py.
-- Wrap model invocations in Tenacity decorators with exponential backoff and jitter, falling back to a secondary model (e.g. gpt-4o -> gpt-4o-mini) when quotas are pressured.`,
+- Wrap model invocations in Tenacity decorators with exponential backoff and jitter, falling back to a secondary model (e.g. gemma-4-e4b-it -> gemma-4-e2b-it) when quotas are pressured.`,
 		keyConcepts: [
 			{
 				name: 'Gunicorn Worker Engines (`gthread` vs `gevent`)',
@@ -78,12 +78,12 @@ The Production Fix:
 			{
 				name: 'Tenacity Exponential Jitter',
 				description:
-					'wait_random_exponential adds random microsecond jitter to retry intervals, preventing synchronized request stampedes against OpenAI endpoints.'
+					'wait_random_exponential adds random microsecond jitter to retry intervals, preventing synchronized request stampedes against inference endpoints.'
 			},
 			{
 				name: 'Graceful Model Degradation',
 				description:
-					'Automatically downgrading from an expensive primary model (GPT-4o) to a lightweight secondary model (GPT-4o-Mini) when upstream rate limits or budget thresholds trigger.'
+					'Automatically downgrading from a primary 4B model (gemma-4-e4b-it) to an ultra-light 2B model (gemma-4-e2b-it) when upstream rate limits or latency thresholds trigger.'
 			}
 		]
 	},
@@ -141,7 +141,7 @@ def ask():
     # 2. No retries, no jitter, no fallback
     # 3. User experiences immediate failure
     resp = client.chat.completions.create(
-        model="gpt-4o",
+        model="gemma-4-e4b-it",
         messages=[{"role": "user", "content": request.json["prompt"]}]
     )
     return jsonify({"answer": resp.choices[0].message.content})`,
@@ -151,7 +151,7 @@ def ask():
 from openai import RateLimitError, APIConnectionError, InternalServerError
 
 class ResilientChatService:
-    def __init__(self, client, primary="gpt-4o", fallback="gpt-4o-mini"):
+    def __init__(self, client, primary="gemma-4-e4b-it", fallback="gemma-4-e2b-it"):
         self.client = client
         self.primary = primary
         self.fallback = fallback
@@ -228,7 +228,7 @@ class ChatResult(BaseModel):
     is_fallback: bool = False
 
 class ResilientChatService:
-    def __init__(self, client: OpenAI, primary_model: str = "gpt-4o", fallback_model: str = "gpt-4o-mini") -> None:
+    def __init__(self, client: OpenAI, primary_model: str = "gemma-4-e4b-it", fallback_model: str = "gemma-4-e2b-it") -> None:
         self.client = client
         self.primary_model = primary_model
         self.fallback_model = fallback_model
@@ -253,7 +253,7 @@ class ResilientChatService:
             content = self._execute_with_retry(self.primary_model, prompt)
             return ChatResult(content=content, model_used=self.primary_model, is_fallback=False)
         except Exception:
-            # Fallback model attempt (e.g. gpt-4o-mini if gpt-4o rate limits trigger)
+            # Fallback model attempt (e.g. gemma-4-e2b-it if gemma-4-e4b-it rate limits trigger)
             try:
                 content = self._execute_with_retry(self.fallback_model, prompt)
                 return ChatResult(content=content, model_used=self.fallback_model, is_fallback=True)
@@ -286,7 +286,7 @@ def test_resilient_service_succeeds_on_first_try(mocker):
     res = service.ask_with_retry("Hello")
 
     assert res.content == "Primary response"
-    assert res.model_used == "gpt-4o"
+    assert res.model_used == "gemma-4-e4b-it"
     assert not res.is_fallback
     assert mock_client.chat.completions.create.call_count == 1
 
@@ -310,7 +310,7 @@ def test_resilient_service_falls_back_when_primary_exhausts_retries(mocker):
     res = service.ask_with_retry("Hello under heavy load")
 
     assert res.content == "Fallback response"
-    assert res.model_used == "gpt-4o-mini"
+    assert res.model_used == "gemma-4-e2b-it"
     assert res.is_fallback is True
     # 3 primary attempts + 1 fallback attempt = 4
     assert mock_client.chat.completions.create.call_count == 4`,

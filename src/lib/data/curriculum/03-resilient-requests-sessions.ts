@@ -232,10 +232,10 @@ def stream_resilient(session: requests.Session, url: str) -> Iterator[str]:
 	codeSnippets: [
 		{
 			id: 'requests-session-factory',
-			title: 'Enterprise requests.Session Factory with Connection Pooling & Retries',
+			title: 'Resilient requests.Session Factory with Connection Pooling & Retries',
 			filePath: 'app/services/http_session.py',
 			description:
-				'Production session factory configuring connection pools, urllib3 retry policies, and granular connect/read timeouts.',
+				'Reusable session factory configuring connection pools, urllib3 retry policies, and granular connect/read timeouts.',
 			language: 'python',
 			code: `"""
 app/services/http_session.py

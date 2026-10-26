@@ -1,9 +1,9 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track06: CurriculumLesson = {
-	id: 'track-06',
-	slug: '06-rag-pipelines',
-	trackNumber: 6,
+export const track07: CurriculumLesson = {
+	id: 'track-07',
+	slug: '07-rag-pipelines',
+	trackNumber: 7,
 	title: 'Retrieval-Augmented Generation (RAG) Architecture',
 	shortTitle: 'RAG Pipelines & Testing',
 	subtitle: 'Document Chunking, Vector Retrieval, Context Re-ranking, and Ground-Truth Evaluation',
@@ -15,19 +15,19 @@ export const track06: CurriculumLesson = {
 		'Context Re-ranking & Truncation Guards',
 		'Testing RAG Retrieval Deterministically with Fixtures'
 	],
-	frameworks: ['openai>=3.35.1', 'pydantic>=2.14.1', 'pytest>=9.0'],
+	frameworks: ['openai>=3.36.1', 'pydantic>=2.14.1', 'pytest>=9.0'],
 	tags: ['RAG', 'Vector Search', 'Embeddings', 'Information Retrieval', 'Testing'],
 	summary:
-		'Deconstruct the complete production RAG lifecycle: chunking raw text, computing dense vector embeddings, retrieving nearest neighbors, and injecting ranked context into LLM prompts. Learn how to write deterministic unit tests for retrieval scoring without calling live vector databases.',
+		'Deconstruct the complete RAG prototype lifecycle: chunking raw text, computing dense vector embeddings, retrieving nearest neighbors, and injecting ranked context into LLM prompts. Learn how to write deterministic unit tests for retrieval scoring without calling live vector databases.',
 	objectives: [
 		'Implement sliding window chunkers with token-based boundaries.',
-		'Build a decoupled vector store protocol that can swap between in-memory mock stores and pgvector/Qdrant.',
+		'Build a decoupled vector store protocol that can swap between in-memory mock stores and external vector stores.',
 		'Formulate prompt context injection templates that instruct the model to cite sources and reject hallucinated answers.',
 		'Write deterministic pytest fixtures testing vector similarity thresholds.',
 		'Evaluate retrieval recall and precision using synthetic benchmark datasets.'
 	],
 	architecture: {
-		patternName: '5-Stage Production RAG Pipeline',
+		patternName: '5-Stage Grounded RAG Pipeline',
 		diagram: `+-------------------------------------------------------------------------+
 | Stage 1: Ingestion & Chunking                                           |
 | Raw Document -> Semantic Splitter (512 tokens, 64 token overlap)        |
@@ -36,7 +36,7 @@ export const track06: CurriculumLesson = {
                                      v
 +-------------------------------------------------------------------------+
 | Stage 2: Dense Embedding Generation                                     |
-| text-embedding-3-small -> Float[1536] Vector Embeddings                 |
+| embeddinggemma-300m -> Float[768] Vector Embeddings                     |
 +-------------------------------------------------------------------------+
                                      |
                                      v
@@ -56,7 +56,7 @@ export const track06: CurriculumLesson = {
 | Stage 5: Context Injection & Synthesis                                  |
 | Grounded System Prompt -> LLM Synthesizes response with source citations|
 +-------------------------------------------------------------------------+`,
-		explanation: `RAG pipelines fail in production predominantly due to retrieval failures (returning irrelevant chunks), context dilution (flooding the LLM with too much noisy context), or hallucination (the model ignoring injected facts).
+		explanation: `RAG pipelines fail in practice predominantly due to retrieval failures (returning irrelevant chunks), context dilution (flooding the LLM with too much noisy context), or hallucination (the model ignoring injected facts).
 
 A robust RAG architecture isolates the retrieval engine behind a testable Python Protocol. By testing chunk boundaries, embedding dimensionality, and cosine scoring deterministically with static fixtures, you ensure that poor answers are due to model reasoning rather than faulty document retrieval.`,
 		keyConcepts: [
@@ -92,10 +92,10 @@ def answer_user_query(user_question: str, all_documents: list[str]):
     massive_context = "\\n\\n".join(all_documents)
     prompt = f"Context:\\n{massive_context}\\n\\nQuestion: {user_question}"
     return client.chat.completions.create(
-        model="gpt-4o",
+        model="gemma-4-e4b-it",
         messages=[{"role": "user", "content": prompt}]
     )`,
-			rightTitle: 'Production RAG Pipeline (Chunked + Scored)',
+			rightTitle: 'Grounded RAG Pipeline (Chunked + Scored)',
 			rightLanguage: 'python',
 			rightCode: `def answer_user_query_rag(
     user_question: str,
@@ -170,7 +170,7 @@ class RAGService:
 
     def get_embedding(self, text: str) -> list[float]:
         resp = self.client.embeddings.create(
-            model="text-embedding-3-small",
+            model="embeddinggemma-300m",
             input=text
         )
         return resp.data[0].embedding
@@ -194,7 +194,7 @@ class RAGService:
         )
 
         resp = self.client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gemma-4-e4b-it",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": question}
@@ -236,7 +236,7 @@ def test_cosine_similarity_orthogonal_vectors():
 
 def test_in_memory_vector_store_ranking():
     store = InMemoryVectorStore()
-    chunk1 = DocumentChunk("doc_1", "Litestar uses async controllers.", {})
+    chunk1 = DocumentChunk("doc_1", "Pydantic v2 validates JSON schemas in Rust.", {})
     chunk2 = DocumentChunk("doc_2", "Flask uses WSGI application factories.", {})
 
     # Mock embeddings
@@ -258,7 +258,7 @@ def test_rag_service_returns_fallback_when_no_chunks_match(mocker):
 
     empty_store = InMemoryVectorStore()
     rag = RAGService(client=mock_client, store=empty_store)
-    result = rag.query_and_answer("How to configure Litestar?")
+    result = rag.query_and_answer("How to configure Flask Blueprints?")
 
     assert result.confidence == 0.0
     assert "No relevant documentation found" in result.answer

@@ -1,9 +1,9 @@
 import type { CurriculumLesson } from '../../types/curriculum';
 
-export const track05: CurriculumLesson = {
-	id: 'track-05',
-	slug: '05-tool-calling-testing',
-	trackNumber: 5,
+export const track06: CurriculumLesson = {
+	id: 'track-06',
+	slug: '06-tool-calling-testing',
+	trackNumber: 6,
 	title: 'Tool Calling & Unit Testing Tool Executions',
 	shortTitle: 'Tool Calling & Testing',
 	subtitle: 'Pydantic Function Schemas, Dispatch Engines, and Deterministic pytest Mocks',
@@ -15,7 +15,7 @@ export const track05: CurriculumLesson = {
 		'Handling Malformed JSON & Error Recovery',
 		'Unit Testing LLM Tool Selection with pytest-mock'
 	],
-	frameworks: ['openai>=3.35.1', 'pydantic>=2.14.1', 'pytest>=9.0', 'pytest-mock>=3.17'],
+	frameworks: ['openai>=3.36.1', 'pydantic>=2.14.1', 'pytest>=9.0', 'pytest-mock>=3.17'],
 	tags: ['Function Calling', 'Agent', 'Testing', 'Mocking', 'Pydantic'],
 	summary:
 		'Bridge LLM intelligence to real-world APIs with strict Pydantic tool schemas. Build an extensible tool dispatch engine with self-healing error recovery, and write robust pytest suites that test tool routing, parameter validation, and network failures without paying for API calls.',
@@ -111,7 +111,7 @@ def handle_weather_call(raw_arguments: str):
     # BUG: No validation for unit
     unit = data.get("unit", "celsius")
     return fetch_weather_api(city=city, unit=unit)`,
-			rightTitle: 'Production Pydantic Dispatch Engine',
+			rightTitle: 'Validated Pydantic Dispatch Engine',
 			rightLanguage: 'python',
 			rightCode: `from pydantic import BaseModel, Field, ValidationError
 
@@ -134,7 +134,7 @@ def safe_dispatch_weather(raw_arguments: str) -> dict:
 	codeSnippets: [
 		{
 			id: 'agent-service-full',
-			title: 'Production AgentService with Tool Registry & OpenAI SDK',
+			title: 'Type-Safe AgentService with Tool Registry & OpenAI SDK',
 			filePath: 'app/services/agent.py',
 			description:
 				'Complete agent service managing tool schema registration, dispatch loop, and error handling.',
@@ -256,7 +256,7 @@ from app.config import Settings, LLMSettings
 def mock_settings():
     settings = MagicMock(spec=Settings)
     settings.llm = MagicMock(spec=LLMSettings)
-    settings.llm.model = "gpt-4o-mini"
+    settings.llm.model = "functiongemma-270m-it"
     return settings
 
 def test_agent_dispatches_tool_call(mocker, mock_settings):

@@ -96,7 +96,7 @@ def analyze():
 
     # 2. Domain logic mixed directly into HTTP handler
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gemma-4-e4b-it",
         messages=[{"role": "user", "content": f"Analyze: {text}"}]
     )
 
@@ -188,7 +188,7 @@ from app.schemas.analysis import AnalysisRequest, AnalysisResponse
 class AnalysisService:
     """Domain service isolated from Flask HTTP transport. Fully testable without Flask context."""
 
-    def __init__(self, client: OpenAI, model: str = "gpt-4o-mini") -> None:
+    def __init__(self, client: OpenAI, model: str = "gemma-4-e4b-it") -> None:
         self._client = client
         self._model = model
 

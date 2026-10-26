@@ -360,12 +360,12 @@
 
 	<!-- Main Body: Two Columns (Chat View | Inspector Drawer) -->
 	<div
-		class="grid min-h-[460px] grid-cols-1 divide-y divide-zinc-800 lg:grid-cols-12 lg:divide-x lg:divide-y-0"
+		class="grid min-h-115 grid-cols-1 divide-y divide-zinc-800 lg:grid-cols-12 lg:divide-x lg:divide-y-0"
 	>
 		<!-- Left: Chat UI (7 cols) -->
 		<div class="flex flex-col bg-zinc-950 p-4 lg:col-span-7">
 			<!-- Message Scroll Window -->
-			<div class="max-h-[420px] min-h-[320px] flex-1 space-y-4 overflow-y-auto pr-1">
+			<div class="max-h-105 min-h-80 flex-1 space-y-4 overflow-y-auto pr-1">
 				{#if messages.length === 0}
 					<div
 						class="flex h-full flex-col items-center justify-center py-12 text-center text-zinc-500"
@@ -518,7 +518,7 @@
 						<span class="text-zinc-500">Accept:</span> text/event-stream<br /><br />
 						&#123;<br />
 						&nbsp;&nbsp;<span class="text-cyan-400">"model"</span>:
-						<span class="text-emerald-400">"gpt-4o-mini"</span>,<br />
+						<span class="text-emerald-400">"gemma-4-e4b-it"</span>,<br />
 						&nbsp;&nbsp;<span class="text-cyan-400">"stream"</span>:
 						<span class="text-purple-400">true</span>,<br />
 						&nbsp;&nbsp;<span class="text-cyan-400">"temperature"</span>: 0.7,<br />
