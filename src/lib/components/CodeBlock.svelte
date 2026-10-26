@@ -47,28 +47,30 @@
 <div class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 shadow-xl {className}">
 	<!-- Header Bar -->
 	<div
-		class="flex items-center justify-between border-b border-zinc-800/80 bg-zinc-900/70 px-4 py-2.5 text-xs text-zinc-400"
+		class="flex items-center justify-between gap-3 border-b border-zinc-800/80 bg-zinc-900/70 px-4 py-2.5 text-xs text-zinc-400"
 	>
-		<div class="flex items-center gap-2">
+		<div class="flex min-w-0 items-center gap-2">
 			{#if language === 'bash' || language === 'sh'}
-				<Terminal class="h-3.5 w-3.5 text-emerald-400" />
+				<Terminal class="h-3.5 w-3.5 shrink-0 text-emerald-400" />
 			{:else}
-				<FileCode class="h-3.5 w-3.5 text-cyan-400" />
+				<FileCode class="h-3.5 w-3.5 shrink-0 text-cyan-400" />
 			{/if}
-			<span class="font-mono font-medium text-zinc-200">
-				{title || (language === 'bash' ? 'Terminal' : `${language.toUpperCase()} Snippet`)}
-			</span>
-			<span
-				class="rounded bg-zinc-800/70 px-1.5 py-0.5 font-mono text-[10px] text-zinc-400 uppercase"
-			>
-				{language}
-			</span>
+			<div class="min-w-0 font-mono font-medium text-zinc-200">
+				<span
+					>{title || (language === 'bash' ? 'Terminal' : `${language.toUpperCase()} Snippet`)}</span
+				>
+				<span
+					class="ml-1.5 inline-flex items-center rounded bg-zinc-800/70 px-1.5 py-0.5 align-middle font-mono text-[10px] whitespace-nowrap text-zinc-400 uppercase"
+				>
+					{language}
+				</span>
+			</div>
 		</div>
 
 		<button
 			type="button"
 			onclick={() => clipboard.copy(code.trim())}
-			class="flex items-center gap-1.5 rounded-md border border-zinc-700/60 bg-zinc-800/80 px-2.5 py-1 text-xs font-medium text-zinc-300 transition-colors hover:border-zinc-600 hover:bg-zinc-700 hover:text-white"
+			class="flex shrink-0 items-center gap-1.5 rounded-md border border-zinc-700/60 bg-zinc-800/80 px-2.5 py-1 text-xs font-medium text-zinc-300 transition-colors hover:border-zinc-600 hover:bg-zinc-700 hover:text-white"
 			aria-label="Copy code to clipboard"
 		>
 			{#if clipboard.copied}

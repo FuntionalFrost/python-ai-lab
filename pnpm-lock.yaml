@@ -173,8 +173,8 @@ importers:
         specifier: ^1.30.0
         version: 1.30.0
       yaxa-svelte:
-        specifier: ^2.0.0
-        version: 2.0.0(@internationalized/date@3.12.4)(@lucide/svelte@1.59.0(svelte@5.57.2(@typescript-eslint/types@8.71.2)))(@sveltejs/kit@3.1.0(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.2(@typescript-eslint/types@8.71.2))(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)))(svelte@5.57.2(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)))(svelte@5.57.2(@typescript-eslint/types@8.71.2))(tailwindcss@4.3.3)
+        specifier: ^2.0.3
+        version: 2.0.3(@internationalized/date@3.12.4)(@lucide/svelte@1.59.0(svelte@5.57.2(@typescript-eslint/types@8.71.2)))(@sveltejs/kit@3.1.0(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.2(@typescript-eslint/types@8.71.2))(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)))(svelte@5.57.2(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)))(svelte@5.57.2(@typescript-eslint/types@8.71.2))(tailwindcss@4.3.3)
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
@@ -1499,8 +1499,8 @@ packages:
     resolution: {integrity: sha512-vIYeF1u3CjlhAFekPPAk2h/Kv4T3mAkMox5OymRiJQB0spDP10LHvt+K7G9Ny6NuuMAb25/6n1qyUjAcGNf/AA==}
     engines: {node: '>= 6'}
 
-  yaxa-svelte@2.0.0:
-    resolution: {integrity: sha512-qAvi6oZZcwyiMcrUiVecAeU7RJo2AdIPoU3uopCsLrsU87MmQnZZyPHZPkYw2dEFJXAPHOGL3xAzezmPD2Z5Yw==}
+  yaxa-svelte@2.0.3:
+    resolution: {integrity: sha512-KdgFVl38qatkz0plgEbTkLW+Tc/lzwWUgC2KEsMF5XEqBOY2DpU2qPpJjHiu5ruPLByAMCpe+dHF7nqon/umQQ==}
     engines: {node: '>=24'}
     peerDependencies:
       '@aws-sdk/client-s3': '>=3.0.0'
@@ -2590,7 +2590,7 @@ snapshots:
 
   yaml@1.10.3: {}
 
-  yaxa-svelte@2.0.0(@internationalized/date@3.12.4)(@lucide/svelte@1.59.0(svelte@5.57.2(@typescript-eslint/types@8.71.2)))(@sveltejs/kit@3.1.0(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.2(@typescript-eslint/types@8.71.2))(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)))(svelte@5.57.2(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)))(svelte@5.57.2(@typescript-eslint/types@8.71.2))(tailwindcss@4.3.3):
+  yaxa-svelte@2.0.3(@internationalized/date@3.12.4)(@lucide/svelte@1.59.0(svelte@5.57.2(@typescript-eslint/types@8.71.2)))(@sveltejs/kit@3.1.0(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.2(@typescript-eslint/types@8.71.2))(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)))(svelte@5.57.2(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)))(svelte@5.57.2(@typescript-eslint/types@8.71.2))(tailwindcss@4.3.3):
     dependencies:
       '@sveltejs/kit': 3.1.0(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.2(@typescript-eslint/types@8.71.2))(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)))(svelte@5.57.2(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0))
       bits-ui: 2.19.5(@internationalized/date@3.12.4)(@sveltejs/kit@3.1.0(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.2(@typescript-eslint/types@8.71.2))(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)))(svelte@5.57.2(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)))(svelte@5.57.2(@typescript-eslint/types@8.71.2))
