@@ -1,0 +1,32 @@
+# Python AI Lab
+
+> A comprehensive interactive curriculum and reference implementation for prototyping, testing, benchmarking, and iterating on AI backends and web interfaces using modern Python (Flask 3.x, Litestar, Pydantic v2, pytest-mock) and SvelteKit 3.
+
+## Core Architectural Principles
+
+- **Prototype First**: Build fast, testable, and lean prototypes of AI backends and web interfaces. Avoid premature optimization or heavy enterprise infrastructure.
+- **Deterministic & Fast Testing**: Keep unit tests (`/tests`) 100% synchronous with `pytest-mock` and in-memory `MagicMock`. Zero network latency and zero event loop overhead in unit test suites (no `pytest-asyncio` required).
+- **Target Models (<=4B Parameters)**: Systematically benchmark prototypes across open-weight instruction-tuned LLMs with <=4B total/effective parameters (`gemma-4-e4b-it`, `gemma-4-e2b-it`, `gemma-3-1b-it`, `functiongemma-270m-it`).
+- **Live Concurrent Benchmarks**: Separate unit tests from live model evaluations (`/benchmarks`). Use `AsyncOpenAI`, `asyncio.gather()`, and `asyncio.Semaphore(10)` invoked via Python's built-in `asyncio.run()`.
+- **Fail-Fast Configuration**: Centralize all environment configuration in `app/config.py` using `pydantic-settings` (`BaseSettings`) and module-level singleton `settings = Settings()`. Mask all API keys with `SecretStr`.
+- **Streaming Protocols**: Produce Server-Sent Events (SSE) via Flask's `stream_with_context` or Litestar's `ServerSentEvent`. Consume on clients via either `fetch() + ReadableStream` (SvelteKit) or `htmx-ext-sse` (hypermedia).
+
+## Curriculum Tracks
+
+- [Track 01: Application Factories & Modular MVC Architecture](module/01-frameworks-mvc): Flask 3.x application factory pattern, modular blueprint registration, Jinja2 template rendering, and isolated test fixtures with 100% test coverage.
+- [Track 02: Pydantic Settings & Fail-Fast Configuration](module/02-pydantic-settings): Centralized `app/config.py` setup, SecretStr leak prevention, environment override precedence, and startup validation testing.
+- [Track 03: Resilient HTTP Sessions & Tenacity Retries](module/03-resilient-requests-sessions): Reusable `requests.Session` connection pools, exponential backoff retries with Tenacity, and deterministic offline mock adapters.
+- [Track 04: Real-Time LLM Token Streaming via SSE](module/04-llm-chat-streaming): Low-latency Server-Sent Events (SSE) generator, `stream_with_context`, buffer flushing (`X-Accel-Buffering: no`), and chunk boundary verification.
+- [Track 05: Live Concurrent Benchmarks vs. Deterministic Unit Tests](module/05-evals-benchmarks): Separating sync `/tests` from async `/benchmarks`, concurrent evaluation with `AsyncOpenAI` and `asyncio.Semaphore`, TTFT/TPS profiling, and LLM-as-a-judge rubrics.
+- [Track 06: Tool Calling & Schema Validation Testing](module/06-tool-calling-testing): Pydantic v2 schemas for LLM function calling, strict argument coercion, and recorded replay test fixtures.
+- [Track 07: RAG Pipelines & Embeddings Evaluation](module/07-rag-pipelines): In-memory vector search with cosine similarity, deterministic embedding mocks, semantic chunking, and retrieval precision assertions.
+- [Track 08: Autonomous Agent Loops & Evaluation Harnesses](module/08-agent-harnesses): Multi-turn tool execution state machines, conversational repair handling, and max-turn recursion guards.
+- [Track 09: HTMX & Hypermedia Prototypes](module/09-htmx-hypermedia-prototypes): Zero-JavaScript server-rendered UI partials, real-time token streaming with `htmx-ext-sse`, djlint quality gates, and semantic DOM assertions with BeautifulSoup4.
+- [Track 10: Prototype to Production Readiness](module/10-prototype-to-production): Structured JSON logging, Gunicorn WSGI workers, multistage Docker builds, and health/readiness probe contracts.
+- [Track 11: Migrating Flask WSGI to Litestar ASGI](module/11-migrating-flask-to-litestar): High-throughput ASGI migration, native DTO schemas, dependency injection, and Litestar `ServerSentEvent` streaming.
+- [Track 12: Connecting Python AI Backends to SvelteKit](module/12-connecting-to-sveltekit): SvelteKit 3 server BFF (`+server.ts`), streaming `fetch() + ReadableStream` consumer with Svelte 5 runes (`$state`), and `$env/static/private` secret isolation.
+
+## Interactive Tools & Telemetry
+
+- [Benchmarks & Telemetry Dashboard](benchmarks): Empirical latency, token throughput, and satisfaction rubrics comparing `gemma-4-e4b-it`, `gemma-4-e2b-it`, `gemma-3-1b-it`, and `functiongemma-270m-it`.
+- [Interactive SSE Chat Playground](playground/chat): Live browser-side simulation of token streaming, latency jitter (TTFT & ITL), and Pydantic schema validation.
