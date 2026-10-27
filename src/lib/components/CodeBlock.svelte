@@ -1,12 +1,6 @@
 <script lang="ts">
-	import Prism from 'prismjs';
-	import 'prismjs/components/prism-python.js';
-	import 'prismjs/components/prism-bash.js';
-	import 'prismjs/components/prism-json.js';
-	import 'prismjs/components/prism-typescript.js';
-	import 'prismjs/components/prism-ini.js';
 	import { Check, Copy, Terminal, FileCode } from '@lucide/svelte';
-	import { useClipboard } from 'yaxa-svelte';
+	import { useClipboard, tokenizeCode } from 'yaxa-svelte';
 
 	interface Props {
 		code: string;
@@ -28,26 +22,48 @@
 
 	const clipboard = useClipboard({ timeout: 2000 });
 
-	const highlightedHtml = $derived.by(() => {
-		const lang = language.toLowerCase();
-		const grammar =
-			Prism.languages[lang] ||
-			(lang === 'svelte' ? Prism.languages.markup : null) ||
-			Prism.languages.python ||
-			Prism.languages.plain;
-		const prismLang = Prism.languages[lang] ? lang : lang === 'svelte' ? 'markup' : 'plain';
-		const cleanCode = code.trim();
-		try {
-			return Prism.highlight(cleanCode, grammar, prismLang);
-		} catch {
-			return cleanCode;
-		}
-	});
-
-	const lines = $derived.by(() => {
-		return code.trim().split('\n');
-	});
+	const resolvedLang = $derived(language.toLowerCase() === 'ini' ? 'env' : language.toLowerCase());
+	const tokenizedLines = $derived(tokenizeCode(code.trim(), resolvedLang));
 </script>
+
+{#snippet renderLine(lineTokens: ReturnType<typeof tokenizeCode>[number], lineNum: number)}
+	{@const isHighlighted = highlightLines.includes(lineNum)}
+	<div class="px-3 {isHighlighted ? 'bg-cyan-500/10' : ''}">
+		{#if lineTokens.length === 0 || lineTokens.every((t) => !t.text)}
+			<span>&#8203;</span>
+		{:else}
+			{#each lineTokens as token, tokenIdx (tokenIdx)}
+				{#if token.type === 'rune'}
+					<span class="font-bold text-amber-400">{token.text}</span>
+				{:else if token.type === 'keyword'}
+					<span class="font-semibold text-purple-400">{token.text}</span>
+				{:else if token.type === 'decorator'}
+					<span class="text-pink-400">{token.text}</span>
+				{:else if token.type === 'string'}
+					<span class="text-emerald-400">{token.text}</span>
+				{:else if token.type === 'comment'}
+					<span class="text-zinc-500 italic">{token.text}</span>
+				{:else if token.type === 'function'}
+					<span class="text-cyan-400">{token.text}</span>
+				{:else if token.type === 'tag'}
+					<span class="font-semibold text-rose-400">{token.text}</span>
+				{:else if token.type === 'attr'}
+					<span class="text-amber-300">{token.text}</span>
+				{:else if token.type === 'directive'}
+					<span class="text-amber-400">{token.text}</span>
+				{:else if token.type === 'number'}
+					<span class="text-purple-400">{token.text}</span>
+				{:else if token.type === 'macro'}
+					<span class="font-semibold text-indigo-400">{token.text}</span>
+				{:else if token.type === 'punctuation'}
+					<span class="text-zinc-400">{token.text}</span>
+				{:else}
+					<span class="text-zinc-200">{token.text}</span>
+				{/if}
+			{/each}
+		{/if}
+	</div>
+{/snippet}
 
 <div class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 shadow-xl {className}">
 	<!-- Header Bar -->
@@ -97,7 +113,7 @@
 					class="sticky left-0 z-10 border-r border-zinc-800/60 bg-zinc-950 py-3 text-right text-zinc-600 select-none"
 					aria-hidden="true"
 				>
-					{#each lines as _line, i (i)}
+					{#each tokenizedLines as _, i (i)}
 						{@const lineNum = i + 1}
 						{@const isHighlighted = highlightLines.includes(lineNum)}
 						<div
@@ -111,76 +127,20 @@
 				</div>
 
 				<!-- Code Content -->
-				<pre class="flex-1 p-3 text-zinc-200"><code class="language-{language}"
-						>{@html highlightedHtml}</code
+				<pre class="flex-1 py-3 text-zinc-200"><code class="language-{language}"
+						>{#each tokenizedLines as lineTokens, i (i)}{@render renderLine(
+								lineTokens,
+								i + 1
+							)}{/each}</code
 					></pre>
 			</div>
 		{:else}
-			<pre class="p-3 text-zinc-200"><code class="language-{language}">{@html highlightedHtml}</code
+			<pre class="py-3 text-zinc-200"><code class="language-{language}"
+					>{#each tokenizedLines as lineTokens, i (i)}{@render renderLine(
+							lineTokens,
+							i + 1
+						)}{/each}</code
 				></pre>
 		{/if}
 	</div>
 </div>
-
-<style>
-	:global(.token.comment),
-	:global(.token.prolog),
-	:global(.token.doctype),
-	:global(.token.cdata) {
-		color: #71717a;
-		font-style: italic;
-	}
-
-	:global(.token.punctuation) {
-		color: #a1a1aa;
-	}
-
-	:global(.token.property),
-	:global(.token.tag),
-	:global(.token.boolean),
-	:global(.token.number),
-	:global(.token.constant),
-	:global(.token.symbol),
-	:global(.token.deleted) {
-		color: #f87171;
-	}
-
-	:global(.token.selector),
-	:global(.token.attr-name),
-	:global(.token.string),
-	:global(.token.char),
-	:global(.token.builtin),
-	:global(.token.inserted) {
-		color: #34d399;
-	}
-
-	:global(.token.operator),
-	:global(.token.entity),
-	:global(.token.url),
-	:global(.language-css .token.string),
-	:global(.style .token.string) {
-		color: #38bdf8;
-	}
-
-	:global(.token.atrule),
-	:global(.token.attr-value),
-	:global(.token.keyword) {
-		color: #c084fc;
-		font-weight: 600;
-	}
-
-	:global(.token.function),
-	:global(.token.class-name) {
-		color: #67e8f9;
-	}
-
-	:global(.token.regex),
-	:global(.token.important),
-	:global(.token.variable) {
-		color: #fbbf24;
-	}
-
-	:global(.token.decorator) {
-		color: #f472b6;
-	}
-</style>
