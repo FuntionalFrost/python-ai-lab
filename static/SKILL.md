@@ -89,6 +89,12 @@ Establish a strict architectural separation between **unit tests** and **live be
       results = asyncio.run(run_matrix(["gemma-4-e4b-it", "gemma-4-e2b-it"], ["Hello!"]))
   ```
 
+### C. In-Route Benchmarks with `flask[async]` & `httpx`
+
+- When triggering multi-model benchmarks or prompt ablations directly from a Flask route or HTMX dashboard, use `flask[async]` (`async def` view handlers).
+- Fan out concurrently using `asyncio.gather()`, `AsyncOpenAI`, and non-blocking `httpx.AsyncClient` for tool calls, returning rendered Jinja2 templates directly in ~2.5s without Redis or Celery.
+- Unit tests for these endpoints remain 100% synchronous via Flask's `test_client().post()` and `pytest-mock`.
+
 ---
 
 ## 4. Real-Time Token Streaming (SSE)
@@ -118,3 +124,12 @@ def stream_chat():
   Use `htmx-ext-sse` (`<div hx-ext="sse" sse-connect="/stream" sse-swap="token">`) for zero-JS prototypes. Test rendered HTML fragments using `BeautifulSoup4` and lint templates with `djlint`.
 * **Full Web Application (SvelteKit 3 BFF)**:
   Use SvelteKit `+server.ts` to proxy requests and isolate private `$env` secrets. In the browser component, consume using `fetch() + ReadableStream` with a `TextDecoder` and push tokens into Svelte 5 `$state` runes.
+
+---
+
+## 5. Resilient External HTTP Integrations (HTTPX)
+
+- **Synchronous in Flask Prototypes**: Use `httpx.Client()` with `httpx.Limits(max_connections=100, max_keepalive_connections=20)` and `httpx.HTTPTransport(retries=3)` for external tools, search APIs, and webhooks.
+- **Structured Timeouts**: Always specify granular timeouts via `httpx.Timeout(connect=3.05, read=60.0, write=10.0, pool=5.0)`.
+- **Deterministic Unit Testing**: Mock `httpx.Client.send()` using `pytest-mock` (`mocker.patch.object(client, "send")`). Tests remain 100% synchronous and execute in milliseconds without `pytest-asyncio`.
+- **Litestar Bridge**: The synchronous `httpx.Client` API translates 1:1 to `httpx.AsyncClient` when scaling to Litestar ASGI (Track 11).

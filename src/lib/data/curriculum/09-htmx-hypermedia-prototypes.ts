@@ -56,7 +56,7 @@ export const track09: CurriculumLesson = {
          |                                                       |
          v                                                       v
 +---------------------------------+     +---------------------------------+
-|   AI Engine (OpenAI + Requests) |     |   Jinja2 Partial Fragment Cache |
+|   AI Engine (OpenAI + HTTPX)    |     |   Jinja2 Partial Fragment Cache |
 |   Streaming Generator via SSE   |     |   Componentized HTML Templates  |
 |   hx-ext="sse" Live DOM Append  |     |   _message.html, _metric.html   |
 +---------------------------------+     +---------------------------------+`,

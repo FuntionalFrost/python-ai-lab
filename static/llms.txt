@@ -15,9 +15,9 @@
 
 - [Track 01: Application Factories & Modular MVC Architecture](module/01-frameworks-mvc): Flask 3.x application factory pattern, modular blueprint registration, Jinja2 template rendering, and isolated test fixtures with 100% test coverage.
 - [Track 02: Pydantic Settings & Fail-Fast Configuration](module/02-pydantic-settings): Centralized `app/config.py` setup, SecretStr leak prevention, environment override precedence, and startup validation testing.
-- [Track 03: Resilient HTTP Sessions & Tenacity Retries](module/03-resilient-requests-sessions): Reusable `requests.Session` connection pools, exponential backoff retries with Tenacity, and deterministic offline mock adapters.
+- [Track 03: Resilient HTTP Clients & Tool Integrations with HTTPX](module/03-resilient-httpx-clients): Reusable `httpx.Client` connection pools, HTTP/2 multiplexing, structured timeouts, and deterministic offline mock fixtures.
 - [Track 04: Real-Time LLM Token Streaming via SSE](module/04-llm-chat-streaming): Low-latency Server-Sent Events (SSE) generator, `stream_with_context`, buffer flushing (`X-Accel-Buffering: no`), and chunk boundary verification.
-- [Track 05: Live Concurrent Benchmarks vs. Deterministic Unit Tests](module/05-evals-benchmarks): Separating sync `/tests` from async `/benchmarks`, concurrent evaluation with `AsyncOpenAI` and `asyncio.Semaphore`, TTFT/TPS profiling, and LLM-as-a-judge rubrics.
+- [Track 05: Live Concurrent Benchmarks vs. Deterministic Unit Tests](module/05-evals-benchmarks): Separating sync `/tests` from async in-route evaluations (`flask[async]`, `httpx.AsyncClient`, `AsyncOpenAI`, and `asyncio.gather`), TTFT/TPS profiling, and LLM-as-a-judge rubrics.
 - [Track 06: Tool Calling & Schema Validation Testing](module/06-tool-calling-testing): Pydantic v2 schemas for LLM function calling, strict argument coercion, and recorded replay test fixtures.
 - [Track 07: RAG Pipelines & Embeddings Evaluation](module/07-rag-pipelines): In-memory vector search with cosine similarity, deterministic embedding mocks, semantic chunking, and retrieval precision assertions.
 - [Track 08: Autonomous Agent Loops & Evaluation Harnesses](module/08-agent-harnesses): Multi-turn tool execution state machines, conversational repair handling, and max-turn recursion guards.

@@ -1,7 +1,7 @@
 import type { CurriculumLesson, TrackSummary } from '../../types/curriculum';
 import { track01 } from './01-frameworks-mvc';
 import { track02 } from './02-pydantic-settings';
-import { track03 } from './03-resilient-requests-sessions';
+import { track03 } from './03-resilient-httpx-clients';
 import { track04 } from './04-llm-chat-streaming';
 import { track05 } from './05-evals-benchmarks';
 import { track06 } from './06-tool-calling-testing';

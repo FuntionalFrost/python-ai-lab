@@ -11,6 +11,7 @@ export const track05: CurriculumLesson = {
 	estimatedMinutes: 45,
 	topics: [
 		'Architectural Split: Deterministic Sync Tests (/tests) vs. Live Async Benchmarks (/benchmarks)',
+		'In-Route Concurrent Fan-Out: flask[async], AsyncOpenAI & httpx.AsyncClient',
 		'Concurrent Multi-Model Benchmarking with AsyncOpenAI, asyncio.gather & Semaphore',
 		'Same-Model Ablation: Concurrent Prompt, Temperature & Schema Variant Runs',
 		'Streaming Telemetry: Measuring Live TTFT and Tokens Per Second (TPS)',
@@ -18,6 +19,8 @@ export const track05: CurriculumLesson = {
 		'Psychometric LLM-as-a-Judge Rubrics with Pydantic Structured Outputs'
 	],
 	frameworks: [
+		'flask[async]>=3.1.3',
+		'httpx>=0.28.1',
 		'openai>=3.36.1',
 		'pydantic>=2.14.1',
 		'pydantic-settings>=2.16.0',
@@ -27,6 +30,8 @@ export const track05: CurriculumLesson = {
 	],
 	tags: [
 		'Benchmarking',
+		'flask[async]',
+		'httpx',
 		'AsyncOpenAI',
 		'asyncio',
 		'Evaluation',
@@ -36,10 +41,12 @@ export const track05: CurriculumLesson = {
 		'LLM-as-a-Judge'
 	],
 	summary:
-		'Establish the foundational separation between /tests and /benchmarks early in your prototype workflow. Keep /tests 100% synchronous and deterministic with pytest-mock (where mocked calls take microseconds and async adds zero benefit), while powering /benchmarks with AsyncOpenAI, asyncio.gather, and semaphores to execute live cross-model and same-model evaluations 15x faster.',
+		'Establish the foundational separation between /tests and /benchmarks early in your prototype workflow. Keep /tests 100% synchronous and deterministic with pytest-mock (where mocked calls take microseconds and async adds zero benefit), while powering /benchmarks and in-route evaluation dashboards with flask[async], httpx.AsyncClient, AsyncOpenAI, and asyncio.gather to execute live cross-model and same-model evaluations 15x faster without rewriting your MVC routing or Jinja templates.',
 	objectives: [
 		'Separate deterministic code verification (/tests) from live empirical model evaluation (/benchmarks).',
 		'Understand why automated unit tests stay synchronous (MagicMock has zero network wait time) while live benchmarks use AsyncOpenAI.',
+		'Leverage flask[async] to run in-route concurrent multi-model benchmarking inside Flask Blueprints and Jinja2 templates without Redis or Celery.',
+		'Use non-blocking httpx.AsyncClient within async benchmark tasks to prevent tool calls from blocking the asyncio event loop.',
 		'Build a concurrent benchmark runner using AsyncOpenAI, asyncio.gather(), and asyncio.Semaphore to measure TTFT and TPS across multiple models simultaneously.',
 		'Run same-model ablations concurrently across prompt variants, temperatures, and Pydantic schema guardrails.',
 		'Enforce the Iron Rule of AI Evals on frozen real-user prompts: when a benchmark fails, harden the system levers, never soften the test prompt.',
@@ -109,6 +116,11 @@ The Clean Architecture Solution: Separate /tests from /benchmarks:
 				name: 'The Iron Rule: Fix System, Never Test',
 				description:
 					'Evaluation suites are immutable ground-truth contracts. Modifying a messy user prompt to dodge a model weakness contaminates benchmarks and hides prototype flaws.'
+			},
+			{
+				name: 'In-Route Fan-Out with flask[async] & httpx',
+				description:
+					'flask[async] enables route handlers (async def) to fan out multi-model queries and non-blocking tool calls using asyncio.gather and httpx.AsyncClient, rendering Jinja partials directly without Redis or Celery.'
 			}
 		]
 	},
@@ -266,6 +278,55 @@ class WeatherQuery(BaseModel):
         if v_clean in ("f", "deg f", "imperial", "fahrenheit"):
             return "fahrenheit"
         return "celsius"`
+		},
+		{
+			title: 'Benchmark Routes: Sequential Sync Flask Loop vs. flask[async] Fan-Out',
+			description:
+				'Observe how flask[async] allows an in-route benchmark handler to fan out across multiple models and non-blocking httpx tool calls simultaneously without Celery or Redis.',
+			leftTitle: 'Sequential Sync Loop (Blocks Worker 40s)',
+			leftLanguage: 'python',
+			leftCode: `@bench_bp.post("/run-evals")
+def run_evals_sync():
+    # ❌ Runs models and tool calls one-by-one
+    # ❌ Blocks the Gunicorn worker thread for 40+ seconds
+    # ❌ Freezes the browser UI; cannot easily cancel
+    models = ["gemma-4-e4b-it", "gemma-4-e2b-it", "gemma-3-1b-it", "functiongemma-270m-it"]
+    results = []
+    
+    for model in models:
+        # Sequential blocking call
+        resp = openai_client.chat.completions.create(model=model, messages=[...])
+        # Blocking synchronous tool execution (unpooled httpx.get)
+        tool_data = httpx.get("https://api.energy.com/price").json()
+        results.append({"model": model, "data": tool_data})
+        
+    return render_template("benchmarks/_results.html", results=results)`,
+			rightTitle: 'flask[async] In-Route Fan-Out (2.5s Total)',
+			rightLanguage: 'python',
+			rightCode: `@bench_bp.post("/run-evals")
+async def run_evals_async():
+    # ✅ Non-blocking fan-out with asyncio.gather
+    # ✅ httpx.AsyncClient prevents tool calls from stalling the loop
+    # ✅ Returns in ~2.5s directly to Jinja2 without Redis or Celery
+    sem = asyncio.Semaphore(10)
+    models = ["gemma-4-e4b-it", "gemma-4-e2b-it", "gemma-3-1b-it", "functiongemma-270m-it"]
+    
+    async with httpx.AsyncClient() as http_client:
+        async def eval_one(model: str):
+            async with sem:
+                resp = await async_openai.chat.completions.create(model=model, messages=[...])
+                tool_data = (await http_client.get("https://api.energy.com/price")).json()
+                return {"model": model, "data": tool_data}
+                
+        results = await asyncio.gather(*(eval_one(m) for m in models))
+        
+    return render_template("benchmarks/_results.html", results=results)`,
+			diffHighlights: [
+				'async def run_evals_async',
+				'httpx.AsyncClient',
+				'asyncio.gather',
+				'asyncio.Semaphore'
+			]
 		}
 	],
 	codeSnippets: [
@@ -444,6 +505,94 @@ WEATHER_TOOL_DEFINITION: ChatCompletionToolParam = {
         }
     }
 }`,
+			runnable: true
+		},
+		{
+			id: 'in-route-benchmark-blueprint',
+			title: 'In-Route Multi-Model Evaluation Blueprint (flask[async] + httpx)',
+			filePath: 'app/blueprints/benchmarks.py',
+			description:
+				'Flask Blueprint route using async def, asyncio.gather, AsyncOpenAI, and httpx.AsyncClient to benchmark multiple <=4B models with tools and render Jinja2 partials.',
+			language: 'python',
+			code: `"""
+app/blueprints/benchmarks.py
+Concurrent in-route evaluation runner using flask[async] and httpx.
+"""
+
+from __future__ import annotations
+import asyncio
+import time
+from flask import Blueprint, render_template, request
+from openai import AsyncOpenAI
+import httpx
+from pydantic import BaseModel, Field
+
+bench_bp = Blueprint("benchmarks", __name__, url_prefix="/benchmarks")
+openai_client = AsyncOpenAI()
+
+CANDIDATE_MODELS = [
+    "gemma-4-e4b-it",
+    "gemma-4-e2b-it",
+    "gemma-3-1b-it",
+    "functiongemma-270m-it"
+]
+
+class ModelBenchmarkSummary(BaseModel):
+    model: str
+    ttft_ms: float
+    total_time_ms: float
+    tool_success: bool
+    final_output: str
+
+async def evaluate_candidate(
+    http_client: httpx.AsyncClient,
+    sem: asyncio.Semaphore,
+    model: str,
+    prompt: str
+) -> ModelBenchmarkSummary:
+    async with sem:
+        t0 = time.perf_counter()
+        ttft = 0.0
+        
+        # 1. First turn: Call model with tool definitions
+        resp = await openai_client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1
+        )
+        first_content = resp.choices[0].message.content or ""
+        ttft = (time.perf_counter() - t0) * 1000
+        
+        # 2. Non-blocking mock/live tool execution with httpx
+        tool_resp = await http_client.get(
+            "https://api.energy-grid.org/v1/pricing",
+            params={"region": "AT"}
+        )
+        tool_ok = tool_resp.status_code == 200
+        
+        elapsed = (time.perf_counter() - t0) * 1000
+        return ModelBenchmarkSummary(
+            model=model,
+            ttft_ms=round(ttft, 1),
+            total_time_ms=round(elapsed, 1),
+            tool_success=tool_ok,
+            final_output=first_content[:120]
+        )
+
+@bench_bp.post("/run-evals")
+async def run_in_route_benchmark():
+    """In-route async fan-out returning rendered Jinja2 HTML table."""
+    prompt = request.form.get("prompt", "Analyze real-time grid energy pricing in AT.")
+    sem = asyncio.Semaphore(10)
+    
+    async with httpx.AsyncClient(timeout=10.0) as http_client:
+        tasks = [
+            evaluate_candidate(http_client, sem, model, prompt)
+            for model in CANDIDATE_MODELS
+        ]
+        results = await asyncio.gather(*tasks)
+        
+    return render_template("benchmarks/_eval_table.html", results=results)`,
 			runnable: true
 		}
 	],
