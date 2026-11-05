@@ -53,12 +53,12 @@ This skill guides AI agents and developers in scaffolding, testing, and benchmar
 
 Establish a strict architectural separation between **unit tests** and **live benchmarks**:
 
-### A. Unit Tests (`/tests`) - 100% Synchronous
+### A. Unit Tests (`/tests`) - Fast & Deterministic (Synchronous Default & `pytest-asyncio` for Async Handlers)
 
-- **Do NOT use `pytest-asyncio` for unit tests**.
-- Replace all external LLM and network calls with in-memory mocks (`pytest-mock` / `MagicMock`).
-- Mocks return in microseconds ($\approx 0.01\text{ms}$); async event loops add zero benefit and cause test flakiness.
-- Example:
+- **Default to synchronous tests (`def test_*`)**: For domain schemas, prompt assembly, and standard route logic, use synchronous tests with `pytest-mock` (`mocker.patch`). Mocks return in microseconds ($\approx 0.01\text{ms}$) with zero event-loop overhead.
+- **Async tests (`async def test_*`)**: When testing `flask[async]` endpoints directly or Litestar ASGI controllers (`AsyncTestClient`), write native `async def test_*` functions supported by `pytest-asyncio` (`asyncio_mode = "auto"` with function loop scope).
+- In both sync and async tests, replace all external LLM and network calls with in-memory mocks (`MagicMock` / `AsyncMock`).
+- Example (Sync):
   ```python
   def test_chat_service_completion(mocker):
       mock_create = mocker.patch("openai.resources.chat.completions.Completions.create")
@@ -67,6 +67,16 @@ Establish a strict architectural separation between **unit tests** and **live be
       ]
       res = generate_answer("Hello")
       assert res == "Mocked response"
+  ```
+- Example (Async via `pytest-asyncio`):
+  ```python
+  async def test_async_in_route_benchmark(mocker):
+      mock_client = mocker.AsyncMock()
+      mock_client.chat.completions.create.return_value.choices = [
+          mocker.MagicMock(message=mocker.MagicMock(content="Async analysis"))
+      ]
+      res = await evaluate_candidate(mock_client, mocker.AsyncMock(), "gemma-4-e4b-it", "test prompt")
+      assert res.model == "gemma-4-e4b-it"
   ```
 
 ### B. Live Benchmarks (`/benchmarks`) - Concurrent `asyncio.run()`
@@ -136,5 +146,5 @@ def stream_chat():
 
 - **Synchronous in Flask Prototypes**: Use `httpx.Client()` with `httpx.Limits(max_connections=100, max_keepalive_connections=20)` and `httpx.HTTPTransport(retries=3)` for external tools, search APIs, and webhooks.
 - **Structured Timeouts**: Always specify granular timeouts via `httpx.Timeout(connect=3.05, read=60.0, write=10.0, pool=5.0)`.
-- **Deterministic Unit Testing**: Mock `httpx.Client.send()` using `pytest-mock` (`mocker.patch.object(client, "send")`). Tests remain 100% synchronous and execute in milliseconds without `pytest-asyncio`.
+- **Deterministic Unit Testing**: Mock `httpx.Client.send()` using `pytest-mock` (`mocker.patch.object(client, "send")`). Tests execute in milliseconds with zero network sockets.
 - **Litestar Bridge**: The synchronous `httpx.Client` API translates 1:1 to `httpx.AsyncClient` when scaling to Litestar ASGI (Track 11).

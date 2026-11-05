@@ -17,7 +17,13 @@ export const track11: CurriculumLesson = {
 		'Strangler Fig Migration Pattern for Zero-Downtime Cutover',
 		'Migrating Test Suites: FlaskClient to TestClient'
 	],
-	frameworks: ['Flask 3.1.3', 'Litestar 2.24.0', 'Granian / Uvicorn', 'Pydantic v2'],
+	frameworks: [
+		'Flask 3.1.3',
+		'Litestar 2.24.0',
+		'Granian / Uvicorn',
+		'Pydantic v2',
+		'pytest-asyncio>=0.25.0'
+	],
 	tags: ['Migration', 'Refactoring', 'ASGI', 'Architecture', 'Clean Code'],
 	summary:
 		'Learn how to systematically migrate a synchronous Flask application to an async-first Litestar service without downtime. Replace threadpool bottlenecks, manual JSON validation, and fragile global contexts with type-safe Controllers, compile-time Dependency Injection, and high-performance ASGI execution.',

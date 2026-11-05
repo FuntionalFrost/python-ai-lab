@@ -26,6 +26,7 @@ export const track05: CurriculumLesson = {
 		'pydantic-settings>=2.16.0',
 		'pytest>=9.0',
 		'pytest-mock>=3.17',
+		'pytest-asyncio>=0.25',
 		'pytest-cov>=7.1'
 	],
 	tags: [

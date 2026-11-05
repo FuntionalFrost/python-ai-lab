@@ -5,7 +5,7 @@
 ## Core Architectural Principles
 
 - **Prototype First**: Build fast, testable, and lean prototypes of AI backends and web interfaces. Avoid premature optimization or heavy enterprise infrastructure.
-- **Deterministic & Fast Testing**: Keep unit tests (`/tests`) 100% synchronous with `pytest-mock` and in-memory `MagicMock`. Zero network latency and zero event loop overhead in unit test suites (no `pytest-asyncio` required).
+- **Deterministic & Fast Testing**: Keep unit tests fast and deterministic with `pytest-mock` and in-memory `MagicMock`. Use `pytest-asyncio` (`asyncio_mode = "auto"`) for native `async def` route and ASGI controller tests with zero network flakiness.
 - **Target Models (<=4B Parameters)**: Systematically benchmark prototypes across open-weight instruction-tuned LLMs with <=4B total/effective parameters (`gemma-4-e4b-it`, `gemma-4-e2b-it`, `gemma-3-1b-it`, `functiongemma-270m-it`).
 - **Live Concurrent Benchmarks**: Separate unit tests from live model evaluations (`/benchmarks`). Use `AsyncOpenAI`, `asyncio.gather()`, and `asyncio.Semaphore(10)` invoked via Python's built-in `asyncio.run()`.
 - **Fail-Fast Configuration**: Centralize all environment configuration in `app/config.py` using `pydantic-settings` (`BaseSettings`) and module-level singleton `settings = Settings()`. Mask all API keys with `SecretStr`.

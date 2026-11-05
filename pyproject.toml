@@ -36,6 +36,7 @@ dependencies = [
 test = [
     "pytest>=9.0.0",
     "pytest-mock>=3.17.0",
+    "pytest-asyncio>=0.25.0",
     "pytest-cov>=7.1.0",
     "beautifulsoup4>=4.13.0",
     "djlint>=1.36.4",
@@ -48,6 +49,7 @@ package = false
 dev = [
     "pytest>=9.0.0",
     "pytest-mock>=3.17.0",
+    "pytest-asyncio>=0.25.0",
     "pytest-cov>=7.1.0",
     "beautifulsoup4>=4.13.0",
     "djlint>=1.36.4",
@@ -56,6 +58,8 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["src/lib/data/code-snippets"]
 addopts = "-v --cov-report=term-missing"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 branch = true
