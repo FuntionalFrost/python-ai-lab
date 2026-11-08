@@ -39,6 +39,14 @@ def stream_chat():
     )`;
 </script>
 
+<svelte:head>
+	<title>Streaming Chat & Tool Playground — Python AI Lab</title>
+	<meta
+		name="description"
+		content="Interactive simulator for LLM Server-Sent Events (SSE) streaming, TTFT/ITL latency simulation, and Pydantic v2 tool call execution."
+	/>
+</svelte:head>
+
 <div class="space-y-10">
 	<!-- Page Header -->
 	<div class="border-b border-zinc-800/80 pb-6">

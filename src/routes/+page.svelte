@@ -12,6 +12,14 @@
 	} from '@lucide/svelte';
 </script>
 
+<svelte:head>
+	<title>Python AI Lab — Prototyping, Testing & Benchmarking AI Backends</title>
+	<meta
+		name="description"
+		content="Master rapid prototyping, deterministic testing with pytest-mock, and <=4B open-weight model benchmarking across Flask 3.x, Litestar, Pydantic v2, and HTTPX."
+	/>
+</svelte:head>
+
 <div class="space-y-12">
 	<!-- Hero Section -->
 	<section

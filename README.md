@@ -3,6 +3,7 @@
 <div align="center">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-python--ai--lab.pages.dev-2ea44f?logo=cloudflarepages&logoColor=white)](https://python-ai-lab.pages.dev/)
 [![Svelte](<https://img.shields.io/badge/Svelte-5%20(Runes)-FF3E00?logo=svelte&logoColor=white>)](https://svelte.dev)
 [![SvelteKit](https://img.shields.io/badge/SvelteKit-3-FF3E00?logo=svelte&logoColor=white)](https://kit.svelte.dev)
 [![Python](https://img.shields.io/badge/Python-3.13%2B-3776AB?logo=python&logoColor=white)](https://python.org)
@@ -16,7 +17,7 @@
 
 **An interactive lab for rapidly prototyping, testing, benchmarking, and iterating on modern Python Web & AI backend architectures.**
 
-[Explore Curriculum](#curriculum-tracks) • [Interactive Features](#interactive-platform-features) • [Quickstart](#quickstart) • [Tech Stack](#tech-stack)
+[🌐 Live Demo](https://python-ai-lab.pages.dev/) • [Explore Curriculum](#curriculum-tracks) • [Interactive Features](#interactive-platform-features) • [Quickstart](#quickstart) • [Tech Stack](#tech-stack)
 
 </div>
 

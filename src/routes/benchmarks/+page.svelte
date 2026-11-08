@@ -100,6 +100,14 @@ exclude_lines =
     if TYPE_CHECKING:`;
 </script>
 
+<svelte:head>
+	<title>Telemetry, Benchmarks & Evaluation Lab — Python AI Lab</title>
+	<meta
+		name="description"
+		content="Empirical latency, throughput (TPS), and psychometric user satisfaction evaluations across open-weight <=4B LLMs and prompt ablations."
+	/>
+</svelte:head>
+
 <div class="space-y-10">
 	<!-- Page Header -->
 	<div class="border-b border-zinc-800/80 pb-6">
