@@ -23,7 +23,7 @@
 - [Track 08: Autonomous Agent Loops & Evaluation Harnesses](module/08-agent-harnesses): Multi-turn tool execution state machines, conversational repair handling, and max-turn recursion guards.
 - [Track 09: HTMX & Hypermedia Prototypes](module/09-htmx-hypermedia-prototypes): Zero-JavaScript server-rendered UI partials, real-time token streaming with `htmx-ext-sse`, djlint quality gates, and semantic DOM assertions with BeautifulSoup4.
 - [Track 10: Prototype to Production Readiness](module/10-prototype-to-production): Structured JSON logging, Gunicorn WSGI workers, multistage Docker builds, and health/readiness probe contracts.
-- [Track 11: Migrating Flask WSGI to Litestar ASGI](module/11-migrating-flask-to-litestar): High-throughput ASGI migration, native DTO schemas, dependency injection, and Litestar `ServerSentEvent` streaming.
+- [Track 11: Scale-Up: Migrating Flask to Quart & Litestar (The ASGI Decision Matrix)](module/11-migrating-flask-to-litestar): High-throughput ASGI migration evaluating Road A (Zero-Rewrite Pallets ASGI with Quart 0.23 on Hypercorn) vs. Road B (Clean Architecture with Litestar 2.24 on Granian), native DTO schemas, and async test suites.
 - [Track 12: Connecting Python AI Backends to SvelteKit](module/12-connecting-to-sveltekit): SvelteKit 3 server BFF (`+server.ts`), streaming `fetch() + ReadableStream` consumer with Svelte 5 runes (`$state`), and `$env/static/private` secret isolation.
 
 ## Interactive Tools & Telemetry

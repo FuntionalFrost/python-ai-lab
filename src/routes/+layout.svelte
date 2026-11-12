@@ -7,6 +7,8 @@
 	import { ALL_TRACKS } from '#lib/data/curriculum/index';
 	import BrandLogo from '#lib/components/BrandLogo.svelte';
 	import { CommandPalette, Kbd, type CommandItem } from 'yaxa-svelte';
+	import { Seo } from 'yaxa-svelte/seo';
+	import { siteConfig } from '#lib/site.config';
 	import { Bot, Activity, Search, Menu, X, Layers, Terminal } from '@lucide/svelte';
 
 	let { children }: LayoutProps = $props();
@@ -61,26 +63,9 @@
 
 <svelte:head>
 	<link rel="icon" type="image/svg+xml" href={favicon} />
-	<title>Python AI Lab — Prototyping & Testing Modern AI Backends</title>
-	<meta
-		name="description"
-		content="An interactive lab for rapidly prototyping, testing, benchmarking, and iterating on modern Python Web & AI backend architectures (Flask, Litestar, Pydantic v2, HTTPX, htmx) with SvelteKit 3."
-	/>
-	<meta property="og:site_name" content="Python AI Lab" />
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content="Python AI Lab — Prototyping & Testing Modern AI Backends" />
-	<meta
-		property="og:description"
-		content="Interactive curriculum and runnable prototype patterns for Flask, Litestar, Pydantic v2, HTTPX, htmx, SSE streaming, and deterministic pytest testing."
-	/>
-	<meta property="og:url" content="https://python-ai-lab.pages.dev{page.url.pathname}" />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Python AI Lab — Prototyping & Testing Modern AI Backends" />
-	<meta
-		name="twitter:description"
-		content="Interactive curriculum and runnable prototype patterns for Flask, Litestar, Pydantic v2, HTTPX, htmx, and pytest."
-	/>
 </svelte:head>
+
+<Seo config={siteConfig} />
 
 <div
 	class="flex min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30 selection:text-cyan-200"

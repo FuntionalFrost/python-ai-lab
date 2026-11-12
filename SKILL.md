@@ -148,3 +148,24 @@ def stream_chat():
 - **Structured Timeouts**: Always specify granular timeouts via `httpx.Timeout(connect=3.05, read=60.0, write=10.0, pool=5.0)`.
 - **Deterministic Unit Testing**: Mock `httpx.Client.send()` using `pytest-mock` (`mocker.patch.object(client, "send")`). Tests execute in milliseconds with zero network sockets.
 - **Litestar Bridge**: The synchronous `httpx.Client` API translates 1:1 to `httpx.AsyncClient` when scaling to Litestar ASGI (Track 11).
+
+---
+
+## 6. The ASGI Modernization Decision Matrix: Quart vs. Litestar
+
+When scaling a synchronous Flask AI backend to asynchronous ASGI to support high-concurrency LLM streaming:
+
+- **Road A: Zero-Rewrite Pallets ASGI (Quart 0.23 + Hypercorn)**:
+  - Official Pallets async framework sharing 99% Flask API compatibility.
+  - Drop-in async Blueprints and task-local async contexts (`request`, `current_app`).
+  - Convert `stream_with_context(generate())` to native `async def generate(): async for chunk in stream: yield ...`.
+  - Non-blocking coroutines eliminate WSGI worker threadpool exhaustion on streaming connections.
+  - Run with `hypercorn app:app --bind 0.0.0.0:8000 --workers 4`.
+  - Test with `quart.testing.QuartClient` and `pytest-asyncio`.
+
+- **Road B: Clean-Architecture ASGI (Litestar 2.24 + Granian)**:
+  - Class-based Controllers and automated Pydantic DTO validation at the framework boundary.
+  - Compile-time dependency injection (`Provide()`), eliminating thread-local and global proxies.
+  - Peak throughput on Rust-based Granian ASGI server.
+  - Run with `granian --interface asgi app:app --host 0.0.0.0 --port 8000 --workers 4`.
+  - Test with Litestar's `TestClient` / `AsyncTestClient` with dependency overrides.

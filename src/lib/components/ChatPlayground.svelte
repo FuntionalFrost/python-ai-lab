@@ -161,6 +161,77 @@
 		}
 	];
 
+	type FrameworkId = 'flask' | 'quart' | 'litestar';
+	let selectedFramework = $state<FrameworkId>('quart');
+
+	const backendSnippets: Record<FrameworkId, string> = {
+		flask: `# Flask 3.x (WSGI + Threadpool)
+from flask import Flask, Response, stream_with_context
+import json
+import time
+
+app = Flask(__name__)
+
+@app.post("/api/v1/chat/stream")
+def chat_stream():
+    def generate():
+        # ⚠️ Blocks 1 OS thread per streaming connection!
+        tokens = ["WSGI ", "threadpool ", "streaming..."]
+        for token in tokens:
+            payload = json.dumps({"choices": [{"delta": {"content": token}}]})
+            yield f"data: {payload}\\n\\n"
+            time.sleep(0.02)
+        yield "data: [DONE]\\n\\n"
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+    )`,
+		quart: `# Quart 0.23 (Pallets Native ASGI + Hypercorn)
+from quart import Quart, Response
+import asyncio
+import json
+
+app = Quart(__name__)
+
+@app.post("/api/v1/chat/stream")
+async def chat_stream():
+    async def generate():
+        # 🚀 Native ASGI coroutine: non-blocking, scales to 10k+ concurrent streams
+        tokens = ["Quart ", "ASGI ", "event ", "loop ", "streaming..."]
+        for token in tokens:
+            payload = json.dumps({"choices": [{"delta": {"content": token}}]})
+            yield f"data: {payload}\\n\\n"
+            await asyncio.sleep(0.02)
+        yield "data: [DONE]\\n\\n"
+
+    return Response(
+        generate(),
+        mimetype="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+    )`,
+		litestar: `# Litestar 2.24 (Clean Architecture ASGI + Granian)
+from litestar import Controller, post
+from litestar.response import ServerSentEvent
+from collections.abc import AsyncGenerator
+import json
+
+class ChatController(Controller):
+    path = "/api/v1/chat"
+
+    @post("/stream")
+    async def stream_chat(self, data: ChatRequest) -> ServerSentEvent:
+        async def token_generator() -> AsyncGenerator[str, None]:
+            tokens = ["Litestar ", "Granian ", "ASGI ", "streaming..."]
+            for token in tokens:
+                payload = json.dumps({"choices": [{"delta": {"content": token}}]})
+                yield payload
+            yield "[DONE]"
+
+        return ServerSentEvent(token_generator())`
+	};
+
 	let selectedPreset = $state<Preset>(PRESETS[0]);
 	let promptInput = $state(PRESETS[0].prompt);
 	let messages = $state<Message[]>([]);
@@ -169,7 +240,7 @@
 	// Latency Simulator Controls
 	let ttftMs = $state(180); // Time to first token
 	let itlMs = $state(28); // Inter-token latency
-	let activeTab = $state<'stream' | 'payload' | 'pydantic' | 'timeline'>('stream');
+	let activeTab = $state<'stream' | 'payload' | 'pydantic' | 'backend'>('stream');
 	let rawChunks = $state<string[]>([]);
 	let stats = $state<{ ttft: number; totalTime: number; tokenCount: number }>({
 		ttft: 0,
@@ -292,24 +363,66 @@
 				</p>
 			</div>
 
-			<!-- Preset Selector Group -->
-			<div class="flex flex-wrap items-center gap-2.5">
-				<span class="shrink-0 font-mono text-xs text-zinc-400">Preset:</span>
-				<div
-					class="flex flex-wrap items-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-950/70 p-1"
-				>
-					{#each PRESETS as preset (preset.id)}
+			<!-- Runtime & Preset Selectors -->
+			<div class="flex flex-wrap items-center gap-4">
+				<!-- Runtime Selector -->
+				<div class="flex flex-wrap items-center gap-2">
+					<span class="shrink-0 font-mono text-xs text-zinc-400">Runtime:</span>
+					<div
+						class="flex flex-wrap items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-950/70 p-1"
+					>
 						<button
 							type="button"
-							onclick={() => applyPreset(preset)}
-							class="rounded-lg px-3 py-1.5 text-xs font-medium transition-all {selectedPreset.id ===
-							preset.id
+							onclick={() => (selectedFramework = 'flask')}
+							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all {selectedFramework ===
+							'flask'
+								? 'bg-amber-600 text-white shadow-sm'
+								: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
+						>
+							Flask 3.x (WSGI)
+						</button>
+						<button
+							type="button"
+							onclick={() => (selectedFramework = 'quart')}
+							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all {selectedFramework ===
+							'quart'
 								? 'bg-cyan-600 text-white shadow-sm'
 								: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
 						>
-							{preset.name}
+							Quart 0.23 (ASGI)
 						</button>
-					{/each}
+						<button
+							type="button"
+							onclick={() => (selectedFramework = 'litestar')}
+							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all {selectedFramework ===
+							'litestar'
+								? 'bg-emerald-600 text-white shadow-sm'
+								: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
+						>
+							Litestar 2.24 (ASGI)
+						</button>
+					</div>
+				</div>
+
+				<!-- Preset Selector Group -->
+				<div class="flex flex-wrap items-center gap-2">
+					<span class="shrink-0 font-mono text-xs text-zinc-400">Preset:</span>
+					<div
+						class="flex flex-wrap items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-950/70 p-1"
+					>
+						{#each PRESETS as preset (preset.id)}
+							<button
+								type="button"
+								onclick={() => applyPreset(preset)}
+								class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all {selectedPreset.id ===
+								preset.id
+									? 'bg-cyan-600 text-white shadow-sm'
+									: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
+							>
+								{preset.name}
+							</button>
+						{/each}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -491,6 +604,15 @@
 				>
 					Pydantic Schema
 				</button>
+				<button
+					type="button"
+					onclick={() => (activeTab = 'backend')}
+					class="rounded-md px-3 py-1.5 font-medium transition-colors {activeTab === 'backend'
+						? 'bg-zinc-800 text-cyan-400 shadow'
+						: 'text-zinc-400 hover:text-zinc-200'}"
+				>
+					Backend Code
+				</button>
 			</div>
 
 			<!-- Inspector Content -->
@@ -515,7 +637,21 @@
 						<span class="text-purple-400">POST</span> /api/v1/chat/stream HTTP/1.1<br />
 						<span class="text-zinc-500">Host:</span> api.python-ai-lab.dev<br />
 						<span class="text-zinc-500">Content-Type:</span> application/json<br />
-						<span class="text-zinc-500">Accept:</span> text/event-stream<br /><br />
+						<span class="text-zinc-500">Accept:</span> text/event-stream<br />
+						<span class="text-zinc-500">Server:</span>
+						<span
+							class={selectedFramework === 'flask'
+								? 'text-amber-400'
+								: selectedFramework === 'quart'
+									? 'text-cyan-400'
+									: 'text-emerald-400'}
+						>
+							{selectedFramework === 'flask'
+								? 'gunicorn/23.0.0 (sync worker)'
+								: selectedFramework === 'quart'
+									? 'hypercorn/0.18.0 (asgi)'
+									: 'granian/1.7.0 (rust-asgi)'}
+						</span><br /><br />
 						&#123;<br />
 						&nbsp;&nbsp;<span class="text-cyan-400">"model"</span>:
 						<span class="text-emerald-400">"gemma-4-e4b-it"</span>,<br />
@@ -526,7 +662,7 @@
 						<span class="text-emerald-400">"{selectedPreset.prompt}"</span><br />
 						&#125;
 					</div>
-				{:else}
+				{:else if activeTab === 'pydantic'}
 					<div class="space-y-3">
 						<div class="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
 							<ShieldCheck class="h-4 w-4" />
@@ -534,6 +670,37 @@
 						</div>
 						<pre
 							class="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-900/80 p-3 text-[11px] text-cyan-300">{selectedPreset.pydanticSchema}</pre>
+					</div>
+				{:else}
+					<div class="space-y-3">
+						<div class="flex items-center justify-between text-xs">
+							<span class="font-semibold text-zinc-200">
+								{#if selectedFramework === 'flask'}
+									Flask 3.x Streaming Blueprint (Gunicorn WSGI)
+								{:else if selectedFramework === 'quart'}
+									Quart 0.23 Streaming Blueprint (Hypercorn ASGI)
+								{:else}
+									Litestar 2.24 Streaming Controller (Granian ASGI)
+								{/if}
+							</span>
+							<span
+								class="rounded px-2 py-0.5 font-mono text-[10px] {selectedFramework === 'flask'
+									? 'border border-amber-500/20 bg-amber-500/10 text-amber-400'
+									: selectedFramework === 'quart'
+										? 'border border-cyan-500/20 bg-cyan-500/10 text-cyan-400'
+										: 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-400'}"
+							>
+								{selectedFramework === 'flask'
+									? 'Blocking Threadpool'
+									: selectedFramework === 'quart'
+										? 'Zero-Rewrite Coroutine'
+										: 'Type-Safe DTO Stream'}
+							</span>
+						</div>
+						<pre
+							class="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-900/80 p-3 font-mono text-[11px] leading-relaxed text-zinc-300">{backendSnippets[
+								selectedFramework
+							]}</pre>
 					</div>
 				{/if}
 			</div>

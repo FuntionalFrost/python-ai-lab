@@ -2,6 +2,13 @@
 	"name": "python-ai-lab",
 	"private": true,
 	"version": "0.0.1",
+	"description": "Interactive prototyping, testing, benchmarking, and iteration lab for modern Python AI backends (Flask, Quart, Litestar, Pydantic v2, HTTPX) and SvelteKit 3.",
+	"homepage": "https://python-ai-lab.pages.dev",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/FuntionalFrost/python-ai-lab.git"
+	},
+	"license": "MIT",
 	"packageManager": "pnpm@12.6.0",
 	"type": "module",
 	"scripts": {
@@ -42,6 +49,6 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^1.59.0",
-		"yaxa-svelte": "^2.0.4"
+		"yaxa-svelte": "^2.8.1"
 	}
 }

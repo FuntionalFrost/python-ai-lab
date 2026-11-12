@@ -25,6 +25,10 @@
 		return 350 + Math.pow(concurrency - 16, 1.45) * 14;
 	});
 
+	const quartLatencyMs = $derived.by(() => {
+		return 185 + concurrency * 3.4;
+	});
+
 	const litestarLatencyMs = $derived.by(() => {
 		return 165 + concurrency * 2.8;
 	});
@@ -37,6 +41,10 @@
 		return Math.max(90, 240 - (concurrency - 16) * 1.8);
 	});
 
+	const quartThroughputTokSec = $derived.by(() => {
+		return Math.min(640, 48 + concurrency * 3.6);
+	});
+
 	const litestarThroughputTokSec = $derived.by(() => {
 		return Math.min(880, 52 + concurrency * 4.4);
 	});
@@ -45,20 +53,28 @@
 	const throughputChartData: ChartDataPoint[] = [10, 20, 30, 50, 75, 100, 125, 150].map((c) => ({
 		label: `${c} users`,
 		litestar: Math.round(Math.min(880, 52 + c * 4.4)),
+		quart: Math.round(Math.min(640, 48 + c * 3.6)),
 		flask: Math.round(c <= 16 ? Math.min(220, 48 * (c / 2.5)) : Math.max(90, 240 - (c - 16) * 1.8))
 	}));
 
 	const throughputSeries: LineSeries[] = [
 		{
 			key: 'litestar',
-			label: 'Litestar 2.24 (ASGI)',
+			label: 'Litestar 2.24 (Granian ASGI)',
 			color: '#10b981',
 			curve: 'smooth',
 			area: true
 		},
 		{
+			key: 'quart',
+			label: 'Quart 0.23 (Hypercorn ASGI)',
+			color: '#06b6d4',
+			curve: 'smooth',
+			area: true
+		},
+		{
 			key: 'flask',
-			label: 'Flask 3.x (WSGI)',
+			label: 'Flask 3.x (Gunicorn WSGI)',
 			color: '#f59e0b',
 			curve: 'smooth',
 			area: true
@@ -68,19 +84,26 @@
 	const latencyChartData: ChartDataPoint[] = [10, 20, 30, 50, 75, 100, 125, 150].map((c) => ({
 		label: `${c} users`,
 		litestar: Math.round(165 + c * 2.8),
+		quart: Math.round(185 + c * 3.4),
 		flask: Math.round(c <= 16 ? 210 + c * 8 : 350 + Math.pow(c - 16, 1.45) * 14)
 	}));
 
 	const latencySeries: LineSeries[] = [
 		{
 			key: 'litestar',
-			label: 'Litestar 2.24 (ASGI TTFT)',
+			label: 'Litestar 2.24 (Granian TTFT)',
 			color: '#10b981',
 			curve: 'smooth'
 		},
 		{
+			key: 'quart',
+			label: 'Quart 0.23 (Hypercorn TTFT)',
+			color: '#06b6d4',
+			curve: 'smooth'
+		},
+		{
 			key: 'flask',
-			label: 'Flask 3.x (WSGI TTFT)',
+			label: 'Flask 3.x (Gunicorn TTFT)',
 			color: '#f59e0b',
 			curve: 'smooth'
 		}
@@ -336,12 +359,12 @@
 	{#if activeTab === 'throughput'}
 		<!-- Throughput Cards & Interactive LineChart -->
 		<div class="space-y-6">
-			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 				<!-- Litestar Card -->
 				<div class="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
 					<div class="flex items-center justify-between">
 						<span class="text-xs font-semibold tracking-wider text-emerald-400 uppercase"
-							>Litestar 2.24 (ASGI)</span
+							>Litestar 2.24 (Granian)</span
 						>
 						<Zap class="h-4 w-4 text-emerald-400" />
 					</div>
@@ -358,7 +381,32 @@
 						></div>
 					</div>
 					<p class="mt-2 text-[11px] text-zinc-400">
-						Non-blocking async event loop yields between token chunks. Zero worker exhaustion.
+						Rust-accelerated Granian ASGI loop. Zero worker exhaustion under heavy concurrency.
+					</p>
+				</div>
+
+				<!-- Quart Card -->
+				<div class="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4">
+					<div class="flex items-center justify-between">
+						<span class="text-xs font-semibold tracking-wider text-cyan-400 uppercase"
+							>Quart 0.23 (Hypercorn)</span
+						>
+						<Zap class="h-4 w-4 text-cyan-400" />
+					</div>
+					<div class="mt-3 flex items-baseline gap-2">
+						<span class="font-mono text-2xl font-bold text-zinc-100"
+							>{Math.round(quartThroughputTokSec)}</span
+						>
+						<span class="text-xs text-zinc-400">tokens / sec aggregate</span>
+					</div>
+					<div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+						<div
+							class="h-full rounded-full bg-cyan-400 transition-all duration-200"
+							style="width: {Math.min(100, (quartThroughputTokSec / 640) * 100)}%"
+						></div>
+					</div>
+					<p class="mt-2 text-[11px] text-zinc-400">
+						Pallets native async event loop. Zero-rewrite non-blocking streaming coroutines.
 					</p>
 				</div>
 
@@ -366,7 +414,7 @@
 				<div class="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
 					<div class="flex items-center justify-between">
 						<span class="text-xs font-semibold tracking-wider text-amber-400 uppercase"
-							>Flask 3.x (WSGI)</span
+							>Flask 3.x (Gunicorn WSGI)</span
 						>
 						<Cpu class="h-4 w-4 text-amber-400" />
 					</div>
@@ -398,9 +446,13 @@
 						>
 					</div>
 					<div class="font-mono text-xs">
-						<span class="text-emerald-400">ASGI: {Math.round(litestarThroughputTokSec)} tok/s</span>
+						<span class="text-emerald-400"
+							>Litestar: {Math.round(litestarThroughputTokSec)} tok/s</span
+						>
 						<span class="mx-1 text-zinc-600">|</span>
-						<span class="text-amber-400">WSGI: {Math.round(flaskThroughputTokSec)} tok/s</span>
+						<span class="text-cyan-400">Quart: {Math.round(quartThroughputTokSec)} tok/s</span>
+						<span class="mx-1 text-zinc-600">|</span>
+						<span class="text-amber-400">Flask: {Math.round(flaskThroughputTokSec)} tok/s</span>
 					</div>
 				</div>
 				<LineChart
@@ -418,12 +470,12 @@
 	{:else if activeTab === 'latency'}
 		<!-- Latency Cards & Interactive LineChart -->
 		<div class="space-y-6">
-			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 				<!-- Litestar Latency Card -->
 				<div class="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
 					<div class="flex items-center justify-between">
 						<span class="text-xs font-semibold tracking-wider text-emerald-400 uppercase"
-							>Litestar 2.24 (Time-To-First-Token)</span
+							>Litestar 2.24 (Granian TTFT)</span
 						>
 						<Zap class="h-4 w-4 text-emerald-400" />
 					</div>
@@ -438,11 +490,30 @@
 					</p>
 				</div>
 
+				<!-- Quart Latency Card -->
+				<div class="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4">
+					<div class="flex items-center justify-between">
+						<span class="text-xs font-semibold tracking-wider text-cyan-400 uppercase"
+							>Quart 0.23 (Hypercorn TTFT)</span
+						>
+						<Zap class="h-4 w-4 text-cyan-400" />
+					</div>
+					<div class="mt-3 flex items-baseline gap-2">
+						<span class="font-mono text-2xl font-bold text-zinc-100"
+							>{Math.round(quartLatencyMs)}</span
+						>
+						<span class="text-xs text-zinc-400">ms TTFT</span>
+					</div>
+					<p class="mt-2 text-[11px] text-zinc-400">
+						Asynchronous event loop prevents queue exhaustion; slight runtime overhead vs Granian.
+					</p>
+				</div>
+
 				<!-- Flask Latency Card -->
 				<div class="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
 					<div class="flex items-center justify-between">
 						<span class="text-xs font-semibold tracking-wider text-amber-400 uppercase"
-							>Flask 3.x (Time-To-First-Token)</span
+							>Flask 3.x (Gunicorn TTFT)</span
 						>
 						<Cpu class="h-4 w-4 text-amber-400" />
 					</div>
@@ -468,9 +539,11 @@
 						>
 					</div>
 					<div class="font-mono text-xs">
-						<span class="text-emerald-400">ASGI: {Math.round(litestarLatencyMs)} ms</span>
+						<span class="text-emerald-400">Litestar: {Math.round(litestarLatencyMs)} ms</span>
 						<span class="mx-1 text-zinc-600">|</span>
-						<span class="text-amber-400">WSGI: {Math.round(flaskLatencyMs)} ms</span>
+						<span class="text-cyan-400">Quart: {Math.round(quartLatencyMs)} ms</span>
+						<span class="mx-1 text-zinc-600">|</span>
+						<span class="text-amber-400">Flask: {Math.round(flaskLatencyMs)} ms</span>
 					</div>
 				</div>
 				<LineChart
