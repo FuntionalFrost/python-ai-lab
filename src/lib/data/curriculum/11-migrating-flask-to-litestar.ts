@@ -65,7 +65,8 @@ export const track11: CurriculumLesson = {
 
 1. Road A (Zero-Rewrite Pallets ASGI with Quart): Quart is the official async sibling of Flask in the Pallets ecosystem. It shares the exact same Blueprint, request, and extension paradigms while running natively on ASGI servers like Hypercorn. If you have an extensive existing Flask codebase and want non-blocking streaming without rewriting routes into classes, Quart is the fastest path to scale.
 2. Road B (Clean-Architecture ASGI with Litestar): If you want to eliminate implicit thread-locals, enforce Pydantic DTOs at the framework boundary, and leverage compile-time Dependency Injection, Litestar provides high architectural rigor and peak throughput when served via Granian.
-3. The Strangler Fig Gateway: Both paths can be rolled out incrementally behind an API Gateway (Nginx/Envoy), routing real-time SSE streaming endpoints to ASGI while leaving legacy CRUD on Flask until decommissioned.`,
+3. The Strangler Fig Gateway: Both paths can be rolled out incrementally behind an API Gateway (Nginx/Envoy), routing real-time SSE streaming endpoints to ASGI while leaving legacy CRUD on Flask until decommissioned.
+4. The Zero-DB AI Proxy Pattern: When building pure LLM inference proxies, agentic tool-calling routers, or RAG retrieval front-doors that possess no relational database or ORM, Quart is exceptionally compelling. In a traditional full-stack app, migrating to ASGI incurs the "async database tax" (asyncpg, greenlet drivers, complex session scoping). In a Zero-DB microservice, that tax is zero! Quart delivers 100% of ASGI’s non-blocking concurrency and native streaming generators while preserving Flask’s concise function-based routes, avoiding the controller/DTO boilerplate of Litestar or FastAPI.`,
 		keyConcepts: [
 			{
 				name: 'The ASGI Decision Matrix',
@@ -81,6 +82,11 @@ export const track11: CurriculumLesson = {
 				name: 'Context Locals vs. Explicit Provide() DI',
 				description:
 					'Quart modernizes Flask thread-locals into task-local async contexts. Litestar replaces magic globals entirely with explicit, verifiable dependency trees via Provide().'
+			},
+			{
+				name: 'The Zero-DB AI Proxy Pattern',
+				description:
+					'When an AI microservice has no relational database (only HTTP/gRPC calls to LLM providers or vector databases), Quart eliminates the classic async ORM tax. Teams gain native async SSE streaming, AsyncOpenAI, and task-local contextvars with zero architectural friction.'
 			}
 		]
 	},

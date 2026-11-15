@@ -8,8 +8,22 @@
 		ShieldCheck,
 		Wrench,
 		RefreshCw,
-		Clock
+		Clock,
+		Copy,
+		Check,
+		FileText,
+		Zap,
+		Code2,
+		Globe
 	} from '@lucide/svelte';
+	import CodeBlock from '#lib/components/CodeBlock.svelte';
+	import { useClipboard } from 'yaxa-svelte';
+
+	interface RAGSource {
+		title: string;
+		score: number;
+		chunk: string;
+	}
 
 	interface Message {
 		id: string;
@@ -20,7 +34,14 @@
 			arguments: string;
 			result: string;
 		};
+		ragSources?: RAGSource[];
 		isStreaming?: boolean;
+		telemetry?: {
+			ttftMs: number;
+			totalTokens: number;
+			tokensPerSec: number;
+			serverRunner: string;
+		};
 	}
 
 	interface Preset {
@@ -29,6 +50,7 @@
 		prompt: string;
 		description: string;
 		requiresTool?: boolean;
+		ragSources?: RAGSource[];
 		tokens: string[];
 		toolInfo?: {
 			name: string;
@@ -40,9 +62,9 @@
 
 	const PRESETS: Preset[] = [
 		{
-			id: 'litestar-sse',
-			name: 'Litestar SSE Stream',
-			description: 'Real-time token streaming with async ServerSentEvent generator',
+			id: 'realtime-sse',
+			name: '⚡ Realtime SSE',
+			description: 'Real-time token streaming with async event generator and low-latency chunking',
 			prompt: 'Explain the difference between WSGI threadpool and ASGI event loop.',
 			tokens: [
 				'WSGI ',
@@ -108,7 +130,7 @@
 		},
 		{
 			id: 'tool-agent',
-			name: 'Tool Calling Weather Agent',
+			name: '🔧 Weather Tool',
 			description: 'Dispatches tool call, validates with Pydantic, and returns synthesized answer',
 			prompt: 'What is the weather in Vienna in celsius?',
 			requiresTool: true,
@@ -146,7 +168,7 @@
 		},
 		{
 			id: 'structured-json',
-			name: 'Structured Pydantic Extraction',
+			name: '📋 Pydantic JSON',
 			description: 'Guaranteed JSON schema output extracted into Pydantic models',
 			prompt: 'Extract key financial metrics from: Revenue was $42M with 28% margin.',
 			tokens: [
@@ -158,11 +180,99 @@
 				'}'
 			],
 			pydanticSchema: `class FinancialReport(BaseModel):\n    company: str\n    revenue_usd: int\n    profit_margin_pct: float\n    status: Literal["profitable", "loss"]`
+		},
+		{
+			id: 'rag-retrieval',
+			name: '📚 RAG Context',
+			description: 'Hybrid vector search retrieval with grounded document context & citations',
+			prompt: 'What are the concurrency guarantees of SQLite WAL mode in Litestar?',
+			ragSources: [
+				{
+					title: 'docs/sqlite_wal_architecture.md',
+					score: 0.94,
+					chunk:
+						'WAL mode allows concurrent readers to access database pages while a single write transaction proceeds without reader lock contention.'
+				},
+				{
+					title: 'app/database/session.py',
+					score: 0.88,
+					chunk:
+						'Litestar SQLAlchemy async engine initializes a NullPool or StaticPool with PRAGMA journal_mode=WAL and busy_timeout=5000ms.'
+				}
+			],
+			tokens: [
+				'Based ',
+				'on ',
+				'the ',
+				'retrieved ',
+				'architecture ',
+				'documentation, ',
+				'SQLite ',
+				'WAL ',
+				'(Write-Ahead ',
+				'Logging) ',
+				'mode ',
+				'enables ',
+				'concurrent ',
+				'read ',
+				'queries ',
+				'without ',
+				'blocking ',
+				'the ',
+				'writer. ',
+				'In ',
+				'Litestar, ',
+				'combining ',
+				'WAL ',
+				'with ',
+				'an ',
+				'async ',
+				'connection ',
+				'pool ',
+				'ensures ',
+				'non-blocking ',
+				'ASGI ',
+				'concurrency.'
+			],
+			pydanticSchema: `class DocumentSource(BaseModel):\n    title: str = Field(description="Document filename")\n    score: float = Field(ge=0.0, le=1.0)\n    chunk: str\n\nclass RAGResponse(BaseModel):\n    answer: str\n    sources: list[DocumentSource] = Field(min_length=1)`
 		}
 	];
 
 	type FrameworkId = 'flask' | 'quart' | 'litestar';
-	let selectedFramework = $state<FrameworkId>('quart');
+
+	interface Props {
+		initialFramework?: FrameworkId;
+		initialPresetId?: string;
+		class?: string;
+	}
+
+	let {
+		initialFramework = 'quart',
+		initialPresetId = 'realtime-sse',
+		class: className = ''
+	}: Props = $props();
+
+	// svelte-ignore state_referenced_locally
+	let selectedFramework = $state<FrameworkId>(initialFramework);
+
+	const initialPreset = PRESETS.find((p) => p.id === initialPresetId) || PRESETS[0];
+	let selectedPreset = $state<Preset>(initialPreset);
+	let promptInput = $state(initialPreset.prompt);
+	let messages = $state<Message[]>([]);
+	let isGenerating = $state(false);
+
+	const sseClipboard = useClipboard({ timeout: 2000 });
+
+	// Latency Simulator Controls
+	let ttftMs = $state(180); // Time to first token
+	let itlMs = $state(28); // Inter-token latency
+	let activeTab = $state<'stream' | 'payload' | 'pydantic' | 'backend' | 'client'>('backend');
+	let rawChunks = $state<string[]>([]);
+	let stats = $state<{ ttft: number; totalTime: number; tokenCount: number }>({
+		ttft: 0,
+		totalTime: 0,
+		tokenCount: 0
+	});
 
 	const backendSnippets: Record<FrameworkId, string> = {
 		flask: `# Flask 3.x (WSGI + Threadpool)
@@ -232,22 +342,6 @@ class ChatController(Controller):
         return ServerSentEvent(token_generator())`
 	};
 
-	let selectedPreset = $state<Preset>(PRESETS[0]);
-	let promptInput = $state(PRESETS[0].prompt);
-	let messages = $state<Message[]>([]);
-	let isGenerating = $state(false);
-
-	// Latency Simulator Controls
-	let ttftMs = $state(180); // Time to first token
-	let itlMs = $state(28); // Inter-token latency
-	let activeTab = $state<'stream' | 'payload' | 'pydantic' | 'backend'>('stream');
-	let rawChunks = $state<string[]>([]);
-	let stats = $state<{ ttft: number; totalTime: number; tokenCount: number }>({
-		ttft: 0,
-		totalTime: 0,
-		tokenCount: 0
-	});
-
 	function applyPreset(preset: Preset) {
 		selectedPreset = preset;
 		promptInput = preset.prompt;
@@ -267,6 +361,7 @@ class ChatController(Controller):
 		messages = [...messages, userMsg];
 		promptInput = '';
 		isGenerating = true;
+		activeTab = 'stream';
 		rawChunks = [];
 
 		const startTime = performance.now();
@@ -298,12 +393,21 @@ class ChatController(Controller):
 			await new Promise((r) => setTimeout(r, 200));
 		}
 
+		// Handle RAG Context Ingestion if present
+		if (selectedPreset.ragSources && selectedPreset.ragSources.length > 0) {
+			rawChunks = [
+				...rawChunks,
+				`event: rag_retrieval\ndata: ${JSON.stringify(selectedPreset.ragSources.map((s) => ({ title: s.title, score: s.score })))}\n\n`
+			];
+		}
+
 		// Assistant message placeholder
 		const assistantMsgId = 'asst-' + Date.now();
 		const assistantMsg: Message = {
 			id: assistantMsgId,
 			role: 'assistant',
 			content: '',
+			ragSources: selectedPreset.ragSources,
 			isStreaming: true
 		};
 		messages = [...messages, assistantMsg];
@@ -336,7 +440,29 @@ class ChatController(Controller):
 			tokenCount: selectedPreset.tokens.length
 		};
 
-		messages = messages.map((m) => (m.id === assistantMsgId ? { ...m, isStreaming: false } : m));
+		const genTimeSec = (totalTime - ttftMeasured) / 1000 || 0.001;
+		const tokensPerSec = Math.round(selectedPreset.tokens.length / genTimeSec);
+		const serverRunner =
+			selectedFramework === 'flask'
+				? 'gunicorn/sync'
+				: selectedFramework === 'quart'
+					? 'hypercorn/asgi'
+					: 'granian/rust';
+
+		messages = messages.map((m) =>
+			m.id === assistantMsgId
+				? {
+						...m,
+						isStreaming: false,
+						telemetry: {
+							ttftMs: ttftMeasured,
+							totalTokens: selectedPreset.tokens.length,
+							tokensPerSec,
+							serverRunner
+						}
+					}
+				: m
+		);
 		isGenerating = false;
 	}
 
@@ -348,10 +474,10 @@ class ChatController(Controller):
 	}
 </script>
 
-<div class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl">
+<div class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl {className}">
 	<!-- Top Bar -->
 	<div class="border-b border-zinc-800 bg-zinc-900/80 px-6 py-4">
-		<div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 			<div>
 				<div class="flex items-center gap-2">
 					<Sparkles class="h-5 w-5 text-cyan-400" />
@@ -363,111 +489,112 @@ class ChatController(Controller):
 				</p>
 			</div>
 
-			<!-- Runtime & Preset Selectors -->
-			<div class="flex flex-wrap items-center gap-4">
-				<!-- Runtime Selector -->
-				<div class="flex flex-wrap items-center gap-2">
-					<span class="shrink-0 font-mono text-xs text-zinc-400">Runtime:</span>
-					<div
-						class="flex flex-wrap items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-950/70 p-1"
+			<!-- Backend Runtime Selector -->
+			<div class="flex items-center gap-2">
+				<span class="shrink-0 font-mono text-xs text-zinc-400">Backend:</span>
+				<div class="flex items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-950/70 p-1">
+					<button
+						type="button"
+						onclick={() => (selectedFramework = 'flask')}
+						class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {selectedFramework ===
+						'flask'
+							? 'bg-amber-600 text-white shadow-sm'
+							: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
 					>
-						<button
-							type="button"
-							onclick={() => (selectedFramework = 'flask')}
-							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all {selectedFramework ===
-							'flask'
-								? 'bg-amber-600 text-white shadow-sm'
-								: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
-						>
-							Flask 3.x (WSGI)
-						</button>
-						<button
-							type="button"
-							onclick={() => (selectedFramework = 'quart')}
-							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all {selectedFramework ===
-							'quart'
-								? 'bg-cyan-600 text-white shadow-sm'
-								: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
-						>
-							Quart 0.23 (ASGI)
-						</button>
-						<button
-							type="button"
-							onclick={() => (selectedFramework = 'litestar')}
-							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all {selectedFramework ===
-							'litestar'
-								? 'bg-emerald-600 text-white shadow-sm'
-								: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
-						>
-							Litestar 2.24 (ASGI)
-						</button>
-					</div>
-				</div>
-
-				<!-- Preset Selector Group -->
-				<div class="flex flex-wrap items-center gap-2">
-					<span class="shrink-0 font-mono text-xs text-zinc-400">Preset:</span>
-					<div
-						class="flex flex-wrap items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-950/70 p-1"
+						Flask 3.x (WSGI)
+					</button>
+					<button
+						type="button"
+						onclick={() => (selectedFramework = 'quart')}
+						class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {selectedFramework ===
+						'quart'
+							? 'bg-cyan-600 text-white shadow-sm'
+							: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
 					>
-						{#each PRESETS as preset (preset.id)}
-							<button
-								type="button"
-								onclick={() => applyPreset(preset)}
-								class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all {selectedPreset.id ===
-								preset.id
-									? 'bg-cyan-600 text-white shadow-sm'
-									: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
-							>
-								{preset.name}
-							</button>
-						{/each}
-					</div>
+						Quart 0.23 (ASGI)
+					</button>
+					<button
+						type="button"
+						onclick={() => (selectedFramework = 'litestar')}
+						class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {selectedFramework ===
+						'litestar'
+							? 'bg-emerald-600 text-white shadow-sm'
+							: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
+					>
+						Litestar 2.24 (ASGI)
+					</button>
 				</div>
 			</div>
 		</div>
 
-		<!-- Latency Simulator Controls -->
-		<div class="mt-4 flex flex-wrap items-center gap-6 border-t border-zinc-800/80 pt-3 text-xs">
-			<div class="flex items-center gap-3">
-				<Clock class="h-4 w-4 text-cyan-400" />
-				<span class="font-medium text-zinc-300">Simulate TTFT (Time To First Token):</span>
-				<input
-					type="range"
-					min="50"
-					max="600"
-					step="10"
-					bind:value={ttftMs}
-					class="w-28 accent-cyan-400"
-				/>
-				<span class="font-mono text-cyan-300">{ttftMs}ms</span>
-			</div>
-
-			<div class="flex items-center gap-3">
-				<SlidersVertical class="h-4 w-4 text-emerald-400" />
-				<span class="font-medium text-zinc-300">Inter-Token Latency (ITL):</span>
-				<input
-					type="range"
-					min="10"
-					max="80"
-					step="5"
-					bind:value={itlMs}
-					class="w-28 accent-emerald-400"
-				/>
-				<span class="font-mono text-emerald-300">{itlMs}ms/tok</span>
-			</div>
-
-			{#if stats.tokenCount > 0}
-				<div class="ml-auto flex items-center gap-3 font-mono text-zinc-400">
-					<span>TTFT: <strong class="text-cyan-400">{stats.ttft}ms</strong></span>
-					<span>Total: <strong class="text-zinc-200">{stats.totalTime}ms</strong></span>
-					<span
-						>Speed: <strong class="text-emerald-400"
-							>{Math.round(stats.tokenCount / (stats.totalTime / 1000) || 0)} tok/s</strong
-						></span
-					>
+		<!-- Toolbar Row: Scenario Presets + Latency Simulator -->
+		<div
+			class="mt-4 flex flex-col gap-4 border-t border-zinc-800/80 pt-3 text-xs xl:flex-row xl:items-center xl:justify-between"
+		>
+			<!-- Preset Selector Group -->
+			<div class="flex flex-wrap items-center gap-2">
+				<span class="shrink-0 font-mono text-xs text-zinc-400">Scenario:</span>
+				<div
+					class="flex flex-wrap items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-950/70 p-1"
+				>
+					{#each PRESETS as preset (preset.id)}
+						<button
+							type="button"
+							onclick={() => applyPreset(preset)}
+							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {selectedPreset.id ===
+							preset.id
+								? 'bg-cyan-600 text-white shadow-sm'
+								: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
+						>
+							{preset.name}
+						</button>
+					{/each}
 				</div>
-			{/if}
+			</div>
+
+			<!-- Latency Simulator Controls -->
+			<div class="flex flex-wrap items-center gap-5">
+				<div class="flex items-center gap-2.5">
+					<Clock class="h-3.5 w-3.5 text-cyan-400" />
+					<span class="font-medium text-zinc-300">TTFT:</span>
+					<input
+						type="range"
+						min="50"
+						max="600"
+						step="10"
+						bind:value={ttftMs}
+						class="w-24 accent-cyan-400"
+					/>
+					<span class="font-mono text-cyan-300">{ttftMs}ms</span>
+				</div>
+
+				<div class="flex items-center gap-2.5">
+					<SlidersVertical class="h-3.5 w-3.5 text-emerald-400" />
+					<span class="font-medium text-zinc-300">ITL:</span>
+					<input
+						type="range"
+						min="10"
+						max="80"
+						step="5"
+						bind:value={itlMs}
+						class="w-24 accent-emerald-400"
+					/>
+					<span class="font-mono text-emerald-300">{itlMs}ms/tok</span>
+				</div>
+
+				{#if stats.tokenCount > 0}
+					<div
+						class="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-2.5 py-0.5 font-mono text-[11px] text-zinc-400"
+					>
+						<span>TTFT: <strong class="text-cyan-400">{stats.ttft}ms</strong></span>
+						<span
+							>Speed: <strong class="text-emerald-400"
+								>{Math.round(stats.tokenCount / (stats.totalTime / 1000) || 0)} tok/s</strong
+							></span
+						>
+					</div>
+				{/if}
+			</div>
 		</div>
 	</div>
 
@@ -480,14 +607,36 @@ class ChatController(Controller):
 			<!-- Message Scroll Window -->
 			<div class="max-h-105 min-h-80 flex-1 space-y-4 overflow-y-auto pr-1">
 				{#if messages.length === 0}
-					<div
-						class="flex h-full flex-col items-center justify-center py-12 text-center text-zinc-500"
-					>
-						<Bot class="mb-2 h-10 w-10 text-zinc-700" />
-						<p class="text-xs">No active conversation.</p>
-						<p class="mt-0.5 text-[11px] text-zinc-600">
-							Click "Send Request" to stream tokens through the pipeline.
-						</p>
+					<div class="flex h-full flex-col items-center justify-center px-4 py-8 text-center">
+						<div
+							class="max-w-md rounded-2xl border border-zinc-800/90 bg-zinc-900/50 p-5 shadow-lg backdrop-blur"
+						>
+							<div
+								class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-400"
+							>
+								<Sparkles class="h-5 w-5" />
+							</div>
+							<h4 class="text-xs font-semibold text-zinc-200">
+								Scenario: {selectedPreset.name}
+							</h4>
+							<p class="mt-1 text-[11px] leading-relaxed text-zinc-400">
+								{selectedPreset.description}
+							</p>
+							<div
+								class="mt-3 rounded-lg border border-zinc-800 bg-zinc-950/80 p-2.5 text-left font-mono text-[11px] text-zinc-300"
+							>
+								<span class="text-zinc-500">Prompt:</span> "{selectedPreset.prompt}"
+							</div>
+							<button
+								type="button"
+								onclick={runChatStream}
+								disabled={isGenerating}
+								class="mt-3.5 inline-flex items-center gap-1.5 rounded-xl bg-cyan-600 px-4 py-2 text-xs font-semibold text-white shadow-md transition-all select-none hover:bg-cyan-500 hover:shadow-cyan-600/20 disabled:opacity-40"
+							>
+								<span>Start Live Stream</span>
+								<Send class="h-3.5 w-3.5" />
+							</button>
+						</div>
 					</div>
 				{/if}
 
@@ -530,10 +679,59 @@ class ChatController(Controller):
 							<div
 								class="max-w-[85%] rounded-2xl border border-zinc-800 bg-zinc-900/90 px-4 py-3 text-xs leading-relaxed text-zinc-200 shadow"
 							>
+								{#if msg.ragSources && msg.ragSources.length > 0}
+									<div
+										class="mb-2 space-y-1.5 rounded-lg border border-cyan-500/20 bg-cyan-950/30 p-2 text-[11px]"
+									>
+										<div class="flex items-center gap-1 font-semibold text-cyan-400">
+											<FileText class="h-3 w-3" />
+											<span>Retrieved Context ({msg.ragSources.length} chunks)</span>
+										</div>
+										{#each msg.ragSources as src (src.title)}
+											<div
+												class="rounded border border-zinc-800 bg-zinc-950/80 p-1.5 font-mono text-[10px] text-zinc-300"
+											>
+												<div class="flex items-center justify-between text-zinc-400">
+													<span class="text-cyan-300">{src.title}</span>
+													<span class="text-emerald-400">score: {src.score}</span>
+												</div>
+												<p class="mt-0.5 line-clamp-2 text-zinc-400">{src.chunk}</p>
+											</div>
+										{/each}
+									</div>
+								{/if}
+
 								<div class="whitespace-pre-wrap">{msg.content}</div>
 								{#if msg.isStreaming}
 									<span class="ml-1 inline-block h-3 w-1.5 animate-pulse bg-cyan-400 align-middle"
 									></span>
+								{/if}
+
+								{#if msg.telemetry}
+									<div
+										class="mt-2.5 flex flex-wrap items-center gap-1.5 border-t border-zinc-800/80 pt-2 font-mono text-[10px]"
+									>
+										<span
+											class="inline-flex items-center gap-1 rounded border border-zinc-800 bg-zinc-950 px-1.5 py-0.5 text-cyan-400"
+										>
+											⚡ TTFT: {msg.telemetry.ttftMs}ms
+										</span>
+										<span
+											class="rounded border border-zinc-800 bg-zinc-950 px-1.5 py-0.5 text-zinc-300"
+										>
+											{msg.telemetry.totalTokens} tokens
+										</span>
+										<span
+											class="rounded border border-zinc-800 bg-zinc-950 px-1.5 py-0.5 text-emerald-400"
+										>
+											{msg.telemetry.tokensPerSec} tok/s
+										</span>
+										<span
+											class="rounded border border-zinc-800 bg-zinc-950 px-1.5 py-0.5 text-purple-400"
+										>
+											{msg.telemetry.serverRunner}
+										</span>
+									</div>
 								{/if}
 							</div>
 						</div>
@@ -576,42 +774,68 @@ class ChatController(Controller):
 		<!-- Right: Inspector Drawer (5 cols) -->
 		<div class="flex flex-col bg-zinc-950/70 lg:col-span-5">
 			<!-- Inspector Tabs -->
-			<div class="flex items-center border-b border-zinc-800 bg-zinc-900/50 px-2 py-1 text-xs">
+			<div
+				class="scrollbar-none flex [scrollbar-width:none] items-center gap-1 overflow-x-auto border-b border-zinc-800 bg-zinc-900/50 px-2 py-1.5 text-xs [&::-webkit-scrollbar]:hidden"
+			>
 				<button
 					type="button"
-					onclick={() => (activeTab = 'stream')}
-					class="rounded-md px-3 py-1.5 font-medium transition-colors {activeTab === 'stream'
-						? 'bg-zinc-800 text-cyan-400 shadow'
+					onclick={() => (activeTab = 'backend')}
+					class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors select-none {activeTab ===
+					'backend'
+						? 'bg-zinc-800 text-cyan-400 shadow-sm'
 						: 'text-zinc-400 hover:text-zinc-200'}"
 				>
-					SSE Chunks
-				</button>
-				<button
-					type="button"
-					onclick={() => (activeTab = 'payload')}
-					class="rounded-md px-3 py-1.5 font-medium transition-colors {activeTab === 'payload'
-						? 'bg-zinc-800 text-cyan-400 shadow'
-						: 'text-zinc-400 hover:text-zinc-200'}"
-				>
-					Request Body
+					<Code2 class="h-3.5 w-3.5" />
+					<span>Backend Code</span>
 				</button>
 				<button
 					type="button"
 					onclick={() => (activeTab = 'pydantic')}
-					class="rounded-md px-3 py-1.5 font-medium transition-colors {activeTab === 'pydantic'
-						? 'bg-zinc-800 text-cyan-400 shadow'
+					class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors select-none {activeTab ===
+					'pydantic'
+						? 'bg-zinc-800 text-cyan-400 shadow-sm'
 						: 'text-zinc-400 hover:text-zinc-200'}"
 				>
-					Pydantic Schema
+					<ShieldCheck class="h-3.5 w-3.5" />
+					<span>Pydantic Schema</span>
 				</button>
 				<button
 					type="button"
-					onclick={() => (activeTab = 'backend')}
-					class="rounded-md px-3 py-1.5 font-medium transition-colors {activeTab === 'backend'
-						? 'bg-zinc-800 text-cyan-400 shadow'
+					onclick={() => (activeTab = 'stream')}
+					class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors select-none {activeTab ===
+					'stream'
+						? 'bg-zinc-800 text-cyan-400 shadow-sm'
 						: 'text-zinc-400 hover:text-zinc-200'}"
 				>
-					Backend Code
+					<Zap class="h-3.5 w-3.5" />
+					<span>SSE Frames</span>
+					{#if rawChunks.length > 0}
+						<span class="rounded bg-cyan-950 px-1 font-mono text-[9px] text-cyan-400">
+							{rawChunks.length}
+						</span>
+					{/if}
+				</button>
+				<button
+					type="button"
+					onclick={() => (activeTab = 'payload')}
+					class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors select-none {activeTab ===
+					'payload'
+						? 'bg-zinc-800 text-cyan-400 shadow-sm'
+						: 'text-zinc-400 hover:text-zinc-200'}"
+				>
+					<FileText class="h-3.5 w-3.5" />
+					<span>Request Body</span>
+				</button>
+				<button
+					type="button"
+					onclick={() => (activeTab = 'client')}
+					class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors select-none {activeTab ===
+					'client'
+						? 'bg-zinc-800 text-cyan-400 shadow-sm'
+						: 'text-zinc-400 hover:text-zinc-200'}"
+				>
+					<Globe class="h-3.5 w-3.5" />
+					<span>SvelteKit Client</span>
 				</button>
 			</div>
 
@@ -621,6 +845,22 @@ class ChatController(Controller):
 					{#if rawChunks.length === 0}
 						<div class="py-12 text-center text-zinc-600">No SSE stream chunks captured yet.</div>
 					{:else}
+						<div class="mb-2 flex items-center justify-between border-b border-zinc-800/80 pb-2">
+							<span class="text-[10px] text-zinc-500">{rawChunks.length} frames received</span>
+							<button
+								type="button"
+								onclick={() => sseClipboard.copy(rawChunks.join(''))}
+								class="inline-flex items-center gap-1 rounded border border-zinc-800 bg-zinc-900 px-2 py-0.5 text-[10px] text-zinc-300 transition-colors select-none hover:bg-zinc-800 hover:text-white"
+							>
+								{#if sseClipboard.copied}
+									<Check class="h-3 w-3 text-emerald-400" />
+									<span class="text-emerald-400">Copied!</span>
+								{:else}
+									<Copy class="h-3 w-3 text-zinc-400" />
+									<span>Copy Raw Frames</span>
+								{/if}
+							</button>
+						</div>
 						<div class="space-y-1.5 text-[11px]">
 							{#each rawChunks as chunk, idx (idx)}
 								<div class="rounded border border-zinc-800/80 bg-zinc-900/60 p-1.5 text-zinc-300">
@@ -668,10 +908,14 @@ class ChatController(Controller):
 							<ShieldCheck class="h-4 w-4" />
 							<span>Validated Pydantic v2 Contract</span>
 						</div>
-						<pre
-							class="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-900/80 p-3 text-[11px] text-cyan-300">{selectedPreset.pydanticSchema}</pre>
+						<CodeBlock
+							code={selectedPreset.pydanticSchema}
+							language="python"
+							title="Pydantic Schema"
+							showLineNumbers={false}
+						/>
 					</div>
-				{:else}
+				{:else if activeTab === 'backend'}
 					<div class="space-y-3">
 						<div class="flex items-center justify-between text-xs">
 							<span class="font-semibold text-zinc-200">
@@ -697,10 +941,59 @@ class ChatController(Controller):
 										: 'Type-Safe DTO Stream'}
 							</span>
 						</div>
-						<pre
-							class="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-900/80 p-3 font-mono text-[11px] leading-relaxed text-zinc-300">{backendSnippets[
-								selectedFramework
-							]}</pre>
+						<CodeBlock
+							code={backendSnippets[selectedFramework]}
+							language="python"
+							title={selectedFramework === 'flask'
+								? 'Flask 3.x (WSGI + Threadpool)'
+								: selectedFramework === 'quart'
+									? 'Quart 0.23 (Pallets Native ASGI)'
+									: 'Litestar 2.24 (Clean Architecture ASGI)'}
+							showLineNumbers={true}
+						/>
+					</div>
+				{:else if activeTab === 'client'}
+					<div class="space-y-3">
+						<div class="flex items-center justify-between text-xs">
+							<span class="font-semibold text-zinc-200">SvelteKit SSE Streaming Consumer</span>
+							<span
+								class="rounded border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 font-mono text-[10px] text-cyan-400"
+							>
+								Fetch + ReadableStream
+							</span>
+						</div>
+						<CodeBlock
+							code={`// src/lib/streaming-client.ts
+export async function streamChat(
+  prompt: string,
+  onToken: (token: string) => void
+): Promise<void> {
+  const response = await fetch('/api/v1/chat/stream', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt, stream: true })
+  });
+
+  if (!response.body) throw new Error('ReadableStream not supported');
+  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    for (const line of value.split('\\n')) {
+      if (line.startsWith('data: ') && !line.includes('[DONE]')) {
+        try {
+          const parsed = JSON.parse(line.slice(6));
+          onToken(parsed.choices[0]?.delta?.content ?? '');
+        } catch { /* parse error handling */ }
+      }
+    }
+  }
+}`}
+							language="typescript"
+							title="SvelteKit SSE Client Reader"
+							showLineNumbers={true}
+						/>
 					</div>
 				{/if}
 			</div>

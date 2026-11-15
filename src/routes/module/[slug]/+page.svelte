@@ -25,6 +25,7 @@
 	const prevTrack = $derived(data.prevTrack);
 
 	let isPytestModalOpen = $state(false);
+	let track11Tab = $state<'benchmark' | 'playground'>('benchmark');
 </script>
 
 <svelte:head>
@@ -219,24 +220,79 @@
 					<span>Live SSE Streaming Playground</span>
 				</h2>
 				<p class="mt-1 text-xs text-zinc-400">
-					Test latency simulation, inspect raw Server-Sent Event chunks, and verify payload schemas.
+					{#if track.slug === '07-rag-pipelines'}
+						Inspect hybrid vector search context retrieval chunks and grounded citation responses.
+					{:else if track.slug === '12-connecting-to-sveltekit'}
+						Validate full-duplex client stream consumption across Python ASGI and SvelteKit readers.
+					{:else}
+						Test latency simulation, inspect raw Server-Sent Event chunks, and verify payload
+						schemas.
+					{/if}
 				</p>
 			</div>
-			<ChatPlayground />
+			<ChatPlayground
+				initialFramework={track.slug === '07-rag-pipelines'
+					? 'litestar'
+					: track.slug === '12-connecting-to-sveltekit'
+						? 'quart'
+						: 'flask'}
+				initialPresetId={track.slug === '07-rag-pipelines' ? 'rag-retrieval' : 'realtime-sse'}
+			/>
 		</section>
 	{:else if track.interactiveComponent === 'benchmark'}
 		<section class="space-y-4">
-			<div class="border-b border-zinc-800/80 pb-3">
-				<h2 class="flex items-center gap-2 text-xl font-bold text-zinc-100">
-					<Sparkles class="h-5 w-5 text-cyan-400" />
-					<span>Interactive Latency & Eval Visualizer</span>
-				</h2>
-				<p class="mt-1 text-xs text-zinc-400">
-					Adjust concurrent client load to simulate threadpool worker saturation versus async event
-					loop scaling.
-				</p>
+			<div
+				class="flex flex-col gap-3 border-b border-zinc-800/80 pb-3 sm:flex-row sm:items-center sm:justify-between"
+			>
+				<div>
+					<h2 class="flex items-center gap-2 text-xl font-bold text-zinc-100">
+						<Sparkles class="h-5 w-5 text-cyan-400" />
+						<span>
+							{track.slug === '11-migrating-flask-to-litestar' && track11Tab === 'playground'
+								? 'Live Runtime Migration Playground'
+								: 'Interactive Latency & Eval Visualizer'}
+						</span>
+					</h2>
+					<p class="mt-1 text-xs text-zinc-400">
+						{track.slug === '11-migrating-flask-to-litestar' && track11Tab === 'playground'
+							? 'Switch between Flask WSGI, Quart ASGI, and Litestar ASGI to compare streaming behavior.'
+							: 'Adjust concurrent client load to simulate threadpool worker saturation versus async event loop scaling.'}
+					</p>
+				</div>
+
+				{#if track.slug === '11-migrating-flask-to-litestar'}
+					<div
+						class="flex items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-950/70 p-1 font-mono text-xs"
+					>
+						<button
+							type="button"
+							onclick={() => (track11Tab = 'benchmark')}
+							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {track11Tab ===
+							'benchmark'
+								? 'bg-cyan-600 text-white shadow-sm'
+								: 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}"
+						>
+							Telemetry Graph
+						</button>
+						<button
+							type="button"
+							onclick={() => (track11Tab = 'playground')}
+							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {track11Tab ===
+							'playground'
+								? 'bg-emerald-600 text-white shadow-sm'
+								: 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}"
+						>
+							Live Playground
+						</button>
+					</div>
+				{/if}
 			</div>
-			<BenchmarkGraph />
+
+			{#if track.slug === '11-migrating-flask-to-litestar' && track11Tab === 'playground'}
+				<ChatPlayground initialFramework="quart" initialPresetId="realtime-sse" />
+			{:else}
+				<BenchmarkGraph />
+			{/if}
 		</section>
 	{/if}
 

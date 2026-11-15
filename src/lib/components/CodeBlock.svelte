@@ -24,6 +24,53 @@
 
 	const resolvedLang = $derived(language.toLowerCase() === 'ini' ? 'env' : language.toLowerCase());
 	const tokenizedLines = $derived(tokenizeCode(code.trim(), resolvedLang));
+
+	const PYTHON_BUILTIN_TYPES = new Set([
+		'str',
+		'int',
+		'float',
+		'bool',
+		'bytes',
+		'dict',
+		'list',
+		'set',
+		'tuple',
+		'any',
+		'object',
+		'type',
+		'None',
+		'True',
+		'False'
+	]);
+
+	function getPlainTokenClass(text: string, lang: string): string {
+		const trimmed = text.trim();
+		if (!trimmed) return 'text-zinc-200';
+
+		if (lang === 'python' || lang === 'py') {
+			if (
+				trimmed === 'None' ||
+				trimmed === 'True' ||
+				trimmed === 'False' ||
+				trimmed === 'self' ||
+				trimmed === 'cls'
+			) {
+				return 'font-semibold text-purple-400';
+			}
+			if (PYTHON_BUILTIN_TYPES.has(trimmed)) {
+				return 'font-medium text-cyan-400';
+			}
+			// PascalCase identifiers (e.g. BaseModel, FinancialReport, Literal, Response, Controller)
+			if (/^[A-Z][a-zA-Z0-9_]*$/.test(trimmed)) {
+				return 'font-medium text-amber-300';
+			}
+		} else if (lang === 'typescript' || lang === 'ts' || lang === 'javascript' || lang === 'js') {
+			if (/^[A-Z][a-zA-Z0-9_]*$/.test(trimmed)) {
+				return 'font-medium text-amber-300';
+			}
+		}
+		return 'text-zinc-200';
+	}
 </script>
 
 {#snippet renderLine(lineTokens: ReturnType<typeof tokenizeCode>[number], lineNum: number)}
@@ -58,7 +105,7 @@
 				{:else if token.type === 'punctuation'}
 					<span class="text-zinc-400">{token.text}</span>
 				{:else}
-					<span class="text-zinc-200">{token.text}</span>
+					<span class={getPlainTokenClass(token.text, resolvedLang)}>{token.text}</span>
 				{/if}
 			{/each}
 		{/if}

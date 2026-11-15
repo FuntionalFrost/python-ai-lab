@@ -73,6 +73,11 @@ Flask 3.x handles streaming via Python generator functions wrapped in 'stream_wi
 				name: 'Reverse-Proxy Buffering Bypass',
 				description:
 					'Sending header "X-Accel-Buffering: no" ensures Nginx forwards each SSE byte chunk immediately instead of waiting for a 4KB internal buffer to fill.'
+			},
+			{
+				name: 'The No-DB Streaming Proxy Dilemma (Flask vs. Quart)',
+				description:
+					'In a pure AI streaming service without a relational database or ORM, Quart completely eliminates async Python friction. You avoid Flask’s stream_with_context context gymnastics while gaining native async generators, AsyncOpenAI integration, and cooperative event loop scheduling.'
 			}
 		]
 	},
@@ -137,6 +142,87 @@ def stream_chat():
         headers={
             "Cache-Control": "no-cache",
             "X-Accel-Buffering": "no", # Prevents Nginx from buffering stream
+            "Connection": "keep-alive"
+        }
+    )`
+		},
+		{
+			title: 'Flask 3.x (stream_with_context) vs. Quart 0.23 (Native Async Generator)',
+			description:
+				'Contrast Flask’s synchronous generator requiring stream_with_context wrappers against Quart’s native ASGI async generator returning Response directly.',
+			leftTitle: 'Flask 3.x WSGI (stream_with_context & Sync Generator)',
+			leftLanguage: 'python',
+			leftCode: `from flask import Blueprint, Response, stream_with_context, request, current_app
+from openai import OpenAI
+import json
+
+chat_bp = Blueprint("chat", __name__)
+
+@chat_bp.post("/stream")
+def stream_chat():
+    data = request.get_json(silent=True) or {}
+    prompt = data.get("prompt", "")
+    client: OpenAI = current_app.extensions["openai_client"]
+
+    # Problem: Synchronous generator blocks 1 OS thread per stream.
+    # Must wrap in stream_with_context() so request/g locals don't detach.
+    def generate():
+        response_stream = client.chat.completions.create(
+            model="gemma-4-e4b-it",
+            messages=[{"role": "user", "content": prompt}],
+            stream=True
+        )
+        for chunk in response_stream:
+            delta = chunk.choices[0].delta.content or ""
+            if delta:
+                payload = json.dumps({"token": delta})
+                yield f"data: {payload}\\n\\n"
+        yield "data: [DONE]\\n\\n"
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "Connection": "keep-alive"
+        }
+    )`,
+			rightTitle: 'Quart 0.23 ASGI (Native Async Generator & Zero Wrappers)',
+			rightLanguage: 'python',
+			rightCode: `from quart import Blueprint, Response, request, current_app
+from openai import AsyncOpenAI
+import json
+
+chat_bp = Blueprint("chat", __name__)
+
+@chat_bp.post("/stream")
+async def stream_chat():
+    data = await request.get_json() or {}
+    prompt = data.get("prompt", "")
+    client: AsyncOpenAI = current_app.extensions["async_openai_client"]
+
+    # Solution: Native async generator without stream_with_context!
+    # Non-blocking event loop coroutine yields control on each token chunk.
+    async def generate():
+        response_stream = await client.chat.completions.create(
+            model="gemma-4-e4b-it",
+            messages=[{"role": "user", "content": prompt}],
+            stream=True
+        )
+        async for chunk in response_stream:
+            delta = chunk.choices[0].delta.content or ""
+            if delta:
+                payload = json.dumps({"token": delta})
+                yield f"data: {payload}\\n\\n"
+        yield "data: [DONE]\\n\\n"
+
+    return Response(
+        generate(),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
             "Connection": "keep-alive"
         }
     )`
