@@ -1,5 +1,5 @@
 """
-Litestar 2.24+ Reference Implementation
+Litestar Reference Implementation
 Demonstrates Async Controller, Dependency Injection (Provide), and Pydantic DTOs.
 """
 from litestar import Controller, Litestar, post, status_codes

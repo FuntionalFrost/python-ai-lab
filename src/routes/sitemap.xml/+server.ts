@@ -7,6 +7,7 @@ export const GET = createSitemapHandler({
 	config: siteConfig,
 	staticRoutes: [
 		'/',
+		'/chat',
 		'/playground/chat',
 		'/benchmarks',
 		...ALL_TRACKS.map((t) => `/module/${t.slug}`)

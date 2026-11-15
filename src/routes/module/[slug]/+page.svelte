@@ -231,11 +231,7 @@
 				</p>
 			</div>
 			<ChatPlayground
-				initialFramework={track.slug === '07-rag-pipelines'
-					? 'litestar'
-					: track.slug === '12-connecting-to-sveltekit'
-						? 'quart'
-						: 'flask'}
+				initialFramework={track.slug === '07-rag-pipelines' ? 'litestar' : 'quart'}
 				initialPresetId={track.slug === '07-rag-pipelines' ? 'rag-retrieval' : 'realtime-sse'}
 			/>
 		</section>

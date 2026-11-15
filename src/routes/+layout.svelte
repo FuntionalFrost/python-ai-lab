@@ -34,7 +34,7 @@
 				icon: Bot,
 				shortcut: 'G P',
 				group: 'Navigation',
-				onSelect: () => goto('/playground/chat')
+				onSelect: () => goto('/chat')
 			},
 			{
 				id: 'benchmarks',
@@ -134,10 +134,10 @@
 						<span>Curriculum Dashboard</span>
 					</a>
 					<a
-						href="/playground/chat"
+						href="/chat"
 						onclick={() => (isMobileSidebarOpen = false)}
 						class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors {page
-							.url.pathname === '/playground/chat'
+							.url.pathname === '/chat' || page.url.pathname === '/playground/chat'
 							? 'border border-cyan-500/20 bg-cyan-500/10 font-semibold text-cyan-400'
 							: 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200'}"
 					>
@@ -222,7 +222,7 @@
 							System Notice ({page.status || 404})
 						{:else if page.url.pathname === '/'}
 							Curriculum Dashboard
-						{:else if page.url.pathname === '/playground/chat'}
+						{:else if page.url.pathname === '/chat' || page.url.pathname === '/playground/chat'}
 							Streaming Chat Playground
 						{:else if page.url.pathname === '/benchmarks'}
 							Evaluations & Benchmarks
@@ -246,7 +246,7 @@
 				</button>
 
 				<a
-					href="/playground/chat"
+					href="/chat"
 					class="hidden items-center gap-1.5 rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-cyan-500 sm:flex"
 				>
 					<Bot class="h-3.5 w-3.5" />

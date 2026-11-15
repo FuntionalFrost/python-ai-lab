@@ -17,7 +17,7 @@ export const track10: CurriculumLesson = {
 		'Graceful Degradation: Secondary Fallback Models (gemma-4-e4b-it -> gemma-4-e2b-it)',
 		'Cost & Quota Defense: Token-Bucket Rate Limiting & Response Caching'
 	],
-	frameworks: ['Quart 0.23+', 'Hypercorn 0.17+', 'Tenacity 9.x', 'AsyncOpenAI 3.x', 'uv'],
+	frameworks: ['Quart', 'Hypercorn 0.17+', 'Tenacity 9.x', 'AsyncOpenAI 3.x', 'uv'],
 	tags: [
 		'Production',
 		'ASGI',

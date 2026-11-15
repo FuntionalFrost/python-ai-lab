@@ -20,7 +20,7 @@ export const track09: CurriculumLesson = {
 	],
 	frameworks: [
 		'htmx 2.x',
-		'Quart 0.23+',
+		'Quart',
 		'Hypercorn 0.17+',
 		'Jinja2 3.1+',
 		'HTTPX2',
@@ -58,7 +58,7 @@ export const track09: CurriculumLesson = {
                                      |
                                      v  (HTTP POST / SSE Event Stream)
 +-------------------------------------------------------------------------+
-|                  Quart 0.23 AI Hypermedia Controller                    |
+|                  Quart AI Hypermedia Controller                         |
 |  - POST /chat/message  -> await render_template("_chat_bubble.html")     |
 |  - GET  /chat/stream   -> Response(generate(), mimetype="text/event-st")|
 |  - GET  /evals/search  -> await render_template("_eval_table_rows.html") |

@@ -19,7 +19,7 @@ export const track05: CurriculumLesson = {
 		'Psychometric LLM-as-a-Judge Rubrics with Pydantic Structured Outputs'
 	],
 	frameworks: [
-		'Quart 0.23+',
+		'Quart',
 		'Hypercorn 0.17+',
 		'httpx2>=2.13.0',
 		'openai>=3.36.1',

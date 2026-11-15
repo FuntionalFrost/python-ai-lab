@@ -12,15 +12,15 @@ export const track11: CurriculumLesson = {
 	estimatedMinutes: 45,
 	topics: [
 		'The ASGI Decision Matrix: When to choose Quart vs. Litestar',
-		'Road A: Zero-DB Pallets ASGI Microservices with Quart 0.23 on Hypercorn',
-		'Road B: Clean-Architecture Enterprise ASGI with Litestar 2.24 Controllers',
+		'Road A: Zero-DB Pallets ASGI Microservices with Quart on Hypercorn',
+		'Road B: Clean-Architecture Enterprise ASGI with Litestar Controllers',
 		'Eliminating Threadpool Starvation in Long-Running LLM Streams',
 		'Automating Validation: Manual request parsing to Pydantic DTOs',
 		'Async Testing: Quart with pytest-asyncio and Litestar with TestClient'
 	],
 	frameworks: [
-		'Quart 0.23+',
-		'Litestar 2.24.0',
+		'Quart',
+		'Litestar',
 		'Hypercorn / Granian',
 		'HTTPX2',
 		'Pydantic v2',
@@ -28,7 +28,7 @@ export const track11: CurriculumLesson = {
 	],
 	tags: ['Quart', 'Litestar', 'ASGI', 'Architecture', 'Hypercorn', 'Granian', 'Pydantic'],
 	summary:
-		'Systematically evaluate the two leading paradigms of modern Python ASGI. Compare Road A (Pallets Async with Quart 0.23 on Hypercorn) for rapid Zero-DB streaming microservices preserving function-based Blueprints, against Road B (Clean Architecture with Litestar 2.24 on Granian) for compile-time DI, automated DTOs, and high-performance Rust-backed ASGI.',
+		'Systematically evaluate the two leading paradigms of modern Python ASGI. Compare Road A (Pallets Async with Quart on Hypercorn) for rapid Zero-DB streaming microservices preserving function-based Blueprints, against Road B (Clean Architecture with Litestar on Granian) for compile-time DI, automated DTOs, and high-performance Rust-backed ASGI.',
 	objectives: [
 		'Evaluate the trade-offs between Quart (Pallets function-based ASGI) and Litestar (clean-architecture class ASGI) using the ASGI Decision Matrix.',
 		'Build high-throughput streaming AI proxies in Quart with native coroutines and task-local contextvars.',
@@ -45,12 +45,12 @@ export const track11: CurriculumLesson = {
 |                                         - Gunicorn + Threadpool (WSGI)  |
 |                                         - 1 OS thread per open stream   |
 |                                                                         |
-|      /api/v1/chat/*    ---------------> [ Road A: Quart 0.23 ASGI ]     |
+|      /api/v1/chat/*    ---------------> [ Road A: Quart ASGI ]          |
 |      (Zero-Rewrite)                     - Hypercorn ASGI Server         |
 |                                         - 99% Flask API compatibility   |
 |                                         - Async Blueprints & context    |
 |                                                                         |
-|      /api/v1/analysis/* ---------------> [ Road B: Litestar 2.24 ASGI ] |
+|      /api/v1/analysis/* ---------------> [ Road B: Litestar ASGI ]      |
 |      (Clean Arch)                       - Granian / Uvicorn ASGI Server |
 |                                         - Class Controllers & DTOs      |
 |                                         - Compile-time Provide() DI     |
@@ -92,7 +92,7 @@ export const track11: CurriculumLesson = {
 	},
 	comparisons: [
 		{
-			title: 'Road A (Zero-Rewrite): Flask 3.x Blueprint vs. Quart 0.23 Async Blueprint',
+			title: 'Road A (Zero-Rewrite): Flask 3.x Blueprint vs. Quart Async Blueprint',
 			description:
 				'Showing how migrating to Quart preserves Flask syntax while converting synchronous I/O into native non-blocking coroutines.',
 			leftTitle: 'Legacy Flask 3.x Blueprint (Imperative WSGI)',
@@ -125,7 +125,7 @@ def generate_summary():
     # 4. Synchronous blocking call (blocks WSGI worker thread)
     result = llm_service.summarize_text_sync(dto.text, dto.max_tokens)
     return jsonify({"summary": result, "status": "success"}), 200`,
-			rightTitle: 'Quart 0.23 Blueprint (Drop-In ASGI Coroutine)',
+			rightTitle: 'Quart Blueprint (Drop-In ASGI Coroutine)',
 			rightLanguage: 'python',
 			rightCode: `from quart import Blueprint, request, jsonify, current_app
 from pydantic import ValidationError
@@ -153,10 +153,10 @@ async def generate_summary():
     return jsonify({"summary": result, "status": "success"}), 200`
 		},
 		{
-			title: 'Road B (Clean Architecture): Quart Async Blueprint vs. Litestar 2.24 Controller',
+			title: 'Road B (Clean Architecture): Quart Async Blueprint vs. Litestar Controller',
 			description:
 				'Contrasting Pallets async route conventions with Litestar type-driven Controllers and compile-time DI.',
-			leftTitle: 'Quart 0.23: Procedural Async Handler',
+			leftTitle: 'Quart: Procedural Async Handler',
 			leftLanguage: 'python',
 			leftCode: `from quart import Blueprint, request, jsonify, current_app
 from app.schemas.summary import SummaryRequest
@@ -172,7 +172,7 @@ async def generate_summary():
 
     summary = await service.summarize_text_async(dto.text, dto.max_tokens)
     return jsonify({"summary": summary, "status": "success"})`,
-			rightTitle: 'Litestar 2.24: Class Controller & DTO Injection',
+			rightTitle: 'Litestar: Class Controller & DTO Injection',
 			rightLanguage: 'python',
 			rightCode: `from litestar import Controller, post, status_codes
 from app.schemas.summary import SummaryRequest, SummaryResponse
@@ -233,7 +233,7 @@ app = Litestar(
 	codeSnippets: [
 		{
 			id: 'quart-streaming-blueprint',
-			title: 'Quart 0.23 Async Streaming Blueprint',
+			title: 'Quart Async Streaming Blueprint',
 			filePath: 'app/blueprints/quart_chat.py',
 			description:
 				'Demonstrates non-blocking Server-Sent Events (SSE) streaming in Quart using native async generators.',

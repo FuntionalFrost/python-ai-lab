@@ -283,7 +283,7 @@
 	});
 
 	const backendSnippets: Record<FrameworkId, string> = {
-		quart: `# Quart 0.23 (Pallets Native ASGI + Hypercorn)
+		quart: `# Quart (Pallets Native ASGI + Hypercorn)
 from quart import Quart, Response, request
 import httpx2
 from openai import AsyncOpenAI
@@ -308,7 +308,7 @@ async def chat_stream():
         mimetype="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
     )`,
-		litestar: `# Litestar 2.24 (Clean Architecture ASGI + Granian)
+		litestar: `# Litestar (Clean Architecture ASGI + Granian)
 from litestar import Controller, post
 from litestar.response import ServerSentEvent
 from collections.abc import AsyncGenerator
@@ -357,8 +357,8 @@ def chat_stream():
 		{ name: '/tool', description: 'Weather tool dispatch with Pydantic validation' },
 		{ name: '/rag', description: 'Hybrid vector search RAG retrieval' },
 		{ name: '/json', description: 'Pydantic structured JSON extraction' },
-		{ name: '/quart', description: 'Switch to Quart 0.23+ ASGI (Hypercorn)' },
-		{ name: '/litestar', description: 'Switch to Litestar 2.24+ ASGI (Granian)' },
+		{ name: '/quart', description: 'Switch to Quart ASGI (Hypercorn)' },
+		{ name: '/litestar', description: 'Switch to Litestar ASGI (Granian)' },
 		{ name: '/flask', description: 'Switch to Legacy WSGI baseline (Flask 3.x)' },
 		{ name: '/reset', description: 'Clear messages and reset conversation' }
 	];
@@ -598,7 +598,7 @@ def chat_stream():
 							? 'bg-cyan-600 text-white shadow-sm'
 							: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
 					>
-						Quart 0.23 (ASGI)
+						Quart (ASGI)
 					</button>
 					<button
 						type="button"
@@ -608,7 +608,7 @@ def chat_stream():
 							? 'bg-emerald-600 text-white shadow-sm'
 							: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
 					>
-						Litestar 2.24 (ASGI)
+						Litestar (ASGI)
 					</button>
 					<button
 						type="button"
@@ -1024,9 +1024,9 @@ def chat_stream():
 								{#if selectedFramework === 'flask'}
 									Flask 3.x Streaming Blueprint (Gunicorn WSGI)
 								{:else if selectedFramework === 'quart'}
-									Quart 0.23 Streaming Blueprint (Hypercorn ASGI)
+									Quart Streaming Blueprint (Hypercorn ASGI)
 								{:else}
-									Litestar 2.24 Streaming Controller (Granian ASGI)
+									Litestar Streaming Controller (Granian ASGI)
 								{/if}
 							</span>
 							<span
@@ -1049,8 +1049,8 @@ def chat_stream():
 							title={selectedFramework === 'flask'
 								? 'Flask 3.x (WSGI + Threadpool)'
 								: selectedFramework === 'quart'
-									? 'Quart 0.23 (Pallets Native ASGI)'
-									: 'Litestar 2.24 (Clean Architecture ASGI)'}
+									? 'Quart (Pallets Native ASGI)'
+									: 'Litestar (Clean Architecture ASGI)'}
 							showLineNumbers={true}
 						/>
 					</div>

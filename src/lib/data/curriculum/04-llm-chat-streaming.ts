@@ -18,7 +18,7 @@ export const track04: CurriculumLesson = {
 		'The No-DB Streaming Proxy Advantage: Zero Thread Starvation'
 	],
 	frameworks: [
-		'Quart 0.23+',
+		'Quart',
 		'Hypercorn 0.17+',
 		'AsyncOpenAI 3.x',
 		'Pydantic v2',
@@ -29,7 +29,7 @@ export const track04: CurriculumLesson = {
 	summary:
 		'Deliver snappy conversational AI in Quart by replacing blocking responses with native async token streaming. Master Quart’s native async generator mechanism, Server-Sent Events (SSE) protocol framing, Nginx reverse-proxy buffering guards, and resilient conversation buffers running on Hypercorn.',
 	objectives: [
-		'Implement streaming HTTP endpoints in Quart 0.23 using native async generator coroutines and Response(generate()).',
+		'Implement streaming HTTP endpoints in Quart using native async generator coroutines and Response(generate()).',
 		'Format SSE chunks according to web standards (data: <json>\\n\\n and data: [DONE]).',
 		'Configure reverse-proxy headers (X-Accel-Buffering: no, Cache-Control: no-cache) to prevent upstream chunk buffering.',
 		'Maintain non-blocking pooled AsyncOpenAI client instances across Quart event loop workers.',
@@ -64,7 +64,7 @@ export const track04: CurriculumLesson = {
 
 If a web endpoint blocks until the entire completion finishes, the user stares at a blank loading spinner for the entire duration (huge Time to First Token / TTFT). In legacy WSGI frameworks, each streaming client pins an operating system thread for the entire 30 seconds, leading to rapid thread exhaustion at moderate traffic.
 
-Quart 0.23 handles streaming via native Python async generator functions:
+Quart handles streaming via native Python async generator functions:
 1. The generator function yields string chunks piece-by-piece as AsyncOpenAI sends them over non-blocking sockets.
 2. No complex wrapper functions (like Flask's 'stream_with_context') are needed because Quart's context is natively task-local via Python 'contextvars'.
 3. Proper headers ('X-Accel-Buffering: no', 'Cache-Control: no-cache') instruct upstream proxies like Nginx or Cloudflare not to buffer packets, ensuring immediate browser delivery.`,
@@ -118,7 +118,7 @@ async def ask():
 
     full_answer = response.choices[0].message.content
     return jsonify({"answer": full_answer})`,
-			rightTitle: 'Modern Quart 0.23 (Native Async Generator & SSE)',
+			rightTitle: 'Modern Quart (Native Async Generator & SSE)',
 			rightLanguage: 'python',
 			rightCode: `from quart import Blueprint, Response, request, current_app
 from openai import AsyncOpenAI
@@ -158,7 +158,7 @@ async def stream_chat():
     )`
 		},
 		{
-			title: 'Flask 3.x (stream_with_context) vs. Quart 0.23 (Native Async Generator)',
+			title: 'Flask 3.x (stream_with_context) vs. Quart (Native Async Generator)',
 			description:
 				'Contrast Flask’s synchronous generator requiring stream_with_context wrappers against Quart’s native ASGI async generator returning Response directly.',
 			leftTitle: 'Flask 3.x WSGI (stream_with_context & Sync Generator)',
@@ -199,7 +199,7 @@ def stream_chat():
             "Connection": "keep-alive"
         }
     )`,
-			rightTitle: 'Quart 0.23 ASGI (Native Async Generator & Zero Wrappers)',
+			rightTitle: 'Quart ASGI (Native Async Generator & Zero Wrappers)',
 			rightLanguage: 'python',
 			rightCode: `from quart import Blueprint, Response, request, current_app
 from openai import AsyncOpenAI

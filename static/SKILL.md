@@ -1,6 +1,6 @@
 ---
 name: python-ai-lab
-description: Guide and operational standard for prototyping, testing, benchmarking, and iterating on AI backends and web interfaces using modern Python (Flask/Litestar, Pydantic v2, pytest-mock) and SvelteKit 3. Enforces <=4B open-weight model benchmarking, deterministic synchronous unit testing, and fail-fast configuration.
+description: Guide and operational standard for prototyping, testing, benchmarking, and iterating on AI backends and web interfaces using modern Python (Quart, Litestar, Pydantic v2, HTTPX2, pytest-mock) and SvelteKit 3. Enforces <=4B open-weight model benchmarking, deterministic synchronous unit testing, and fail-fast configuration.
 ---
 
 # Python AI Lab: Prototyping, Testing & Benchmarking Standard
@@ -99,50 +99,52 @@ Establish a strict architectural separation between **unit tests** and **live be
       results = asyncio.run(run_matrix(["gemma-4-e4b-it", "gemma-4-e2b-it"], ["Hello!"]))
   ```
 
-### C. In-Route Benchmarks with `flask[async]` & `httpx`
+### C. In-Route Benchmarks with Quart & `httpx2`
 
-- When triggering multi-model benchmarks or prompt ablations directly from a Flask route or HTMX dashboard, use `flask[async]` (`async def` view handlers).
-- Fan out concurrently using `asyncio.gather()`, `AsyncOpenAI`, and non-blocking `httpx.AsyncClient` for tool calls, returning rendered Jinja2 templates directly in ~2.5s without Redis or Celery.
-- Unit tests for these endpoints remain 100% synchronous via Flask's `test_client().post()` and `pytest-mock`.
+- When triggering multi-model benchmarks or prompt ablations directly from a Quart route or HTMX dashboard, use native `async def` view handlers.
+- Fan out concurrently using `asyncio.gather()`, `AsyncOpenAI`, and non-blocking `httpx2.AsyncClient` for tool calls, returning rendered Jinja2 templates directly in ~2.5s without Redis or Celery.
+- Unit tests for these endpoints remain fast and deterministic via Quart's `test_client()` under `pytest-asyncio` with `pytest-mock`.
 
 ---
 
 ## 4. Real-Time Token Streaming (SSE)
 
-### Flask 3.x Backend
-Always use `stream_with_context` and set non-buffering headers for reverse proxies:
+### Quart Async Backend
+
+Always use native async generators with non-buffering headers for reverse proxies:
+
 ```python
 @chat_bp.post("/stream")
-def stream_chat():
-    def generate():
-        stream = client.chat.completions.create(model="gemma-4-e4b-it", stream=True, messages=...)
-        for chunk in stream:
+async def stream_chat():
+    async def generate():
+        stream = await client.chat.completions.create(model="gemma-4-e4b-it", stream=True, messages=...)
+        async for chunk in stream:
             delta = chunk.choices[0].delta.content or ""
             if delta:
                 yield f"data: {json.dumps({'token': delta})}\n\n"
         yield "data: [DONE]\n\n"
 
     return Response(
-        stream_with_context(generate()),
+        generate(),
         mimetype="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Connection": "keep-alive"}
     )
 ```
 
 ### Client Consumption Choices
-* **Hypermedia / Rapid Prototypes (Flask + Jinja2 + htmx)**:
+
+- **Hypermedia / Rapid Prototypes (Quart + Jinja2 + htmx)**:
   Use `htmx-ext-sse` (`<div hx-ext="sse" sse-connect="/stream" sse-swap="token">`) for zero-JS prototypes. Test rendered HTML fragments using `BeautifulSoup4` and lint templates with `djlint`.
-* **Full Web Application (SvelteKit 3 BFF)**:
+- **Full Web Application (SvelteKit 3 BFF)**:
   Use SvelteKit `+server.ts` to proxy requests and isolate private `$env` secrets. In the browser component, consume using `fetch() + ReadableStream` with a `TextDecoder` and push tokens into Svelte 5 `$state` runes.
 
 ---
 
-## 5. Resilient External HTTP Integrations (HTTPX)
+## 5. Resilient External HTTP Integrations (HTTPX2)
 
-- **Synchronous in Flask Prototypes**: Use `httpx.Client()` with `httpx.Limits(max_connections=100, max_keepalive_connections=20)` and `httpx.HTTPTransport(retries=3)` for external tools, search APIs, and webhooks.
-- **Structured Timeouts**: Always specify granular timeouts via `httpx.Timeout(connect=3.05, read=60.0, write=10.0, pool=5.0)`.
-- **Deterministic Unit Testing**: Mock `httpx.Client.send()` using `pytest-mock` (`mocker.patch.object(client, "send")`). Tests execute in milliseconds with zero network sockets.
-- **Litestar Bridge**: The synchronous `httpx.Client` API translates 1:1 to `httpx.AsyncClient` when scaling to Litestar ASGI (Track 11).
+- **Async Connection Pooling**: Use `httpx2.AsyncClient()` with `httpx2.Limits(max_connections=100, max_keepalive_connections=20)` and OS-native trust stores for external tools, search APIs, and webhooks.
+- **Structured Timeouts**: Always specify granular timeouts via `httpx2.Timeout(connect=3.0, read=30.0, write=10.0, pool=5.0)`.
+- **Deterministic Unit Testing**: Mock `httpx2.AsyncClient.send()` using `pytest-mock` (`mocker.patch.object(client, "send")`). Tests execute in milliseconds with zero network sockets.
 
 ---
 
@@ -150,7 +152,7 @@ def stream_chat():
 
 When scaling a synchronous Flask AI backend to asynchronous ASGI to support high-concurrency LLM streaming:
 
-- **Road A: Zero-Rewrite Pallets ASGI (Quart 0.23 + Hypercorn)**:
+- **Road A: Zero-Rewrite Pallets ASGI (Quart + Hypercorn)**:
   - Official Pallets async framework sharing 99% Flask API compatibility.
   - Drop-in async Blueprints and task-local async contexts (`request`, `current_app`).
   - Convert `stream_with_context(generate())` to native `async def generate(): async for chunk in stream: yield ...`.
@@ -158,7 +160,7 @@ When scaling a synchronous Flask AI backend to asynchronous ASGI to support high
   - Run with `hypercorn app:app --bind 0.0.0.0:8000 --workers 4`.
   - Test with `quart.testing.QuartClient` and `pytest-asyncio`.
 
-- **Road B: Clean-Architecture ASGI (Litestar 2.24 + Granian)**:
+- **Road B: Clean-Architecture ASGI (Litestar + Granian)**:
   - Class-based Controllers and automated Pydantic DTO validation at the framework boundary.
   - Compile-time dependency injection (`Provide()`), eliminating thread-local and global proxies.
   - Peak throughput on Rust-based Granian ASGI server.

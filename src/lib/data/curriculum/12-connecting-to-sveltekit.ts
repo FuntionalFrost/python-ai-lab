@@ -17,7 +17,7 @@ export const track12: CurriculumLesson = {
 		'Hybrid Architecture: SvelteKit BFF vs. Direct Quart ASGI Endpoints',
 		'Testing Full-Stack Endpoints with Vitest and pytest'
 	],
-	frameworks: ['SvelteKit 3', 'TypeScript 5.x', 'Quart 0.23+', 'HTTPX2', 'Pydantic v2'],
+	frameworks: ['SvelteKit 3', 'TypeScript 5.x', 'Quart', 'HTTPX2', 'Pydantic v2'],
 	tags: ['Full-Stack', 'SvelteKit', 'Quart', 'Streaming', 'TypeScript', 'Svelte 5'],
 	summary:
 		'Bridge your Python Quart AI backend with a modern fullstack frontend in SvelteKit. Discover how Svelte 5 runes consume Quart Server-Sent Event streams in real-time, how to synchronize Pydantic schemas to TypeScript types, and how to structure production deployment boundaries.',
@@ -43,7 +43,7 @@ export const track12: CurriculumLesson = {
                                      | (Server-Sent Events: text/event-stream)
                                      v
 +-------------------------------------------------------------------------+
-|                    Quart 0.23 AI Backend Microservice                   |
+|                    Quart AI Backend Microservice                        |
 |   - Application Factory & Modular Blueprints (create_app)               |
 |   - Native Async Token Generator Response(generate())                   |
 |   - Pydantic v2 Input Validation & Strict DTO Schemas                   |
@@ -75,10 +75,10 @@ export const track12: CurriculumLesson = {
 	},
 	comparisons: [
 		{
-			title: 'Streaming Pipeline: Quart 0.23 Backend vs. SvelteKit Server BFF',
+			title: 'Streaming Pipeline: Quart Backend vs. SvelteKit Server BFF',
 			description:
 				'Observe the difference between producing an SSE stream in Quart and proxying/handling it in SvelteKit.',
-			leftTitle: 'Quart 0.23 (Native Async SSE Generator)',
+			leftTitle: 'Quart (Native Async SSE Generator)',
 			leftLanguage: 'python',
 			leftCode: `from quart import Blueprint, Response, request, current_app
 from openai import AsyncOpenAI

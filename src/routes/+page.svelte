@@ -16,7 +16,7 @@
 	<title>Python AI Lab — Prototyping, Testing & Benchmarking AI Backends</title>
 	<meta
 		name="description"
-		content="Master rapid prototyping, deterministic testing with pytest-mock, and <=4B open-weight model benchmarking across Quart 0.23+, Litestar, Pydantic v2, and HTTPX2."
+		content="Master rapid prototyping, deterministic testing with pytest-mock, and <=4B open-weight model benchmarking across Quart, Litestar, Pydantic v2, and HTTPX2."
 	/>
 </svelte:head>
 
@@ -44,7 +44,7 @@
 
 			<p class="text-sm leading-relaxed text-zinc-300 sm:text-base">
 				Build, test, and iterate rapidly on AI prototypes. Master fast async prototyping with
-				<strong class="font-semibold text-white">Quart 0.23+</strong>,
+				<strong class="font-semibold text-white">Quart</strong>,
 				<strong class="font-semibold text-white">Jinja2</strong>, and
 				<strong class="font-semibold text-white">htmx</strong>, resilient HTTP integrations with
 				<strong class="font-semibold text-white">HTTPX2</strong> and
@@ -69,7 +69,7 @@
 				</a>
 
 				<a
-					href="/playground/chat"
+					href="/chat"
 					class="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/80 px-5 py-3 text-xs font-semibold text-zinc-200 transition-all hover:border-zinc-700 hover:bg-zinc-800 sm:text-sm"
 				>
 					<Bot class="h-4 w-4 text-cyan-400" />

@@ -60,14 +60,14 @@
 	const throughputSeries: LineSeries[] = [
 		{
 			key: 'litestar',
-			label: 'Litestar 2.24 (Granian ASGI)',
+			label: 'Litestar (Granian ASGI)',
 			color: '#10b981',
 			curve: 'smooth',
 			area: true
 		},
 		{
 			key: 'quart',
-			label: 'Quart 0.23 (Hypercorn ASGI)',
+			label: 'Quart (Hypercorn ASGI)',
 			color: '#06b6d4',
 			curve: 'smooth',
 			area: true
@@ -91,13 +91,13 @@
 	const latencySeries: LineSeries[] = [
 		{
 			key: 'litestar',
-			label: 'Litestar 2.24 (Granian TTFT)',
+			label: 'Litestar (Granian TTFT)',
 			color: '#10b981',
 			curve: 'smooth'
 		},
 		{
 			key: 'quart',
-			label: 'Quart 0.23 (Hypercorn TTFT)',
+			label: 'Quart (Hypercorn TTFT)',
 			color: '#06b6d4',
 			curve: 'smooth'
 		},
@@ -364,7 +364,7 @@
 				<div class="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
 					<div class="flex items-center justify-between">
 						<span class="text-xs font-semibold tracking-wider text-emerald-400 uppercase"
-							>Litestar 2.24 (Granian)</span
+							>Litestar (Granian)</span
 						>
 						<Zap class="h-4 w-4 text-emerald-400" />
 					</div>
@@ -389,7 +389,7 @@
 				<div class="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4">
 					<div class="flex items-center justify-between">
 						<span class="text-xs font-semibold tracking-wider text-cyan-400 uppercase"
-							>Quart 0.23 (Hypercorn)</span
+							>Quart (Hypercorn)</span
 						>
 						<Zap class="h-4 w-4 text-cyan-400" />
 					</div>
@@ -475,7 +475,7 @@
 				<div class="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
 					<div class="flex items-center justify-between">
 						<span class="text-xs font-semibold tracking-wider text-emerald-400 uppercase"
-							>Litestar 2.24 (Granian TTFT)</span
+							>Litestar (Granian TTFT)</span
 						>
 						<Zap class="h-4 w-4 text-emerald-400" />
 					</div>
@@ -494,7 +494,7 @@
 				<div class="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4">
 					<div class="flex items-center justify-between">
 						<span class="text-xs font-semibold tracking-wider text-cyan-400 uppercase"
-							>Quart 0.23 (Hypercorn TTFT)</span
+							>Quart (Hypercorn TTFT)</span
 						>
 						<Zap class="h-4 w-4 text-cyan-400" />
 					</div>

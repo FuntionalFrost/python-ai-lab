@@ -16,7 +16,7 @@ export const track03: CurriculumLesson = {
 		'Granular Structured Timeouts: httpx2.Timeout(connect, read, write, pool)',
 		'Memory-Efficient Streaming with async with client.stream("GET", url)',
 		'Deterministic Unit Testing with pytest-mock Mocking httpx2 Client.send()',
-		'Async Non-Blocking Integration with Quart 0.23 and Litestar 2.24'
+		'Async Non-Blocking Integration with Quart and Litestar'
 	],
 	frameworks: ['HTTPX2 2.13+', 'HTTP/2', 'Pydantic v2', 'pytest 9.x', 'pytest-mock'],
 	tags: [

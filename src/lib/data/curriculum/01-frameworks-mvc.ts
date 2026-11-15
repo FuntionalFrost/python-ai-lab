@@ -16,17 +16,10 @@ export const track01: CurriculumLesson = {
 		'Quart Async Contexts: current_app vs g vs Task-Local Scope',
 		'Serving Production AI Backends on Hypercorn ASGI'
 	],
-	frameworks: [
-		'Quart 0.23+',
-		'Hypercorn 0.17+',
-		'HTTPX2',
-		'Pydantic v2',
-		'pytest 9.x',
-		'pytest-asyncio'
-	],
+	frameworks: ['Quart', 'Hypercorn 0.17+', 'HTTPX2', 'Pydantic v2', 'pytest 9.x', 'pytest-asyncio'],
 	tags: ['Quart', 'ASGI', 'Architecture', 'MVC', 'Blueprints', 'Hypercorn', 'Clean Code'],
 	summary:
-		'Ditch legacy synchronous WSGI bottlenecks. Master the Quart 0.23 Application Factory pattern, structured async Blueprints, Clean Architecture separation of concerns, and typed Pydantic validation inside native non-blocking coroutines served via Hypercorn.',
+		'Ditch legacy synchronous WSGI bottlenecks. Master the Quart Application Factory pattern, structured async Blueprints, Clean Architecture separation of concerns, and typed Pydantic validation inside native non-blocking coroutines served via Hypercorn.',
 	objectives: [
 		'Construct robust Quart ASGI applications using create_app() and decoupled async Blueprints.',
 		'Eliminate circular imports and mutable global state using Quart’s application context (current_app).',
@@ -91,7 +84,7 @@ Modern Quart resolves this with ASGI and Clean Architecture:
 	},
 	comparisons: [
 		{
-			title: 'Monolithic Anti-Pattern vs. Modern Quart 0.23 Architecture',
+			title: 'Monolithic Anti-Pattern vs. Modern Quart Architecture',
 			description:
 				'Contrasting a fragile global WSGI script with an enterprise Quart Application Factory & Async Blueprint structure.',
 			leftTitle: 'Legacy Monolith (Global app, Raw Dicts, WSGI Thread Blocking)',
@@ -120,7 +113,7 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(debug=True)`,
-			rightTitle: 'Modern Quart 0.23 (Async Blueprint + Service Layer + Pydantic)',
+			rightTitle: 'Modern Quart (Async Blueprint + Service Layer + Pydantic)',
 			rightLanguage: 'python',
 			rightCode: `from quart import Blueprint, request, jsonify, current_app
 from pydantic import ValidationError
@@ -175,7 +168,7 @@ from app.config import settings
 from app.blueprints.analysis import analysis_bp
 
 def create_app() -> Quart:
-    """Application factory for Quart 0.23. Enables isolated testing per suite."""
+    """Application factory for Quart. Enables isolated testing per suite."""
     app = Quart(__name__)
 
     # Store configured AsyncOpenAI and HTTPX2 clients in extensions registry

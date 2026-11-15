@@ -1,5 +1,5 @@
 """
-Quart 0.23 Reference Implementation
+Quart Reference Implementation
 Demonstrates Application Factory, Async Blueprint, Pydantic v2 validation, and HTTPX2.
 """
 from quart import Quart, Blueprint, request, jsonify, current_app
