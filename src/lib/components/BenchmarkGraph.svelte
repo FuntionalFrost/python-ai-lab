@@ -74,7 +74,7 @@
 		},
 		{
 			key: 'flask',
-			label: 'Flask 3.x (Gunicorn WSGI)',
+			label: 'Legacy WSGI Baseline (Flask 3.x)',
 			color: '#f59e0b',
 			curve: 'smooth',
 			area: true
@@ -103,7 +103,7 @@
 		},
 		{
 			key: 'flask',
-			label: 'Flask 3.x (Gunicorn TTFT)',
+			label: 'Legacy WSGI (Flask TTFT)',
 			color: '#f59e0b',
 			curve: 'smooth'
 		}

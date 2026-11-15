@@ -5,35 +5,35 @@ export const track11: CurriculumLesson = {
 	slug: '11-migrating-flask-to-litestar',
 	trackNumber: 11,
 	title:
-		'Scale-Up Architecture: Migrating from Flask to Quart & Litestar (The ASGI Decision Matrix)',
-	shortTitle: 'Scale-Up: Flask to Quart & Litestar',
+		'The Modern ASGI Matrix: Quart (Microservice Simplicity) vs. Litestar (Clean Architecture)',
+	shortTitle: 'ASGI Matrix: Quart vs. Litestar',
 	subtitle:
-		'The ASGI Decision Matrix: Zero-Rewrite Pallets ASGI via Quart vs. Clean-Architecture Controllers via Litestar',
+		'The Modern ASGI Dilemma: Pallets Async Simplicity with Hypercorn vs. Dependency-Injected Controllers with Granian',
 	estimatedMinutes: 45,
 	topics: [
 		'The ASGI Decision Matrix: When to choose Quart vs. Litestar',
-		'Road A: Zero-Rewrite Pallets ASGI with Quart 0.23 on Hypercorn',
-		'Road B: Clean-Architecture ASGI with Litestar 2.24 Controllers',
+		'Road A: Zero-DB Pallets ASGI Microservices with Quart 0.23 on Hypercorn',
+		'Road B: Clean-Architecture Enterprise ASGI with Litestar 2.24 Controllers',
 		'Eliminating Threadpool Starvation in Long-Running LLM Streams',
-		'Automating Validation: manual request.json to Pydantic DTOs',
+		'Automating Validation: Manual request parsing to Pydantic DTOs',
 		'Async Testing: Quart with pytest-asyncio and Litestar with TestClient'
 	],
 	frameworks: [
-		'Flask 3.1.3',
 		'Quart 0.23+',
 		'Litestar 2.24.0',
 		'Hypercorn / Granian',
+		'HTTPX2',
 		'Pydantic v2',
 		'pytest-asyncio>=0.25.0'
 	],
-	tags: ['Migration', 'Quart', 'Litestar', 'ASGI', 'Architecture', 'Refactoring'],
+	tags: ['Quart', 'Litestar', 'ASGI', 'Architecture', 'Hypercorn', 'Granian', 'Pydantic'],
 	summary:
-		'Learn how to systematically scale a synchronous Flask application to async-first architectures without downtime. Evaluate the ASGI Decision Matrix: choose Road A (Zero-Rewrite Pallets ASGI with Quart 0.23 on Hypercorn) for rapid migration with existing Blueprints, or Road B (Clean Architecture with Litestar 2.24 on Granian) for compile-time DI, DTOs, and high-performance Rust-backed ASGI.',
+		'Systematically evaluate the two leading paradigms of modern Python ASGI. Compare Road A (Pallets Async with Quart 0.23 on Hypercorn) for rapid Zero-DB streaming microservices preserving function-based Blueprints, against Road B (Clean Architecture with Litestar 2.24 on Granian) for compile-time DI, automated DTOs, and high-performance Rust-backed ASGI.',
 	objectives: [
-		'Evaluate the trade-offs between Quart (drop-in Pallets ASGI) and Litestar (clean-architecture ASGI) using the ASGI Decision Matrix.',
-		'Migrate synchronous Flask Blueprints to asynchronous Quart coroutines with zero route restructuring.',
-		'Convert imperative route handlers into declarative, type-safe Litestar Controllers with automatic Pydantic DTO validation.',
-		'Eliminate thread-local globals (current_app, request) using Quart async contexts and Litestar Provide dependency injection.',
+		'Evaluate the trade-offs between Quart (Pallets function-based ASGI) and Litestar (clean-architecture class ASGI) using the ASGI Decision Matrix.',
+		'Build high-throughput streaming AI proxies in Quart with native coroutines and task-local contextvars.',
+		'Construct declarative, type-safe Litestar Controllers with automatic Pydantic DTO validation.',
+		'Eliminate thread-local globals using Quart async contexts and Litestar Provide() dependency injection.',
 		'Write robust async test suites using quart.testing and litestar.testing under pytest-asyncio.'
 	],
 	architecture: {

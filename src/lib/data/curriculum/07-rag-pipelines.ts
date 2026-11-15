@@ -237,7 +237,7 @@ def test_cosine_similarity_orthogonal_vectors():
 def test_in_memory_vector_store_ranking():
     store = InMemoryVectorStore()
     chunk1 = DocumentChunk("doc_1", "Pydantic v2 validates JSON schemas in Rust.", {})
-    chunk2 = DocumentChunk("doc_2", "Flask uses WSGI application factories.", {})
+    chunk2 = DocumentChunk("doc_2", "Quart uses native ASGI application factories.", {})
 
     # Mock embeddings
     store.add(chunk1, [0.9, 0.1, 0.0])
@@ -258,7 +258,7 @@ def test_rag_service_returns_fallback_when_no_chunks_match(mocker):
 
     empty_store = InMemoryVectorStore()
     rag = RAGService(client=mock_client, store=empty_store)
-    result = rag.query_and_answer("How to configure Flask Blueprints?")
+    result = rag.query_and_answer("How to configure Quart Blueprints?")
 
     assert result.confidence == 0.0
     assert "No relevant documentation found" in result.answer

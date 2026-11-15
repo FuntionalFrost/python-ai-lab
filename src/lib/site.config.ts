@@ -5,7 +5,7 @@ export const siteConfig = defineSiteConfig({
 	title: 'Python AI Lab — Prototyping & Testing Modern AI Backends',
 	url: 'https://python-ai-lab.pages.dev',
 	description:
-		'An interactive lab for rapidly prototyping, testing, benchmarking, and iterating on modern Python Web & AI backend architectures (Flask 3.x, Quart, Litestar, Pydantic v2, HTTPX) with SvelteKit 3.',
+		'An interactive lab for rapidly prototyping, testing, benchmarking, and iterating on modern Python Web & AI backend architectures (Quart 0.23+, Litestar, Pydantic v2, HTTPX2) with SvelteKit 3.',
 	author: {
 		name: 'FuntionalFrost',
 		github: 'https://github.com/FuntionalFrost'
@@ -25,8 +25,9 @@ export const siteConfig = defineSiteConfig({
 		twitterCard: 'summary_large_image',
 		keywords: [
 			'Python AI',
-			'Flask 3',
 			'Quart',
+			'HTTPX2',
+			'Hypercorn',
 			'Litestar',
 			'Pydantic v2',
 			'LLM Benchmarking',

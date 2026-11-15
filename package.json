@@ -49,6 +49,6 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^1.59.0",
-		"yaxa-svelte": "^2.8.1"
+		"yaxa-svelte": "^2.10.0"
 	}
 }

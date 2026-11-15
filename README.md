@@ -7,10 +7,10 @@
 [![Svelte](<https://img.shields.io/badge/Svelte-5%20(Runes)-FF3E00?logo=svelte&logoColor=white>)](https://svelte.dev)
 [![SvelteKit](https://img.shields.io/badge/SvelteKit-3-FF3E00?logo=svelte&logoColor=white)](https://kit.svelte.dev)
 [![Python](https://img.shields.io/badge/Python-3.13%2B-3776AB?logo=python&logoColor=white)](https://python.org)
+[![Quart](https://img.shields.io/badge/Quart-0.23%2B-000000)](https://quart.palletsprojects.com)
 [![Litestar](https://img.shields.io/badge/Litestar-2.24%2B-edb641)](https://litestar.dev)
-[![Flask](https://img.shields.io/badge/Flask-3.x-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com)
 [![Pydantic](https://img.shields.io/badge/Pydantic-v2.14%2B-E92063?logo=pydantic&logoColor=white)](https://docs.pydantic.dev)
-[![HTTPX](https://img.shields.io/badge/HTTPX-0.28%2B-11998e)](https://www.python-httpx.org)
+[![HTTPX2](https://img.shields.io/badge/HTTPX2-2.13%2B-11998e)](https://pypi.org/project/httpx2/)
 [![htmx](https://img.shields.io/badge/htmx-2.x-3366cc?logo=htmx&logoColor=white)](https://htmx.org)
 [![djlint](https://img.shields.io/badge/linted%20with-djlint-10b981)](https://www.djlint.com)
 [![pytest](https://img.shields.io/badge/tested%20with-pytest-0A9EDC?logo=pytest&logoColor=white)](https://pytest.org)
@@ -29,7 +29,7 @@ Building AI backends requires fast feedback loops: quickly constructing prototyp
 
 **Python AI Lab** is a modular, interactive platform built with **SvelteKit 3** and **Svelte 5** (runes) paired with fully tested, runnable **Python 3.13+** prototype patterns. Rather than getting bogged down in premature production infrastructure, this lab focuses on:
 
-- **Rapid Prototyping:** Lean architectures in Flask 3.x and Litestar with Pydantic v2.
+- **Rapid Prototyping:** Lean architectures in Quart 0.23+ and Litestar with Pydantic v2.
 - **Deterministic Testing:** Test harnesses using `pytest-mock`, deterministic mocks, and replay fixtures.
 - **Cross-Model Benchmarking:** Comparing open-weight instruction-tuned candidate models with $\le 4\text{B}$ total/effective parameters (`gemma-4-e4b-it`, `gemma-4-e2b-it`, `gemma-3-1b-it`, `functiongemma-270m-it`) on latency, throughput, token cost, and tool precision.
 - **Same-Model Benchmarking & Tuning:** Ablating prompts, few-shot exemplars, temperature, and schema guardrails on the same model to uncover optimal prototype configurations.
@@ -46,8 +46,8 @@ The platform is not just static documentation—it includes live interactive sim
 - **Psychometric User Satisfaction Evaluator:** Interactive rubrics measuring authentic conversational dynamics (ambiguity disambiguation, conversational repair on user reversal, tone de-escalation, tool precision).
 - **Closed-Loop Tool Call Visualizer:** Step through the 5-stage LLM function calling lifecycle (Prompt $\to$ LLM Tool Proposal $\to$ Pydantic Validation $\to$ Python Execution $\to$ Synthesis) with interactive schema error injection (`unit="kelvin"`).
 - **Realistic Pytest Terminal Modal:** Watch animated test suites execute line-by-line with ANSI highlights, `--cov` coverage breakdowns, `-v` verbose flags, and failure simulations.
-- **Side-by-Side Code Comparators:** Dual-pane diff viewers comparing Flask 3.x vs. Litestar 2.24, and Hackathon Prototype vs. Production-grade patterns.
-- **Concurrency Load Simulator:** Live throughput & latency benchmark graphing how Flask's synchronous threadpool saturates under load compared to Litestar's non-blocking ASGI event loop.
+- **Side-by-Side Code Comparators:** Dual-pane diff viewers comparing Quart 0.23 vs. Litestar 2.24, and Hackathon Prototype vs. Production-grade patterns.
+- **Concurrency Load Simulator:** Live throughput & latency benchmark graphing how Quart (Hypercorn) and Litestar (Granian) maintain peak performance compared to legacy WSGI threadpool saturation.
 - **Command Palette Search:** Fast global navigation across all 12 tracks and tools (**Cmd+K** / **Ctrl+K**).
 
 ---
@@ -56,20 +56,20 @@ The platform is not just static documentation—it includes live interactive sim
 
 The platform features 12 comprehensive tracks organized into rapid prototyping/testing foundations (Tracks 01–09) followed by full-stack, production deployment, and ASGI scaling (Tracks 10–12):
 
-| #      | Track                                                     | Focus & Architectural Concepts                                                                                                                                                | Stack                                                |
-| :----- | :-------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------- |
-| **01** | **Application Factory & Clean MVC**                       | Flask 3.x `create_app` factory, modular Blueprints, Clean Architecture Service/Repository layering, and Pydantic DTO request validation.                                      | Flask 3.1, Pydantic v2, pytest-mock                  |
-| **02** | **Settings & Schemas with Pydantic v2**                   | `pydantic-settings` `BaseSettings`, `SecretStr` key masking, fail-fast environment validation, and module-level singleton pattern.                                            | Pydantic v2, pydantic-settings                       |
-| **03** | **Resilient HTTP with HTTPX**                             | `httpx.Client` connection pooling, HTTP/2 multiplexing, structured timeouts, and `pytest-mock` testing.                                                                       | HTTPX 0.28+, HTTP/2, pytest-mock                     |
-| **04** | **LLM Chats & Streaming Backends**                        | Flask `stream_with_context` Server-Sent Events (SSE), connection pooling, chunk delimiters, and sliding-window conversational memory.                                         | Flask 3.1, OpenAI SDK, SSE                           |
-| **05** | **Live Async Benchmarks (`/benchmarks`) vs `/tests`**     | Separating sync unit tests (`/tests`) from concurrent in-route evals (`flask[async]`, `httpx`, `AsyncOpenAI`, `asyncio.gather`, TTFT/TPS).                                    | flask[async], httpx, AsyncOpenAI, pytest-asyncio     |
-| **06** | **Tool Calling & Unit Testing**                           | Generating OpenAI function schemas from Pydantic models, multi-turn dispatch engine, self-healing recovery, and `pytest-mock` parameter assertions.                           | OpenAI, Pydantic v2, pytest-mock                     |
-| **07** | **RAG Pipelines & Testing**                               | Semantic chunking, cosine vector similarity, in-memory vector store protocols, grounded context injection, and deterministic fixtures.                                        | OpenAI Embeddings, Pydantic v2                       |
-| **08** | **Building & Testing Agent Harnesses**                    | Decoupling LLM loops from web transports, state machine controllers, step-count circuit breakers (`MaxIterationsExceededError`), and replay fixtures.                         | OpenAI SDK, pytest-mock                              |
-| **09** | **Hypermedia AI Prototypes (htmx & Jinja2)**              | Zero-build AI interfaces, `hx-post` chat feeds, declarative `htmx-ext-sse` token streaming, Jinja2 partials, and `djlint` template quality gates.                             | htmx 2.x, Flask 3.1, Jinja2, djlint, pytest          |
-| **10** | **Production WSGI & Hardening**                           | Gunicorn worker concurrency (`gthread` vs. `gevent`), long-running streaming timeouts, Tenacity exponential jitter backoff, and Nginx proxying.                               | Gunicorn, Tenacity, Nginx                            |
-| **11** | **Scale-Up: Flask to Quart & Litestar (The ASGI Matrix)** | The ASGI Decision Matrix: Road A (Zero-Rewrite Pallets ASGI via Quart 0.23 on Hypercorn) vs. Road B (Clean Architecture via Litestar 2.24 on Granian), and async test suites. | Flask 3.x, Quart 0.23, Litestar 2.24, pytest-asyncio |
-| **12** | **Connecting to SvelteKit**                               | Full-Stack AI Integration: SvelteKit BFF, consuming backend SSE streams with Svelte 5 runes (`$state`, `$derived`), and type-safe contracts.                                  | SvelteKit 3, Svelte 5, TypeScript                    |
+| #      | Track                                                 | Focus & Architectural Concepts                                                                                                                                           | Stack                                           |
+| :----- | :---------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------- |
+| **01** | **Application Factory & Clean MVC**                   | Quart 0.23 `create_app` factory, modular async Blueprints, Clean Architecture Service/Repository layering, and Pydantic DTO request validation.                          | Quart 0.23, Hypercorn, Pydantic v2, pytest-mock |
+| **02** | **Settings & Schemas with Pydantic v2**               | `pydantic-settings` `BaseSettings`, `SecretStr` key masking, fail-fast environment validation, and module-level singleton pattern.                                       | Pydantic v2, pydantic-settings                  |
+| **03** | **Resilient HTTP with HTTPX2**                        | `httpx2.AsyncClient` connection pooling, OS-native TLS trust store, HTTP/2 multiplexing, structured timeouts, and `pytest-mock` testing.                                 | HTTPX2 2.13+, HTTP/2, pytest-mock               |
+| **04** | **LLM Chats & Streaming Backends**                    | Quart native async generator Server-Sent Events (SSE), connection pooling, chunk delimiters, and sliding-window conversational memory.                                   | Quart 0.23, AsyncOpenAI, SSE                    |
+| **05** | **Live Async Benchmarks (`/benchmarks`) vs `/tests`** | Separating sync unit tests (`/tests`) from concurrent in-route evals (Quart, `httpx2`, `AsyncOpenAI`, `asyncio.gather`, TTFT/TPS).                                       | Quart, httpx2, AsyncOpenAI, pytest-asyncio      |
+| **06** | **Tool Calling & Unit Testing**                       | Generating OpenAI function schemas from Pydantic models, multi-turn dispatch engine, self-healing recovery, and `pytest-mock` parameter assertions.                      | OpenAI, Pydantic v2, pytest-mock                |
+| **07** | **RAG Pipelines & Testing**                           | Semantic chunking, cosine vector similarity, in-memory vector store protocols, grounded context injection, and deterministic fixtures.                                   | OpenAI Embeddings, Pydantic v2                  |
+| **08** | **Building & Testing Agent Harnesses**                | Decoupling LLM loops from web transports, state machine controllers, step-count circuit breakers (`MaxIterationsExceededError`), and replay fixtures.                    | OpenAI SDK, pytest-mock                         |
+| **09** | **Hypermedia AI Prototypes (htmx & Jinja2)**          | Zero-build AI interfaces, `hx-post` chat feeds, declarative `htmx-ext-sse` token streaming, Jinja2 partials, and `djlint` template quality gates on Quart.               | htmx 2.x, Quart 0.23, Jinja2, djlint, pytest    |
+| **10** | **Production ASGI & Hardening**                       | Hypercorn ASGI concurrency, long-running streaming timeouts, Tenacity exponential jitter backoff, and Nginx proxying.                                                    | Hypercorn, Tenacity, Nginx                      |
+| **11** | **The ASGI Matrix: Quart vs. Litestar**               | The ASGI Decision Matrix: Road A (Zero-DB Pallets ASGI via Quart 0.23 on Hypercorn) vs. Road B (Clean Architecture via Litestar 2.24 on Granian), and async test suites. | Quart 0.23, Litestar 2.24, pytest-asyncio       |
+| **12** | **Connecting to SvelteKit**                           | Full-Stack AI Integration: SvelteKit BFF, consuming Quart backend SSE streams with Svelte 5 runes (`$state`, `$derived`), and type-safe contracts.                       | SvelteKit 3, Svelte 5, TypeScript, Quart        |
 
 ---
 
@@ -166,8 +166,8 @@ python-ai-lab/
 ## Tech Stack
 
 - **Frontend & Hypermedia:** [SvelteKit 3](https://kit.svelte.dev) + [Svelte 5](https://svelte.dev) (Runes `$state`, `$derived`, `$props`), [htmx 2.x](https://htmx.org), [Tailwind CSS v4](https://tailwindcss.com), [Lucide Svelte](https://lucide.dev), [yaxa-svelte](https://github.com/yaxa-ui/yaxa-svelte).
-- **Python Backends:** Python 3.13+, [Flask 3.1](https://flask.palletsprojects.com) (with `flask[async]`), [Quart 0.23](https://quart.palletsprojects.com) (Pallets native ASGI + [Hypercorn](https://hypercorn.readthedocs.io)), [Litestar 2.24](https://litestar.dev) ([Granian](https://github.com/emmett-framework/granian) Rust ASGI), [Jinja2 3.1](https://jinja.palletsprojects.com).
-- **HTTP & AI Networking:** [HTTPX](https://www.python-httpx.org) (`httpx.Client` + `httpx.Limits`), [OpenAI Python SDK](https://github.com/openai/openai-python), [Pydantic v2](https://docs.pydantic.dev), [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/), [tenacity](https://tenacity.readthedocs.io/).
+- **Python Backends:** Python 3.13+, [Quart 0.23](https://quart.palletsprojects.com) (Pallets native ASGI + [Hypercorn](https://hypercorn.readthedocs.io)), [Litestar 2.24](https://litestar.dev) ([Granian](https://github.com/emmett-framework/granian) Rust ASGI), [Jinja2 3.1](https://jinja.palletsprojects.com).
+- **HTTP & AI Networking:** [HTTPX2](https://pypi.org/project/httpx2/) (`httpx2.AsyncClient` + `httpx2.Limits`), [OpenAI Python SDK](https://github.com/openai/openai-python), [Pydantic v2](https://docs.pydantic.dev), [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/), [tenacity](https://tenacity.readthedocs.io/).
 - **Testing, Linting & Quality:** [pytest 9](https://pytest.org), [pytest-mock](https://github.com/pytest-dev/pytest-mock), [pytest-asyncio](https://pytest-asyncio.readthedocs.io/), [pytest-cov](https://pytest-cov.readthedocs.io/), [djlint](https://www.djlint.com), [BeautifulSoup4](https://beautiful-soup-4.readthedocs.io/).
 
 ---

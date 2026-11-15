@@ -7,29 +7,29 @@ export const track12: CurriculumLesson = {
 	title: 'Connecting Python AI Backends to SvelteKit (Full-Stack AI Integration)',
 	shortTitle: 'Connecting to SvelteKit',
 	subtitle:
-		'Consuming Streaming AI Backends, Type-Safe Pydantic Contracts, and Svelte 5 Reactive Frontends',
+		'Consuming Streaming Quart Backends, Type-Safe Pydantic Contracts, and Svelte 5 Reactive Frontends',
 	estimatedMinutes: 45,
 	topics: [
-		'Full-Stack Topology: Flask AI Microservice & SvelteKit UI',
-		'Consuming Flask SSE Streams with Svelte 5 Runes ($state, $derived)',
-		'Generating TypeScript Interfaces from Flask Pydantic v2 Models',
-		'CORS, Reverse Proxying & Streaming Headers (X-Accel-Buffering)',
-		'Hybrid Architecture: SvelteKit BFF vs. Direct Flask Endpoints',
+		'Full-Stack Topology: Quart ASGI Microservice & SvelteKit UI',
+		'Consuming Quart SSE Streams with Svelte 5 Runes ($state, $derived)',
+		'Generating TypeScript Interfaces from Quart Pydantic v2 Models',
+		'CORS, Reverse Proxying & Streaming Headers (X-Accel-Buffering: no)',
+		'Hybrid Architecture: SvelteKit BFF vs. Direct Quart ASGI Endpoints',
 		'Testing Full-Stack Endpoints with Vitest and pytest'
 	],
-	frameworks: ['SvelteKit 3', 'TypeScript 5.x', 'Flask 3.1.3', 'Pydantic v2'],
-	tags: ['Full-Stack', 'SvelteKit', 'Flask', 'Streaming', 'TypeScript', 'Svelte 5'],
+	frameworks: ['SvelteKit 3', 'TypeScript 5.x', 'Quart 0.23+', 'HTTPX2', 'Pydantic v2'],
+	tags: ['Full-Stack', 'SvelteKit', 'Quart', 'Streaming', 'TypeScript', 'Svelte 5'],
 	summary:
-		'Bridge your Python Flask AI backend with a modern fullstack frontend in SvelteKit. Discover how Svelte 5 runes consume Flask Server-Sent Event streams in real-time, how to synchronize Pydantic schemas to TypeScript types, and how to structure production deployment boundaries.',
+		'Bridge your Python Quart AI backend with a modern fullstack frontend in SvelteKit. Discover how Svelte 5 runes consume Quart Server-Sent Event streams in real-time, how to synchronize Pydantic schemas to TypeScript types, and how to structure production deployment boundaries.',
 	objectives: [
-		'Architect a production boundary between a Flask AI backend service and a SvelteKit user interface.',
+		'Architect a production boundary between a Quart AI backend service and a SvelteKit user interface.',
 		'Implement resilient client-side SSE readers in Svelte 5 using the Web Streams API and reactive runes.',
 		'Eliminate drift between Python models and TypeScript contracts with automated schema generation.',
-		'Configure CORS and reverse-proxy buffering rules so Flask streams arrive in SvelteKit with zero latency.',
+		'Configure CORS and reverse-proxy buffering rules so Quart streams arrive in SvelteKit with zero latency.',
 		'Verify fullstack streaming integrity with Vitest end-to-end and mock test suites.'
 	],
 	architecture: {
-		patternName: 'Full-Stack Flask AI Backend & Svelte 5 UI Topology',
+		patternName: 'Full-Stack Quart AI Backend & Svelte 5 UI Topology',
 		diagram: `+-------------------------------------------------------------------------+
 |                  SvelteKit Frontend Application (Browser + SSR)         |
 |                                                                         |
@@ -43,18 +43,18 @@ export const track12: CurriculumLesson = {
                                      | (Server-Sent Events: text/event-stream)
                                      v
 +-------------------------------------------------------------------------+
-|                    Flask 3.x AI Backend Microservice                    |
+|                    Quart 0.23 AI Backend Microservice                   |
 |   - Application Factory & Modular Blueprints (create_app)               |
-|   - stream_with_context() Token Generator                               |
+|   - Native Async Token Generator Response(generate())                   |
 |   - Pydantic v2 Input Validation & Strict DTO Schemas                   |
-|   - Pooled OpenAI Client in current_app.extensions                      |
-|   - Vector DB / RAG / Agent Tool Dispatching Layers                     |
+|   - Pooled AsyncOpenAI Client in current_app.extensions                 |
+|   - Vector DB / RAG / Agent Tool Dispatching Layers with HTTPX2         |
 +-------------------------------------------------------------------------+`,
 		explanation: `The most popular real-world architecture for AI products combines Python's rich data science ecosystem with a fast modern frontend:
 
-1. Flask Backend: Owns LLM orchestration, prompt engineering, vector database indexing, and fine-tuned model inferences where Python libraries (Pydantic, LangChain, PyTorch) dominate.
+1. Quart Backend: Owns LLM orchestration, prompt engineering, vector database indexing, and fine-tuned model inferences where Python libraries (Pydantic, HTTPX2, LangChain, PyTorch) dominate.
 2. SvelteKit Frontend: Delivers instant page loads, snappy interactive UI, and reactive state management powered by Svelte 5 runes.
-3. Streaming Glue: Flask emits chunks using 'Response(stream_with_context(generate()), mimetype="text/event-stream")' while SvelteKit consumes the stream via the browser's standard 'ReadableStream' API, appending tokens to reactive $state variables with zero UI flicker.`,
+3. Streaming Glue: Quart emits chunks natively using 'Response(generate(), mimetype="text/event-stream")' while SvelteKit consumes the stream via the browser's standard 'ReadableStream' API, appending tokens to reactive $state variables with zero UI flicker.`,
 		keyConcepts: [
 			{
 				name: 'Svelte 5 Runes Streaming',
@@ -75,30 +75,30 @@ export const track12: CurriculumLesson = {
 	},
 	comparisons: [
 		{
-			title: 'Streaming Pipeline: Flask 3.x Backend vs. SvelteKit Server BFF',
+			title: 'Streaming Pipeline: Quart 0.23 Backend vs. SvelteKit Server BFF',
 			description:
-				'Observe the difference between producing an SSE stream in Flask and proxying/handling it in SvelteKit.',
-			leftTitle: 'Flask 3.x (SSE Generator)',
+				'Observe the difference between producing an SSE stream in Quart and proxying/handling it in SvelteKit.',
+			leftTitle: 'Quart 0.23 (Native Async SSE Generator)',
 			leftLanguage: 'python',
-			leftCode: `from flask import Blueprint, Response, stream_with_context, request, current_app
-from openai import OpenAI
+			leftCode: `from quart import Blueprint, Response, request, current_app
+from openai import AsyncOpenAI
 import json
 
 chat_bp = Blueprint("chat", __name__, url_prefix="/api/chat")
 
 @chat_bp.post("/stream")
-def stream_chat():
-    data = request.get_json(silent=True) or {}
+async def stream_chat():
+    data = await request.get_json() or {}
     prompt = data.get("prompt", "")
-    client: OpenAI = current_app.extensions["openai_client"]
+    client: AsyncOpenAI = current_app.extensions["async_openai_client"]
 
-    def generate():
-        stream = client.chat.completions.create(
+    async def generate():
+        stream = await client.chat.completions.create(
             model="gemma-4-e4b-it",
             messages=[{"role": "user", "content": prompt}],
             stream=True
         )
-        for chunk in stream:
+        async for chunk in stream:
             token = chunk.choices[0].delta.content or ""
             if token:
                 payload = json.dumps({"token": token})
@@ -106,7 +106,7 @@ def stream_chat():
         yield "data: [DONE]\\n\\n"
 
     return Response(
-        stream_with_context(generate()),
+        generate(),
         mimetype="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
@@ -186,10 +186,10 @@ export const serverOpenAI = new OpenAI({
 	codeSnippets: [
 		{
 			id: 'svelte5-sse-consumer',
-			title: 'Consuming Flask SSE Stream in Svelte 5 with Runes',
+			title: 'Consuming Quart SSE Stream in Svelte 5 with Runes',
 			filePath: 'src/lib/components/ChatStreamConsumer.svelte',
 			description:
-				'Modern Svelte 5 component reading Flask SSE stream chunks with $state and $derived runes.',
+				'Modern Svelte 5 component reading Quart SSE stream chunks with $state and $derived runes.',
 			language: 'svelte',
 			code: `<script lang="ts">
 	let prompt = $state('');
@@ -203,7 +203,7 @@ export const serverOpenAI = new OpenAI({
 		isStreaming = true;
 		answer = '';
 
-		// Connect to Flask backend SSE endpoint
+		// Connect to Quart backend SSE endpoint
 		const response = await fetch('/api/chat/stream', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -242,7 +242,7 @@ export const serverOpenAI = new OpenAI({
 </script>
 
 <form onsubmit={handleSubmit} class="space-y-3">
-	<input bind:value={prompt} placeholder="Ask Flask AI..." class="w-full rounded-lg bg-zinc-900 p-3 text-sm text-white" />
+	<input bind:value={prompt} placeholder="Ask Quart AI..." class="w-full rounded-lg bg-zinc-900 p-3 text-sm text-white" />
 	<button type="submit" disabled={isStreaming} class="rounded-lg bg-cyan-600 px-4 py-2 text-xs font-semibold text-white">
 		{isStreaming ? 'Streaming...' : 'Generate Stream'}
 	</button>
@@ -255,10 +255,10 @@ export const serverOpenAI = new OpenAI({
 		},
 		{
 			id: 'pydantic-to-typescript-script',
-			title: 'Automated Schema Sync: Flask Pydantic to TypeScript',
+			title: 'Automated Schema Sync: Quart Pydantic to TypeScript',
 			filePath: 'scripts/export_schemas.py',
 			description:
-				'Generates TypeScript definitions from Flask Pydantic v2 schemas to ensure end-to-end type safety between Flask and SvelteKit.',
+				'Generates TypeScript definitions from Quart Pydantic v2 schemas to ensure end-to-end type safety between Quart and SvelteKit.',
 			language: 'python',
 			code: `import json
 from pathlib import Path

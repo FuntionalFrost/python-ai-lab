@@ -3,25 +3,25 @@
 	import CodeBlock from '#lib/components/CodeBlock.svelte';
 	import { Bot, Zap } from '@lucide/svelte';
 
-	const sseSnippet = `from flask import Blueprint, Response, stream_with_context, request, current_app
-from openai import OpenAI
+	const sseSnippet = `from quart import Blueprint, Response, request, current_app
+from openai import AsyncOpenAI
 import json
 
 chat_bp = Blueprint("chat", __name__, url_prefix="/api/chat")
 
 @chat_bp.post("/stream")
-def stream_chat():
-    data = request.get_json(silent=True) or {}
+async def stream_chat():
+    data = await request.get_json() or {}
     prompt = data.get("prompt", "")
-    client: OpenAI = current_app.extensions["openai_client"]
+    client: AsyncOpenAI = current_app.extensions["async_openai_client"]
 
-    def generate():
-        stream = client.chat.completions.create(
+    async def generate():
+        stream = await client.chat.completions.create(
             model="gemma-4-e4b-it",
             messages=[{"role": "user", "content": prompt}],
             stream=True,
         )
-        for chunk in stream:
+        async for chunk in stream:
             delta = chunk.choices[0].delta.content or ""
             if delta:
                 payload = json.dumps({"token": delta})
@@ -29,7 +29,7 @@ def stream_chat():
         yield "data: [DONE]\\n\\n"
 
     return Response(
-        stream_with_context(generate()),
+        generate(),
         mimetype="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
@@ -74,15 +74,17 @@ def stream_chat():
 			<div class="flex items-center gap-2">
 				<Zap class="h-5 w-5 text-cyan-400" />
 				<h3 class="text-sm font-bold tracking-wide text-zinc-100 uppercase">
-					SSE Streaming Anatomy in Flask 3.x
+					SSE Streaming Anatomy in Quart ASGI
 				</h3>
 			</div>
 
 			<p class="text-xs leading-relaxed text-zinc-300">
 				Unlike WebSockets, which require a full-duplex protocol upgrade over HTTP/1.1, Server-Sent
-				Events (SSE) operate over standard HTTP. Flask 3.x streams SSE using Python generator
-				functions wrapped in <code class="text-cyan-400">stream_with_context</code>, preserving
-				application and request state while emitting real-time token chunks:
+				Events (SSE) operate over standard HTTP. Quart streams SSE using native asynchronous
+				generator functions returned directly in <code class="text-cyan-400"
+					>Response(generate())</code
+				>, preserving task-local state without threadpool starvation while emitting real-time token
+				chunks:
 			</p>
 
 			<ul class="list-inside list-disc space-y-2 text-xs text-zinc-400">
@@ -101,12 +103,10 @@ def stream_chat():
 			</ul>
 		</div>
 
-		<!-- Right: Flask Reference Code -->
+		<!-- Right: Quart Reference Code -->
 		<div class="min-w-0 space-y-2">
 			<div class="flex flex-wrap items-center justify-between gap-2">
-				<span class="text-xs font-semibold text-zinc-300"
-					>Flask 3.x stream_with_context Endpoint</span
-				>
+				<span class="text-xs font-semibold text-zinc-300">Quart 0.23 Async Generator Endpoint</span>
 				<span class="font-mono text-[11px] text-cyan-400">app/blueprints/chat.py</span>
 			</div>
 			<CodeBlock code={sseSnippet} language="python" title="app/blueprints/chat.py" />

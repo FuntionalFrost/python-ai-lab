@@ -39,7 +39,7 @@
 			{
 				id: 'benchmarks',
 				label: 'Telemetry & Benchmarks',
-				description: 'Flask WSGI vs Litestar ASGI latency and evals',
+				description: 'Quart & Litestar ASGI throughput, latency and evals',
 				icon: Activity,
 				shortcut: 'G B',
 				group: 'Navigation',
@@ -283,7 +283,7 @@
 <CommandPalette
 	bind:open={isSearchOpen}
 	items={commandItems}
-	placeholder="Search curriculum tracks, patterns (e.g. 'Flask', 'RAG', 'streaming')..."
+	placeholder="Search curriculum tracks, patterns (e.g. 'Quart', 'HTTPX2', 'streaming')..."
 	ui={{
 		overlay: 'bg-black/80 backdrop-blur-sm',
 		content: 'border-zinc-800 bg-zinc-950 text-zinc-100 shadow-2xl',

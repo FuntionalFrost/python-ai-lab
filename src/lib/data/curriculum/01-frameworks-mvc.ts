@@ -4,33 +4,42 @@ export const track01: CurriculumLesson = {
 	id: 'track-01',
 	slug: '01-frameworks-mvc',
 	trackNumber: 1,
-	title: 'Application Factory & Clean MVC',
-	shortTitle: 'Modern Flask Architecture',
-	subtitle: 'Application Factories, Modular Blueprints, Service Layering, and Scalable AI APIs',
+	title: 'Application Factory & Clean MVC with Quart ASGI',
+	shortTitle: 'Quart ASGI Architecture',
+	subtitle: 'Application Factories, Modular Blueprints, Hypercorn ASGI, and Scalable AI APIs',
 	estimatedMinutes: 30,
 	topics: [
-		'Application Factory Pattern (create_app)',
-		'Modular Blueprints & URL Organization',
+		'Quart Application Factory Pattern (create_app -> Quart)',
+		'Async Modular Blueprints & Non-Blocking URL Routing',
 		'Clean Architecture & Service/Repository Layering',
-		'Pydantic v2 Payload Validation in Flask Routes',
-		'Flask Contexts: current_app vs g vs Request Scope'
+		'Pydantic v2 Payload Validation with await request.get_json()',
+		'Quart Async Contexts: current_app vs g vs Task-Local Scope',
+		'Serving Production AI Backends on Hypercorn ASGI'
 	],
-	frameworks: ['Flask 3.1.3', 'Pydantic v2', 'pytest 9.x', 'pytest-mock'],
-	tags: ['Flask', 'Architecture', 'MVC', 'Blueprints', 'Service Layer', 'Clean Code'],
+	frameworks: [
+		'Quart 0.23+',
+		'Hypercorn 0.17+',
+		'HTTPX2',
+		'Pydantic v2',
+		'pytest 9.x',
+		'pytest-asyncio'
+	],
+	tags: ['Quart', 'ASGI', 'Architecture', 'MVC', 'Blueprints', 'Hypercorn', 'Clean Code'],
 	summary:
-		'Transform monolithic Flask scripts into enterprise-ready, modular AI web services. Master the Application Factory pattern, structured Blueprints, Clean Architecture separation of concerns, and typed Pydantic validation inside Flask request handlers.',
+		'Ditch legacy synchronous WSGI bottlenecks. Master the Quart 0.23 Application Factory pattern, structured async Blueprints, Clean Architecture separation of concerns, and typed Pydantic validation inside native non-blocking coroutines served via Hypercorn.',
 	objectives: [
-		'Construct robust Flask 3.x applications using create_app() and decoupled Blueprints.',
-		'Eliminate circular imports and mutable global state using Flask’s application context (current_app).',
+		'Construct robust Quart ASGI applications using create_app() and decoupled async Blueprints.',
+		'Eliminate circular imports and mutable global state using Quart’s application context (current_app).',
 		'Separate HTTP transport logic from AI reasoning using the Domain Service & Repository pattern.',
-		'Enforce strict runtime validation with Pydantic v2 schemas inside Flask route endpoints.',
-		'Write deterministic unit and integration tests using app.test_client(), pytest, and pytest-mock.'
+		'Enforce strict runtime validation with Pydantic v2 schemas inside Quart route endpoints.',
+		'Write deterministic async unit tests using app.test_client(), pytest, and pytest-asyncio.',
+		'Deploy non-blocking AI endpoints capable of handling thousands of concurrent connections on Hypercorn.'
 	],
 	architecture: {
-		patternName: 'Flask AI-Native Clean Architecture & Service Layer',
+		patternName: 'Quart AI-Native ASGI Clean Architecture & Service Layer',
 		diagram: `+-------------------------------------------------------------------+
 |                        Transport Layer                            |
-|             Flask Blueprints (@analysis_bp.post("/"))             |
+|             Quart Blueprints (@analysis_bp.post("/"))             |
 +-------------------------------------------------------------------+
                                  |
                                  v  (Validated Pydantic DTO)
@@ -44,31 +53,37 @@ export const track01: CurriculumLesson = {
         v                                                 v
 +-------------------------------+ +---------------------------------+
 |       LLM Gateway / Client    | |       Repository Layer          |
-|    OpenAI Client (Injected)   | |  DocumentRepository (Postgres)  |
+|  AsyncOpenAI Client (Injected)| |  AsyncDocumentRepository (SQL)  |
 +-------------------------------+ +---------------------------------+`,
-		explanation: `In traditional Flask tutorials, developers often place everything into a single 'app.py' script using global variables like 'app = Flask(__name__)'. While fine for quick scripts, this naive approach quickly collapses in AI applications:
+		explanation: `In traditional tutorials, developers often place everything into a single 'app.py' script using global variables like 'app = Flask(__name__)'. While fine for quick scripts, this naive approach quickly collapses in AI applications:
 
 1. Circular Imports: Importing models or routes into the global app creates circular dependencies.
 2. Global State Mutation: Sharing global client instances makes testing impossible without monkeypatching.
 3. Fat Route Functions: Mixing prompt construction, JSON parsing, API calls, and database saves into one route handler leads to untestable spaghetti code.
+4. WSGI Thread Starvation: Synchronous frameworks block an entire OS thread per active request, collapsing when LLM streams run for 10-30 seconds.
 
-Modern Flask 3.x resolves this with Clean Architecture:
-- Transport Layer (Blueprints): Handles HTTP verbs, extracts request JSON, validates schemas, and formats responses.
+Modern Quart resolves this with ASGI and Clean Architecture:
+- Transport Layer (Async Blueprints): Handles HTTP verbs, asynchronously extracts request JSON (await request.get_json()), validates schemas, and formats responses.
 - Service Layer (Domain Logic): Houses prompt engineering, token safety checks, and multi-step tool calls.
-- Gateway Layer: Encapsulates external I/O (OpenAI client, vector stores, relational DBs).`,
+- Gateway Layer: Encapsulates external I/O (AsyncOpenAI client, vector stores, relational DBs) using non-blocking async clients.`,
 		keyConcepts: [
 			{
-				name: 'Flask Application Factory (`create_app`)',
+				name: 'Quart Application Factory (`create_app`)',
 				description:
-					'Prevents circular imports and global state by isolating app creation, database binding, and blueprint registration into a testable factory function.'
+					'Prevents circular imports and global state by isolating app creation, client binding, and blueprint registration into a testable factory function.'
 			},
 			{
-				name: 'Modular Blueprints',
+				name: 'Modular Async Blueprints',
 				description:
-					'Groups related routes and URL prefixes into reusable modules that can be registered onto any Flask app instance with custom configuration.'
+					'Groups related routes and URL prefixes into reusable modules that can be registered onto any Quart app instance with custom configuration.'
 			},
 			{
-				name: 'Pydantic DTO Validation in Flask',
+				name: 'Task-Local Async Contexts (`contextvars`)',
+				description:
+					'Quart modernizes Flask thread-locals into Python task-local contextvars, allowing concurrent coroutines on the same event loop to access current_app and request safely.'
+			},
+			{
+				name: 'Pydantic DTO Validation in Quart',
 				description:
 					'Validates incoming request JSON against strict Pydantic models with custom error handling before executing expensive AI operations.'
 			}
@@ -76,10 +91,10 @@ Modern Flask 3.x resolves this with Clean Architecture:
 	},
 	comparisons: [
 		{
-			title: 'Monolithic Anti-Pattern vs. Modern Flask 3.x Architecture',
+			title: 'Monolithic Anti-Pattern vs. Modern Quart 0.23 Architecture',
 			description:
-				'Contrasting a fragile global Flask script with an enterprise Application Factory & Blueprint structure.',
-			leftTitle: 'Legacy Monolith (Global app, Raw Dicts, No Layering)',
+				'Contrasting a fragile global WSGI script with an enterprise Quart Application Factory & Async Blueprint structure.',
+			leftTitle: 'Legacy Monolith (Global app, Raw Dicts, WSGI Thread Blocking)',
 			leftLanguage: 'python',
 			leftCode: `# Anti-pattern: app.py contains everything in global scope
 from flask import Flask, request, jsonify
@@ -94,7 +109,7 @@ def analyze():
     data = request.json
     text = data.get("text", "") # Silent bug if missing or wrong type!
 
-    # 2. Domain logic mixed directly into HTTP handler
+    # 2. Domain logic mixed directly into HTTP handler (blocks OS thread)
     response = client.chat.completions.create(
         model="gemma-4-e4b-it",
         messages=[{"role": "user", "content": f"Analyze: {text}"}]
@@ -105,9 +120,9 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(debug=True)`,
-			rightTitle: 'Modern Flask 3.x (Blueprint + Service Layer + Pydantic)',
+			rightTitle: 'Modern Quart 0.23 (Async Blueprint + Service Layer + Pydantic)',
 			rightLanguage: 'python',
-			rightCode: `from flask import Blueprint, request, jsonify, current_app
+			rightCode: `from quart import Blueprint, request, jsonify, current_app
 from pydantic import ValidationError
 from app.schemas.analysis import AnalysisRequest, AnalysisResponse
 from app.services.analysis import AnalysisService
@@ -115,9 +130,9 @@ from app.services.analysis import AnalysisService
 analysis_bp = Blueprint("analysis", __name__, url_prefix="/api/v1/analysis")
 
 @analysis_bp.post("/")
-def create_analysis():
-    # 1. Parse raw JSON body safely
-    json_data = request.get_json(silent=True)
+async def create_analysis():
+    # 1. Parse raw JSON body safely via non-blocking await
+    json_data = await request.get_json()
     if not json_data:
         return jsonify({"error": "Malformed or missing JSON body"}), 400
 
@@ -127,25 +142,25 @@ def create_analysis():
     except ValidationError as err:
         return jsonify({"errors": err.errors()}), 422
 
-    # 3. Resolve OpenAI client from Flask application extensions
-    client = current_app.extensions["openai_client"]
+    # 3. Resolve AsyncOpenAI client from Quart application extensions
+    client = current_app.extensions["async_openai_client"]
     service = AnalysisService(client=client)
 
-    # 4. Delegate to pure domain service layer
-    result: AnalysisResponse = service.analyze(payload)
+    # 4. Delegate to pure domain service layer (non-blocking)
+    result: AnalysisResponse = await service.analyze(payload)
     return jsonify(result.model_dump()), 201`
 		},
 		{
 			title: 'Application Bootstrap: Global Script vs. create_app() Factory',
 			description:
-				'How to bootstrap Flask applications cleanly with environment-aware settings and blueprint registration.',
+				'How to bootstrap Quart applications cleanly with environment-aware settings and blueprint registration.',
 			leftTitle: 'Global app Instance (Hard to Test / Configure)',
 			leftLanguage: 'python',
 			leftCode: `# Anti-pattern: app is initialized at module import time
-from flask import Flask
+from quart import Quart
 import os
 
-app = Flask(__name__)
+app = Quart(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret")
 app.config["OPENAI_KEY"] = os.environ.get("OPENAI_KEY")
 
@@ -153,19 +168,23 @@ app.config["OPENAI_KEY"] = os.environ.get("OPENAI_KEY")
 import app_routes`,
 			rightTitle: 'Application Factory Pattern (app/__init__.py)',
 			rightLanguage: 'python',
-			rightCode: `from flask import Flask
-from openai import OpenAI
+			rightCode: `from quart import Quart
+from openai import AsyncOpenAI
+import httpx2
 from app.config import settings
 from app.blueprints.analysis import analysis_bp
 
-def create_app() -> Flask:
-    """Application factory for Flask 3.x. Enables isolated testing per suite."""
-    app = Flask(__name__)
+def create_app() -> Quart:
+    """Application factory for Quart 0.23. Enables isolated testing per suite."""
+    app = Quart(__name__)
 
-    # Store configured OpenAI client in Flask extensions registry
-    app.extensions["openai_client"] = OpenAI(
+    # Store configured AsyncOpenAI and HTTPX2 clients in extensions registry
+    app.extensions["async_openai_client"] = AsyncOpenAI(
         api_key=settings.openai_api_key.get_secret_value(),
         timeout=settings.request_timeout_seconds,
+    )
+    app.extensions["http_client"] = httpx2.AsyncClient(
+        limits=httpx2.Limits(max_connections=50, max_keepalive_connections=15)
     )
 
     # Register decoupled modular Blueprints
@@ -175,30 +194,30 @@ def create_app() -> Flask:
 	],
 	codeSnippets: [
 		{
-			id: 'flask-service-impl',
-			title: 'Clean Architecture Service Layer',
+			id: 'quart-service-impl',
+			title: 'Clean Architecture Async Service Layer',
 			filePath: 'app/services/analysis.py',
 			description:
-				'Decoupled analysis service implementing domain boundary validation, OpenAI interaction, and Pydantic serialization.',
+				'Decoupled analysis service implementing domain boundary validation, AsyncOpenAI interaction, and Pydantic serialization.',
 			language: 'python',
-			code: `from openai import OpenAI
+			code: `from openai import AsyncOpenAI
 from app.schemas.analysis import AnalysisRequest, AnalysisResponse
 
 class AnalysisService:
-    """Domain service isolated from Flask HTTP transport. Fully testable without Flask context."""
+    """Domain service isolated from Quart HTTP transport. Fully testable without web context."""
 
-    def __init__(self, client: OpenAI, model: str = "gemma-4-e4b-it") -> None:
+    def __init__(self, client: AsyncOpenAI, model: str = "gemma-4-e4b-it") -> None:
         self._client = client
         self._model = model
 
-    def analyze(self, req: AnalysisRequest) -> AnalysisResponse:
+    async def analyze(self, req: AnalysisRequest) -> AnalysisResponse:
         prompt = (
             f"Analyze the following enterprise text snippet for security and compliance risks.\\n"
             f"Input text: \\"{req.content}\\"\\n"
             f"Return JSON adhering strictly to: {AnalysisResponse.model_json_schema()}"
         )
 
-        response = self._client.chat.completions.create(
+        response = await self._client.chat.completions.create(
             model=self._model,
             response_format={"type": "json_object"},
             messages=[
@@ -216,7 +235,7 @@ class AnalysisService:
 			id: 'pydantic-schemas',
 			title: 'Domain Schemas with Pydantic v2',
 			filePath: 'app/schemas/analysis.py',
-			description: 'Strongly typed request/response contracts for Flask analysis endpoints.',
+			description: 'Strongly typed request/response contracts for Quart analysis endpoints.',
 			language: 'python',
 			code: `from enum import Enum
 from pydantic import BaseModel, Field
@@ -245,12 +264,12 @@ class AnalysisResponse(BaseModel):
 		}
 	],
 	testSuite: {
-		title: 'Flask Blueprint Test Suite (pytest + app.test_client())',
+		title: 'Quart Blueprint Async Test Suite (pytest-asyncio + app.test_client())',
 		testFilePath: 'tests/test_analysis_blueprint.py',
 		command: 'pytest -v --cov=app tests/',
-		executionTimeSec: 0.62,
+		executionTimeSec: 0.54,
 		testCode: `import pytest
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 from app import create_app
 from app.schemas.analysis import AnalysisResponse, RiskLevel
 
@@ -264,48 +283,50 @@ def app():
 def client(app):
     return app.test_client()
 
-def test_create_analysis_success(client, app, mocker):
-    # Mock the OpenAI client in app.extensions
-    mock_client = mocker.MagicMock()
-    mock_choice = mocker.MagicMock()
+@pytest.mark.asyncio
+async def test_create_analysis_success(client, app, mocker):
+    # Mock the AsyncOpenAI client in app.extensions
+    mock_client = mocker.AsyncMock()
+    mock_choice = MagicMock()
     mock_choice.message.content = (
         '{"summary": "Compliant document", "risk_level": "low", '
         '"findings": ["Standard footer"], "confidence_score": 0.98}'
     )
     mock_client.chat.completions.create.return_value.choices = [mock_choice]
-    app.extensions["openai_client"] = mock_client
+    app.extensions["async_openai_client"] = mock_client
 
-    res = client.post(
+    res = await client.post(
         "/api/v1/analysis/",
         json={"content": "Employee onboarding document sample text here.", "domain": "fintech"}
     )
     assert res.status_code == 201
-    data = res.get_json()
+    data = await res.get_json()
     assert data["risk_level"] == "low"
     assert data["confidence_score"] == 0.98
 
-def test_create_analysis_validation_failure(client):
+@pytest.mark.asyncio
+async def test_create_analysis_validation_failure(client):
     # Send payload violating min_length=10 constraint
-    res = client.post(
+    res = await client.post(
         "/api/v1/analysis/",
         json={"content": "short", "domain": "fintech"}
     )
-    assert res.status_code == 422 # Pydantic validation failure in Flask handler
-    data = res.get_json()
+    assert res.status_code == 422 # Pydantic validation failure in Quart handler
+    data = await res.get_json()
     assert "errors" in data`,
 		simulatedStdout: `============================= test session starts ==============================
-platform win32 -- Python 3.13.0, pytest-9.0.1, pluggy-1.5.0
+platform win32 -- Python 3.14.7, pytest-9.1.1, pluggy-1.7.0
 rootdir: d:\\Web Projects\\Static\\python-ai-lab
-plugins: mock-3.17.0, cov-7.1.0
+plugins: mock-3.17.0, cov-7.1.0, asyncio-1.4.1
 collected 2 items
 
 tests/test_analysis_blueprint.py::test_create_analysis_success PASSED    [ 50%]
 tests/test_analysis_blueprint.py::test_create_analysis_validation_failure PASSED [100%]
 
----------- coverage: platform win32, python 3.13.0 -----------
+---------- coverage: platform win32, python 3.14.7 -----------
 Name                            Stmts   Miss  Cover   Missing
 -------------------------------------------------------------
-app/__init__.py                    12      0   100%
+app/__init__.py                    14      0   100%
 app/config.py                      18      0   100%
 app/blueprints/__init__.py          0      0   100%
 app/blueprints/analysis.py         16      0   100%
@@ -314,21 +335,21 @@ app/schemas/analysis.py            16      0   100%
 app/services/__init__.py            0      0   100%
 app/services/analysis.py           15      0   100%
 -------------------------------------------------------------
-TOTAL                              77      0   100%
+TOTAL                              79      0   100%
 
-============================== 2 passed in 0.62s ===============================`,
+============================== 2 passed in 0.54s ===============================`,
 		coverage: {
 			files: [
 				{ name: 'app/blueprints/analysis.py', stmts: 16, miss: 0, cover: '100%', missing: '' },
 				{ name: 'app/schemas/analysis.py', stmts: 16, miss: 0, cover: '100%', missing: '' },
 				{ name: 'app/services/analysis.py', stmts: 15, miss: 0, cover: '100%', missing: '' },
 				{ name: 'app/config.py', stmts: 18, miss: 0, cover: '100%', missing: '' },
-				{ name: 'app/__init__.py', stmts: 12, miss: 0, cover: '100%', missing: '' }
+				{ name: 'app/__init__.py', stmts: 14, miss: 0, cover: '100%', missing: '' }
 			],
-			total: { stmts: 77, miss: 0, cover: '100%' }
+			total: { stmts: 79, miss: 0, cover: '100%' }
 		},
 		summary:
-			'All 2 tests passed. 100% overall test coverage across Flask factory, blueprint, schema, and service.'
+			'All 2 tests passed. 100% overall test coverage across Quart factory, blueprint, schema, and service.'
 	},
 	interactiveComponent: 'code-comparison'
 };

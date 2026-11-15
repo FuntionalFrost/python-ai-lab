@@ -17,12 +17,19 @@
 		Globe
 	} from '@lucide/svelte';
 	import CodeBlock from '#lib/components/CodeBlock.svelte';
-	import { useClipboard } from 'yaxa-svelte';
+	import { useClipboard, PromptBar, AiToolCall, AiThought, type SlashCommand } from 'yaxa-svelte';
 
 	interface RAGSource {
 		title: string;
 		score: number;
 		chunk: string;
+	}
+
+	interface ThoughtData {
+		title: string;
+		steps: string[];
+		duration?: number;
+		running?: boolean;
 	}
 
 	interface Message {
@@ -34,6 +41,7 @@
 			arguments: string;
 			result: string;
 		};
+		thought?: ThoughtData;
 		ragSources?: RAGSource[];
 		isStreaming?: boolean;
 		telemetry?: {
@@ -275,31 +283,10 @@
 	});
 
 	const backendSnippets: Record<FrameworkId, string> = {
-		flask: `# Flask 3.x (WSGI + Threadpool)
-from flask import Flask, Response, stream_with_context
-import json
-import time
-
-app = Flask(__name__)
-
-@app.post("/api/v1/chat/stream")
-def chat_stream():
-    def generate():
-        # ⚠️ Blocks 1 OS thread per streaming connection!
-        tokens = ["WSGI ", "threadpool ", "streaming..."]
-        for token in tokens:
-            payload = json.dumps({"choices": [{"delta": {"content": token}}]})
-            yield f"data: {payload}\\n\\n"
-            time.sleep(0.02)
-        yield "data: [DONE]\\n\\n"
-
-    return Response(
-        stream_with_context(generate()),
-        mimetype="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
-    )`,
 		quart: `# Quart 0.23 (Pallets Native ASGI + Hypercorn)
-from quart import Quart, Response
+from quart import Quart, Response, request
+import httpx2
+from openai import AsyncOpenAI
 import asyncio
 import json
 
@@ -339,14 +326,93 @@ class ChatController(Controller):
                 yield payload
             yield "[DONE]"
 
-        return ServerSentEvent(token_generator())`
+        return ServerSentEvent(token_generator())`,
+		flask: `# Legacy Flask 3.x (WSGI + Threadpool)
+from flask import Flask, Response, stream_with_context
+import json
+import time
+
+app = Flask(__name__)
+
+@app.post("/api/v1/chat/stream")
+def chat_stream():
+    def generate():
+        # ⚠️ Blocks 1 OS thread per streaming connection!
+        tokens = ["WSGI ", "threadpool ", "streaming..."]
+        for token in tokens:
+            payload = json.dumps({"choices": [{"delta": {"content": token}}]})
+            yield f"data: {payload}\\n\\n"
+            time.sleep(0.02)
+        yield "data: [DONE]\\n\\n"
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+    )`
 	};
+
+	const SLASH_COMMANDS: SlashCommand[] = [
+		{ name: '/sse', description: 'Real-time SSE token streaming' },
+		{ name: '/tool', description: 'Weather tool dispatch with Pydantic validation' },
+		{ name: '/rag', description: 'Hybrid vector search RAG retrieval' },
+		{ name: '/json', description: 'Pydantic structured JSON extraction' },
+		{ name: '/quart', description: 'Switch to Quart 0.23+ ASGI (Hypercorn)' },
+		{ name: '/litestar', description: 'Switch to Litestar 2.24+ ASGI (Granian)' },
+		{ name: '/flask', description: 'Switch to Legacy WSGI baseline (Flask 3.x)' },
+		{ name: '/reset', description: 'Clear messages and reset conversation' }
+	];
 
 	function applyPreset(preset: Preset) {
 		selectedPreset = preset;
 		promptInput = preset.prompt;
 		messages = [];
 		rawChunks = [];
+	}
+
+	function stopGeneration() {
+		isGenerating = false;
+	}
+
+	function handlePromptSubmit(text: string) {
+		const trimmed = text.trim();
+		if (!trimmed) return;
+
+		if (trimmed.startsWith('/quart')) {
+			selectedFramework = 'quart';
+			return;
+		}
+		if (trimmed.startsWith('/litestar')) {
+			selectedFramework = 'litestar';
+			return;
+		}
+		if (trimmed.startsWith('/flask')) {
+			selectedFramework = 'flask';
+			return;
+		}
+		if (trimmed.startsWith('/sse')) {
+			applyPreset(PRESETS[0]);
+			return;
+		}
+		if (trimmed.startsWith('/tool')) {
+			applyPreset(PRESETS[1]);
+			return;
+		}
+		if (trimmed.startsWith('/json')) {
+			applyPreset(PRESETS[2]);
+			return;
+		}
+		if (trimmed.startsWith('/rag')) {
+			applyPreset(PRESETS[3]);
+			return;
+		}
+		if (trimmed.startsWith('/reset')) {
+			resetChat();
+			return;
+		}
+
+		promptInput = trimmed;
+		runChatStream();
 	}
 
 	async function runChatStream() {
@@ -366,9 +432,45 @@ class ChatController(Controller):
 
 		const startTime = performance.now();
 
+		// Assistant message placeholder with initial thinking phase
+		const assistantMsgId = 'asst-' + Date.now();
+		const assistantMsg: Message = {
+			id: assistantMsgId,
+			role: 'assistant',
+			content: '',
+			ragSources: selectedPreset.ragSources,
+			thought: {
+				title: `Pydantic v2 Validation (${selectedFramework.toUpperCase()})`,
+				steps: [
+					`Validating prompt payload against ${selectedPreset.id === 'tool-agent' ? 'WeatherQuery' : selectedPreset.id === 'structured-json' ? 'FinancialReport' : 'ChatRequest'} schema`,
+					`Connecting to ${selectedFramework === 'quart' ? 'Hypercorn ASGI event loop' : selectedFramework === 'litestar' ? 'Granian Rust ASGI worker' : 'Waitress WSGI threadpool'}`,
+					'Measuring Time-to-First-Token (TTFT)'
+				],
+				running: true
+			},
+			isStreaming: true
+		};
+		messages = [...messages, assistantMsg];
+
 		// Simulate TTFT
 		await new Promise((r) => setTimeout(r, ttftMs));
+		if (!isGenerating) return;
+
 		const ttftMeasured = Math.round(performance.now() - startTime);
+
+		// Conclude thinking phase
+		messages = messages.map((m) =>
+			m.id === assistantMsgId && m.thought
+				? {
+						...m,
+						thought: {
+							...m.thought,
+							running: false,
+							duration: Number((ttftMeasured / 1000).toFixed(2))
+						}
+					}
+				: m
+		);
 
 		// Handle Tool Call Simulation if preset requires it
 		if (selectedPreset.requiresTool && selectedPreset.toolInfo) {
@@ -382,7 +484,7 @@ class ChatController(Controller):
 					result: selectedPreset.toolInfo.result
 				}
 			};
-			messages = [...messages, toolMsg];
+			messages = [...messages.filter((m) => m.id !== assistantMsgId), toolMsg, assistantMsg];
 			rawChunks = [
 				...rawChunks,
 				`event: tool_call\ndata: ${JSON.stringify({ name: selectedPreset.toolInfo.name, arguments: selectedPreset.toolInfo.args })}\n\n`,
@@ -391,6 +493,7 @@ class ChatController(Controller):
 			];
 			// Brief execution pause
 			await new Promise((r) => setTimeout(r, 200));
+			if (!isGenerating) return;
 		}
 
 		// Handle RAG Context Ingestion if present
@@ -401,19 +504,9 @@ class ChatController(Controller):
 			];
 		}
 
-		// Assistant message placeholder
-		const assistantMsgId = 'asst-' + Date.now();
-		const assistantMsg: Message = {
-			id: assistantMsgId,
-			role: 'assistant',
-			content: '',
-			ragSources: selectedPreset.ragSources,
-			isStreaming: true
-		};
-		messages = [...messages, assistantMsg];
-
 		let assembledContent = '';
 		for (let i = 0; i < selectedPreset.tokens.length; i++) {
+			if (!isGenerating) break;
 			const token = selectedPreset.tokens[i];
 			assembledContent += token;
 
@@ -431,7 +524,11 @@ class ChatController(Controller):
 			await new Promise((r) => setTimeout(r, itlMs));
 		}
 
-		rawChunks = [...rawChunks, `data: [DONE]\n\n`];
+		if (isGenerating) {
+			rawChunks = [...rawChunks, `data: [DONE]\n\n`];
+		} else {
+			rawChunks = [...rawChunks, `data: [STREAM CANCELLED BY USER]\n\n`];
+		}
 
 		const totalTime = Math.round(performance.now() - startTime);
 		stats = {
@@ -495,16 +592,6 @@ class ChatController(Controller):
 				<div class="flex items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-950/70 p-1">
 					<button
 						type="button"
-						onclick={() => (selectedFramework = 'flask')}
-						class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {selectedFramework ===
-						'flask'
-							? 'bg-amber-600 text-white shadow-sm'
-							: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
-					>
-						Flask 3.x (WSGI)
-					</button>
-					<button
-						type="button"
 						onclick={() => (selectedFramework = 'quart')}
 						class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {selectedFramework ===
 						'quart'
@@ -522,6 +609,16 @@ class ChatController(Controller):
 							: 'text-zinc-300 hover:bg-zinc-800 hover:text-white'}"
 					>
 						Litestar 2.24 (ASGI)
+					</button>
+					<button
+						type="button"
+						onclick={() => (selectedFramework = 'flask')}
+						class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {selectedFramework ===
+						'flask'
+							? 'bg-amber-600/80 text-white shadow-sm'
+							: 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'}"
+					>
+						Legacy WSGI
 					</button>
 				</div>
 			</div>
@@ -652,23 +749,22 @@ class ChatController(Controller):
 								<User class="h-3.5 w-3.5" />
 							</div>
 						</div>
-					{:else if msg.role === 'tool'}
+					{:else if msg.role === 'tool' && msg.toolCall}
 						<div class="flex items-start gap-3">
 							<div
 								class="rounded-full border border-amber-500/30 bg-amber-500/20 p-1.5 text-amber-400"
 							>
 								<Wrench class="h-3.5 w-3.5" />
 							</div>
-							<div
-								class="max-w-[85%] rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200"
-							>
-								<div class="mb-1 flex items-center gap-1.5 font-semibold text-amber-300">
-									<span>Tool Call:</span>
-									<code class="font-mono text-[11px] text-amber-400">{msg.toolCall?.name}</code>
-								</div>
-								<div class="rounded bg-zinc-950/80 p-2 font-mono text-[10px] text-zinc-300">
-									Args: {msg.toolCall?.arguments}<br />Result: {msg.toolCall?.result}
-								</div>
+							<div class="max-w-[85%] flex-1">
+								<AiToolCall
+									name={msg.toolCall.name}
+									status="success"
+									args={msg.toolCall.arguments}
+									result={msg.toolCall.result}
+									open={true}
+									class="my-0 border-amber-500/30 bg-zinc-900/90 dark:border-amber-500/30 dark:bg-zinc-900/90"
+								/>
 							</div>
 						</div>
 					{:else}
@@ -679,6 +775,17 @@ class ChatController(Controller):
 							<div
 								class="max-w-[85%] rounded-2xl border border-zinc-800 bg-zinc-900/90 px-4 py-3 text-xs leading-relaxed text-zinc-200 shadow"
 							>
+								{#if msg.thought}
+									<AiThought
+										title={msg.thought.title}
+										running={msg.thought.running}
+										duration={msg.thought.duration}
+										steps={msg.thought.steps}
+										open={true}
+										class="my-0 mb-3 border-cyan-500/30 bg-zinc-950/80 dark:border-cyan-500/30 dark:bg-zinc-950/80"
+									/>
+								{/if}
+
 								{#if msg.ragSources && msg.ragSources.length > 0}
 									<div
 										class="mb-2 space-y-1.5 rounded-lg border border-cyan-500/20 bg-cyan-950/30 p-2 text-[11px]"
@@ -739,35 +846,30 @@ class ChatController(Controller):
 				{/each}
 			</div>
 
-			<!-- Chat Input Bar -->
-			<div class="mt-4 flex items-center gap-2 border-t border-zinc-800/80 pt-3">
-				<button
-					type="button"
-					onclick={resetChat}
-					class="rounded-lg border border-zinc-800 bg-zinc-900 p-2 text-zinc-400 transition-colors hover:text-white"
-					title="Reset conversation"
-				>
-					<RefreshCw class="h-4 w-4" />
-				</button>
+			<!-- Chat Input Bar with Yaxa PromptBar -->
+			<div class="mt-4 border-t border-zinc-800/80 pt-3">
+				<div class="flex items-start gap-2">
+					<button
+						type="button"
+						onclick={resetChat}
+						class="mt-2 shrink-0 rounded-xl border border-zinc-800 bg-zinc-900 p-2 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white"
+						title="Reset conversation (/reset)"
+					>
+						<RefreshCw class="h-4 w-4" />
+					</button>
 
-				<input
-					type="text"
-					bind:value={promptInput}
-					onkeydown={(e) => e.key === 'Enter' && runChatStream()}
-					disabled={isGenerating}
-					placeholder="Enter prompt to stream..."
-					class="flex-1 rounded-xl border border-zinc-800 bg-zinc-900/80 px-4 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:border-cyan-500 focus:outline-none"
-				/>
-
-				<button
-					type="button"
-					onclick={runChatStream}
-					disabled={isGenerating || !promptInput.trim()}
-					class="flex items-center gap-1.5 rounded-xl bg-cyan-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-cyan-500 disabled:opacity-40"
-				>
-					<span>Send</span>
-					<Send class="h-3.5 w-3.5" />
-				</button>
+					<div class="min-w-0 flex-1">
+						<PromptBar
+							bind:value={promptInput}
+							placeholder="Ask anything or type / for commands (/quart, /tool, /rag, /sse)..."
+							loading={isGenerating}
+							commands={SLASH_COMMANDS}
+							onsubmit={(text) => handlePromptSubmit(text)}
+							onstop={stopGeneration}
+							class="[&_button[title='Attach files']]:hidden [&_button[title='Voice prompt']]:hidden"
+						/>
+					</div>
+				</div>
 			</div>
 		</div>
 

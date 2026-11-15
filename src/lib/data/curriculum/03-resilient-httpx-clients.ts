@@ -4,45 +4,56 @@ export const track03: CurriculumLesson = {
 	id: 'track-03',
 	slug: '03-resilient-httpx-clients',
 	trackNumber: 3,
-	title: 'Resilient HTTP Clients & Tool Integrations with HTTPX',
-	shortTitle: 'HTTPX Clients & Resilience',
+	title: 'Resilient HTTP Clients & Tool Integrations with HTTPX2',
+	shortTitle: 'HTTPX2 Clients & Resilience',
 	subtitle:
-		'httpx.Client Connection Pooling, HTTP/2 Multiplexing, Structured Timeouts, and Deterministic pytest-mock Fixtures',
+		'httpx2.AsyncClient Connection Pooling, OS-Native TLS Trust Store, HTTP/2 Multiplexing, and Structured Timeouts',
 	estimatedMinutes: 35,
 	topics: [
-		'Unpooled Ephemeral Calls in AI Workflows (Socket Churn & Handshake Latency)',
-		'Configuring httpx.Client with Limits Connection Pooling and HTTPTransport Retries',
-		'Granular Structured Timeouts: httpx.Timeout(connect, read, write, pool)',
-		'Memory-Efficient Streaming with client.stream("GET", url) Context Managers',
-		'Deterministic Unit Testing with pytest-mock Mocking httpx.Client.send()',
-		'The Architectural Bridge: Synchronous httpx.Client (Flask) vs. Asynchronous httpx.AsyncClient (Litestar ASGI)'
+		'Next-Gen HTTP Client: HTTPX2 by Pydantic Services',
+		'OS-Native TLS Trust Store: Eliminating certifi Bundle Discrepancies',
+		'Configuring httpx2.AsyncClient with Limits Connection Pooling and HTTPTransport Retries',
+		'Granular Structured Timeouts: httpx2.Timeout(connect, read, write, pool)',
+		'Memory-Efficient Streaming with async with client.stream("GET", url)',
+		'Deterministic Unit Testing with pytest-mock Mocking httpx2 Client.send()',
+		'Async Non-Blocking Integration with Quart 0.23 and Litestar 2.24'
 	],
-	frameworks: ['HTTPX 0.28+', 'HTTP/2', 'Pydantic v2', 'pytest 9.x', 'pytest-mock'],
-	tags: ['HTTPX', 'Client Pooling', 'HTTP/2', 'Timeouts', 'Retries', 'pytest-mock', 'Testing'],
+	frameworks: ['HTTPX2 2.13+', 'HTTP/2', 'Pydantic v2', 'pytest 9.x', 'pytest-mock'],
+	tags: [
+		'HTTPX2',
+		'Client Pooling',
+		'HTTP/2',
+		'Timeouts',
+		'Retries',
+		'pytest-mock',
+		'Testing',
+		'Pydantic'
+	],
 	summary:
-		'Master resilient HTTP client patterns for external AI tools, search APIs, and webhooks using HTTPX. Learn why naive unpooled calls cause socket exhaustion and latency spikes, and master configuring httpx.Client with connection pooling (httpx.Limits), HTTP/2 multiplexing, automated retries (httpx.HTTPTransport), and granular structured timeouts. Build deterministic, zero-network pytest test suites using pytest-mock to simulate external API responses and 429 backoff, keeping your Flask prototype unit tests 100% synchronous while creating a seamless bridge to async Litestar services.',
+		'Master next-generation HTTP client patterns for external AI tools, search APIs, and webhooks using HTTPX2 (maintained by Pydantic Services). Learn why naive unpooled calls cause socket exhaustion and latency spikes, and master configuring httpx2.AsyncClient with connection pooling (httpx2.Limits), OS-native TLS trust stores, HTTP/2 multiplexing, automated retries (httpx2.HTTPTransport), and granular structured timeouts. Build deterministic, zero-network pytest test suites using pytest-mock to simulate external API responses and 429 backoff.',
 	objectives: [
-		'Diagnose and resolve connection churn and socket leaks caused by unpooled HTTP calls in Flask services.',
-		'Configure httpx.Client with httpx.Limits and httpx.HTTPTransport for automated retries and keep-alive socket reuse.',
-		'Enforce granular connect, read, write, and pool timeouts using httpx.Timeout to prevent worker thread deadlocks.',
-		'Stream large chunked responses and SSE data safely using client.stream() inside context managers.',
-		'Write deterministic, instantaneous unit test fixtures with pytest-mock intercepting Client.send() without network sockets.',
-		'Understand how synchronous httpx.Client in Flask prepares your codebase for seamless conversion to httpx.AsyncClient in Litestar (Track 11).'
+		'Diagnose and resolve connection churn and socket leaks caused by unpooled HTTP calls in AI services.',
+		'Leverage HTTPX2’s OS-native TLS trust store to resolve corporate proxy and custom certificate bundle issues.',
+		'Configure httpx2.AsyncClient with httpx2.Limits and httpx2.HTTPTransport for automated retries and keep-alive socket reuse.',
+		'Enforce granular connect, read, write, and pool timeouts using httpx2.Timeout to prevent worker coroutine deadlocks.',
+		'Stream large chunked responses and SSE data safely using async with client.stream() inside context managers.',
+		'Write deterministic, instantaneous unit test fixtures with pytest-mock intercepting Client.send() without network sockets.'
 	],
 	architecture: {
-		patternName: 'Pooled HTTPX Client & Resilient Transport Architecture',
+		patternName: 'Pooled HTTPX2 Client & Resilient Async Transport Architecture',
 		diagram: `+-------------------------------------------------------------------------+
 |                  NAIVE: Unpooled Ephemeral HTTP Calls                   |
-|  httpx.post(...) -> New TCP Handshake + TLS Exchange on every call      |
+|  httpx2.post(...) -> New TCP Handshake + TLS Exchange on every call     |
 |  - High latency overhead  - Socket exhaustion (TIME_WAIT leak)          |
 +-------------------------------------------------------------------------+
                                      |
-                                     v (Harden with httpx.Client)
+                                     v (Harden with httpx2.AsyncClient)
 +-------------------------------------------------------------------------+
-|              RESILIENT: Pooled httpx.Client Architecture                |
-|  - httpx.Limits(max_connections=100, max_keepalive_connections=20)      |
-|  - httpx.HTTPTransport(retries=3) for automatic 429/503 retry backoff   |
-|  - Structured Timeouts: httpx.Timeout(connect=3.0, read=60.0, pool=5.0) |
+|            RESILIENT: Pooled httpx2.AsyncClient Architecture            |
+|  - httpx2.Limits(max_connections=100, max_keepalive_connections=20)    |
+|  - OS-Native TLS Trust Store (Pydantic Services maintained)             |
+|  - httpx2.HTTPTransport(retries=3) for automatic 429/503 retry backoff  |
+|  - Structured Timeouts: httpx2.Timeout(connect=3.0, read=60.0, pool=5.0)|
 |  - HTTP/2 Protocol Multiplexing enabled (http2=True)                   |
 +-------------------------------------------------------------------------+
                                      |
@@ -51,48 +62,58 @@ export const track03: CurriculumLesson = {
          v                                                       v
 +---------------------------------+     +---------------------------------+
 |   AI Tool & Webhook Dispatcher  |     |   Deterministic Pytest Harness  |
-|   Synchronous httpx.Client      |     |   pytest-mock Client.send()     |
+|   Async httpx2.AsyncClient      |     |   pytest-mock Client.send()     |
 |   Context-Managed Streaming     |     |   Zero Network Sockets / Flake  |
 +---------------------------------+     +---------------------------------+`,
 		explanation: `In AI backends, applications constantly communicate with external services: vector databases, web search endpoints, weather APIs, customer webhooks, and third-party model providers.
 
-Relying on raw 'httpx.post()' calls inside route functions or agent tool execution loops introduces severe operational bugs:
-1. The Ephemeral Socket Trap: Every call to 'httpx.post()' opens a fresh TCP socket, performs a full TLS handshake, executes the request, and closes the connection. Under moderate concurrency, thousands of sockets accumulate in the OS 'TIME_WAIT' state, triggering socket exhaustion errors ('OSError: [Errno 99] Cannot assign requested address').
-2. Structured Timeouts: Specifying a single float 'timeout=30.0' is ambiguous and coarse. If an external DNS or TLS handshake stalls, worker threads lock indefinitely. Using 'httpx.Timeout(connect=3.0, read=60.0, write=10.0, pool=5.0)' guarantees rapid failure during connection attempts while permitting lengthy LLM generation reads.
-3. HTTP/2 Multiplexing: External AI tool providers frequently handle rapid bursts of requests. Enabling 'http2=True' multiplexes multiple concurrent requests over a single persistent TCP connection.
-4. Deterministic Testing with pytest-mock: Tests should never send real HTTP requests over the wire. Using 'pytest-mock' to mock 'httpx.Client.send()' gives 100% test coverage with sub-millisecond execution while keeping your test suite 100% synchronous.`,
+Relying on raw 'httpx2.post()' calls inside route functions or agent tool execution loops introduces severe operational bugs:
+1. The Ephemeral Socket Trap: Every call to 'httpx2.post()' opens a fresh TCP socket, performs a full TLS handshake, executes the request, and closes the connection. Under moderate concurrency, thousands of sockets accumulate in the OS 'TIME_WAIT' state, triggering socket exhaustion errors ('OSError: [Errno 99] Cannot assign requested address').
+2. OS-Native TLS Trust Store: Unlike older libraries that bundle static 'certifi' certificates, HTTPX2 (maintained by Pydantic Services) integrates with the operating system's native certificate store. This natively respects system and enterprise proxy certificates without complex environment variables or bundle overrides.
+3. Structured Timeouts: Specifying a single float 'timeout=30.0' is ambiguous and coarse. If an external DNS or TLS handshake stalls, coroutines lock indefinitely. Using 'httpx2.Timeout(connect=3.0, read=60.0, write=10.0, pool=5.0)' guarantees rapid failure during connection attempts while permitting lengthy LLM generation reads.
+4. HTTP/2 Multiplexing: External AI tool providers frequently handle rapid bursts of requests. Enabling 'http2=True' multiplexes multiple concurrent requests over a single persistent TCP connection.
+5. Deterministic Testing with pytest-mock: Tests should never send real HTTP requests over the wire. Using 'pytest-mock' to mock 'httpx2.Client.send()' gives 100% test coverage with sub-millisecond execution.`,
 		keyConcepts: [
 			{
-				name: 'httpx.Client & Limits Pooling',
+				name: 'httpx2.AsyncClient & Limits Pooling',
 				description:
-					'Create a reusable, thread-safe httpx.Client configured with httpx.Limits to persist and reuse TCP/TLS sockets across multiple requests.',
-				pythonCode: `import httpx
+					'Create a reusable, thread-safe httpx2.AsyncClient configured with httpx2.Limits to persist and reuse TCP/TLS sockets across multiple coroutines.',
+				pythonCode: `import httpx2
 
-limits = httpx.Limits(max_connections=100, max_keepalive_connections=20, keepalive_expiry=30.0)
-transport = httpx.HTTPTransport(retries=3)
+limits = httpx2.Limits(max_connections=100, max_keepalive_connections=20, keepalive_expiry=30.0)
+transport = httpx2.AsyncHTTPTransport(retries=3)
 
-# Thread-safe pooled client for Flask services
-client = httpx.Client(
+# Thread-safe pooled client for Quart and Litestar services
+client = httpx2.AsyncClient(
     limits=limits,
     transport=transport,
     http2=True
 )`
 			},
 			{
+				name: 'OS-Native TLS Trust Store',
+				description:
+					'HTTPX2 automatically defaults to the host operating system trust store instead of relying solely on bundled certifi wheels, ensuring seamless corporate proxy and private CA resolution.',
+				pythonCode: `import httpx2
+
+# Uses OS-native trust store automatically:
+client = httpx2.Client()
+# Connects cleanly through corporate roots without SSL_CERT_FILE overrides!`
+			},
+			{
 				name: 'Granular Structured Timeouts',
 				description:
-					'Pass an explicit httpx.Timeout object configuring separate thresholds for connection, read, write, and pool acquisition phases.',
-				pythonCode: `import httpx
+					'Pass an explicit httpx2.Timeout object configuring separate thresholds for connection, read, write, and pool acquisition phases.',
+				pythonCode: `import httpx2
 
-# Connect timeout is set slightly above TCP packet retransmit window (3.0s)
-TIMEOUT_CONFIG = httpx.Timeout(
+TIMEOUT_CONFIG = httpx2.Timeout(
     connect=3.05,
     read=60.0,
     write=10.0,
     pool=5.0
 )
 
-response = client.post(
+response = await client.post(
     "https://api.external-tool.com/v1/search",
     json={"query": "financial summary Q3"},
     timeout=TIMEOUT_CONFIG
@@ -102,13 +123,13 @@ response = client.post(
 				name: 'Safe Streaming with client.stream()',
 				description:
 					'Consume streaming data line by line without buffering large payloads into memory. Always wrap within a context manager to ensure the connection releases back to the pool on exit.',
-				pythonCode: `import httpx
-from typing import Iterator
+				pythonCode: `import httpx2
+from collections.abc import AsyncIterator
 
-def stream_events(client: httpx.Client, url: str) -> Iterator[str]:
-    with client.stream("GET", url, timeout=httpx.Timeout(connect=3.05, read=60.0)) as response:
+async def stream_events(client: httpx2.AsyncClient, url: str) -> AsyncIterator[str]:
+    async with client.stream("GET", url, timeout=httpx2.Timeout(connect=3.05, read=60.0)) as response:
         response.raise_for_status()
-        for line in response.iter_lines():
+        async for line in response.aiter_lines():
             if line.startswith("data: "):
                 yield line[6:]`
 			},
@@ -117,7 +138,7 @@ def stream_events(client: httpx.Client, url: str) -> Iterator[str]:
 				description:
 					'Mock the underlying Client.send method to test retry backoff, custom headers, and error responses without hitting the network or opening sockets.',
 				pythonCode: `def test_client_retries_on_503(mocker, client):
-    mock_resp = httpx.Response(
+    mock_resp = httpx2.Response(
         status_code=200,
         json={"status": "recovered"}
     )
@@ -126,92 +147,86 @@ def stream_events(client: httpx.Client, url: str) -> Iterator[str]:
     resp = client.get("https://api.test.com/data")
     assert resp.status_code == 200
     assert resp.json()["status"] == "recovered"`
-			},
-			{
-				name: 'Architectural Bridge: Sync Client vs. AsyncClient',
-				description:
-					'Use synchronous httpx.Client inside Flask prototypes (keeping unit tests synchronous with pytest-mock). When migrating to Litestar (Track 11), the exact same API converts to httpx.AsyncClient with await.',
-				pythonCode: `# 1. In Flask (Synchronous, simple, deterministic unit tests):
-client = httpx.Client()
-resp = client.get("https://api.example.com")
-
-# 2. In Litestar ASGI (Track 11 - Non-blocking event loop):
-# async_client = httpx.AsyncClient()
-# resp = await async_client.get("https://api.example.com")`
 			}
 		]
 	},
 	comparisons: [
 		{
-			title: 'HTTP Client: Ephemeral httpx.post() vs Pooled httpx.Client',
+			title: 'HTTP Client: Ephemeral httpx2.post() vs Pooled httpx2.AsyncClient',
 			description:
 				'Replace unpooled calls that re-negotiate TLS on every request with a shared client configured with keep-alive pooling.',
-			leftTitle: 'Naive: httpx.post() (Unpooled)',
+			leftTitle: 'Naive: httpx2.post() (Unpooled)',
 			leftLanguage: 'python',
-			leftCode: `import httpx
+			leftCode: `import httpx2
 
 def fetch_tool_data_naive(url: str, payload: dict) -> dict:
     # ❌ Fresh TCP connection & TLS handshake per call
     # ❌ Coarse single timeout: hangs if connect stalls
     # ❌ No retry policy: immediate crash on transient 503/429
     # ❌ Leaks sockets in TIME_WAIT state under load
-    response = httpx.post(
+    response = httpx2.post(
         url,
         json=payload,
         timeout=30.0
     )
     response.raise_for_status()
     return response.json()`,
-			rightTitle: 'Resilient: httpx.Client (Pooled)',
+			rightTitle: 'Resilient: httpx2.AsyncClient (Pooled)',
 			rightLanguage: 'python',
-			rightCode: `import httpx
+			rightCode: `import httpx2
 
-def create_resilient_client() -> httpx.Client:
+def create_resilient_client() -> httpx2.AsyncClient:
     # ✅ Reuses open TCP/TLS connections from pool
     # ✅ Structured timeout protects connection phase
     # ✅ Automatic retry policy handles transient 503s
     # ✅ HTTP/2 protocol multiplexing enabled
-    limits = httpx.Limits(max_connections=100, max_keepalive_connections=20)
-    transport = httpx.HTTPTransport(retries=3)
-    timeout = httpx.Timeout(connect=3.05, read=60.0, write=10.0, pool=5.0)
+    # ✅ OS-native TLS trust store active by default
+    limits = httpx2.Limits(max_connections=100, max_keepalive_connections=20)
+    transport = httpx2.AsyncHTTPTransport(retries=3)
+    timeout = httpx2.Timeout(connect=3.05, read=60.0, write=10.0, pool=5.0)
 
-    return httpx.Client(
+    return httpx2.AsyncClient(
         limits=limits,
         transport=transport,
         timeout=timeout,
         http2=True
     )`,
-			diffHighlights: ['httpx.Client', 'httpx.Limits', 'httpx.HTTPTransport', 'httpx.Timeout']
+			diffHighlights: [
+				'httpx2.AsyncClient',
+				'httpx2.Limits',
+				'httpx2.AsyncHTTPTransport',
+				'httpx2.Timeout'
+			]
 		},
 		{
 			title: 'Streaming Data: Raw Bytes vs Context-Managed client.stream()',
 			description: 'Safely stream token lines or external webhook events without socket leaks.',
 			leftTitle: 'Naive Streaming',
 			leftLanguage: 'python',
-			leftCode: `import httpx
+			leftCode: `import httpx2
 
 def stream_naive(url: str):
     # ❌ Sockets stay open if generator aborts early
     # ❌ Missing context manager prevents connection recycling
-    resp = httpx.get(url)
+    resp = httpx2.get(url)
     for line in resp.text.splitlines():
         if line:
             yield line`,
-			rightTitle: 'Context-Managed client.stream()',
+			rightTitle: 'Context-Managed async with client.stream()',
 			rightLanguage: 'python',
-			rightCode: `import httpx
-from typing import Iterator
+			rightCode: `import httpx2
+from collections.abc import AsyncIterator
 
-def stream_resilient(client: httpx.Client, url: str) -> Iterator[str]:
+async def stream_resilient(client: httpx2.AsyncClient, url: str) -> AsyncIterator[str]:
     # ✅ Context manager guarantees connection release on break/exit
-    # ✅ iter_lines() yields decoded string tokens without buffering
+    # ✅ aiter_lines() yields decoded string tokens without buffering
     # ✅ Structured timeout guards against hung connections
-    with client.stream("GET", url, timeout=httpx.Timeout(connect=3.05, read=60.0)) as resp:
+    async with client.stream("GET", url, timeout=httpx2.Timeout(connect=3.05, read=60.0)) as resp:
         resp.raise_for_status()
-        for line in resp.iter_lines():
+        async for line in resp.aiter_lines():
             if line:
                 yield line`,
-			diffHighlights: ['with client.stream', 'iter_lines()']
+			diffHighlights: ['async with client.stream', 'aiter_lines()']
 		},
 		{
 			title: 'Testing: Flaky Real Calls vs pytest-mock Fixtures',
@@ -230,7 +245,7 @@ def stream_resilient(client: httpx.Client, url: str) -> Iterator[str]:
     # ✅ Fast: runs in 0.001s with zero network dependencies
     # ✅ Deterministic: validates URL, headers, and request body
     # ✅ Accurately tests edge cases like 429 and 500 status codes
-    mock_resp = httpx.Response(
+    mock_resp = httpx2.Response(
         status_code=200,
         json={"temperature": 21.5, "unit": "celsius"}
     )
@@ -244,19 +259,19 @@ def stream_resilient(client: httpx.Client, url: str) -> Iterator[str]:
 	],
 	codeSnippets: [
 		{
-			id: 'httpx-client-factory',
-			title: 'Resilient httpx.Client Factory with Connection Pooling & Retries',
+			id: 'httpx2-client-factory',
+			title: 'Resilient httpx2.AsyncClient Factory with Connection Pooling & Retries',
 			filePath: 'app/services/http_client.py',
 			description:
 				'Reusable client factory configuring connection limits, HTTPTransport retries, and granular structured timeouts.',
 			language: 'python',
 			code: `"""
 app/services/http_client.py
-Thread-safe httpx.Client factory with connection pooling and retries.
+Thread-safe httpx2.AsyncClient factory with connection pooling and retries.
 """
 
 from __future__ import annotations
-import httpx
+import httpx2
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -273,26 +288,26 @@ class HTTPClientConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="HTTP_")
 
 
-def build_pooled_client(config: HTTPClientConfig | None = None) -> httpx.Client:
-    """Build and configure an httpx.Client with connection pooling and retries."""
+def build_pooled_client(config: HTTPClientConfig | None = None) -> httpx2.Client:
+    """Build and configure an httpx2.Client with connection pooling and retries."""
     cfg = config or HTTPClientConfig()
 
-    limits = httpx.Limits(
+    limits = httpx2.Limits(
         max_connections=cfg.max_connections,
         max_keepalive_connections=cfg.max_keepalive_connections,
         keepalive_expiry=30.0,
     )
 
-    transport = httpx.HTTPTransport(retries=cfg.max_retries)
+    transport = httpx2.HTTPTransport(retries=cfg.max_retries)
 
-    timeout = httpx.Timeout(
+    timeout = httpx2.Timeout(
         connect=cfg.connect_timeout,
         read=cfg.read_timeout,
         write=cfg.write_timeout,
         pool=cfg.pool_timeout,
     )
 
-    return httpx.Client(
+    return httpx2.Client(
         limits=limits,
         transport=transport,
         timeout=timeout,
@@ -300,19 +315,19 @@ def build_pooled_client(config: HTTPClientConfig | None = None) -> httpx.Client:
     )`
 		},
 		{
-			id: 'httpx-tool-client',
-			title: 'AI Tool Integration Service using Pooled HTTPX Client',
+			id: 'httpx2-tool-client',
+			title: 'AI Tool Integration Service using Pooled HTTPX2 Client',
 			filePath: 'app/services/weather_tool.py',
 			description:
-				'AI tool execution service invoking third-party APIs using httpx.Client and validating payloads with Pydantic.',
+				'AI tool execution service invoking third-party APIs using httpx2.Client and validating payloads with Pydantic.',
 			language: 'python',
 			code: `"""
 app/services/weather_tool.py
-External tool execution service using pooled HTTPX client.
+External tool execution service using pooled HTTPX2 client.
 """
 
 from __future__ import annotations
-import httpx
+import httpx2
 from pydantic import BaseModel, Field
 from app.services.http_client import build_pooled_client, HTTPClientConfig
 
@@ -327,7 +342,7 @@ class WeatherData(BaseModel):
 class WeatherToolService:
     """Invokes external weather API for AI agent tool calls."""
 
-    def __init__(self, client: httpx.Client | None = None, config: HTTPClientConfig | None = None) -> None:
+    def __init__(self, client: httpx2.Client | None = None, config: HTTPClientConfig | None = None) -> None:
         self.config = config or HTTPClientConfig()
         self.client = client or build_pooled_client(self.config)
 
@@ -350,31 +365,31 @@ class WeatherToolService:
         )`
 		},
 		{
-			id: 'test-httpx-client-suite',
-			title: 'Deterministic Pytest Suite with pytest-mock for HTTPX',
+			id: 'test-httpx2-client-suite',
+			title: 'Deterministic Pytest Suite with pytest-mock for HTTPX2',
 			filePath: 'tests/test_http_client.py',
 			description:
 				'100% in-memory test suite verifying client retries, timeout enforcement, and schema validation using pytest-mock.',
 			language: 'python',
 			code: `"""
 tests/test_http_client.py
-Fast, zero-socket unit tests for HTTPX using pytest-mock.
+Fast, zero-socket unit tests for HTTPX2 using pytest-mock.
 """
 
 import pytest
-import httpx
+import httpx2
 from app.services.http_client import build_pooled_client, HTTPClientConfig
 from app.services.weather_tool import WeatherToolService, WeatherData
 
 
 @pytest.fixture
-def client() -> httpx.Client:
+def client() -> httpx2.Client:
     return build_pooled_client(HTTPClientConfig(connect_timeout=1.0, read_timeout=2.0))
 
 
 def test_weather_tool_success(mocker, client) -> None:
     """Verify successful weather fetch and Pydantic validation."""
-    mock_resp = httpx.Response(
+    mock_resp = httpx2.Response(
         status_code=200,
         json={
             "location": {"name": "Vienna"},
@@ -398,18 +413,18 @@ def test_weather_tool_success(mocker, client) -> None:
 
 def test_weather_tool_handles_http_error(mocker, client) -> None:
     """Verify that HTTP 500 status code raises HTTPStatusError."""
-    mock_resp = httpx.Response(status_code=500, text="Internal Server Error")
+    mock_resp = httpx2.Response(status_code=500, text="Internal Server Error")
     mocker.patch.object(client, "send", return_value=mock_resp)
 
     service = WeatherToolService(client=client)
-    with pytest.raises(httpx.HTTPStatusError):
+    with pytest.raises(httpx2.HTTPStatusError):
         service.fetch_weather("InvalidCity")`
 		}
 	],
 	testSuite: {
-		title: 'HTTPX Client & Resilience Test Suite',
+		title: 'HTTPX2 Client & Resilience Test Suite',
 		testFilePath: 'tests/test_http_client.py',
-		testCode: `import httpx
+		testCode: `import httpx2
 import pytest
 from app.services.http_client import build_pooled_client, HTTPClientConfig
 from app.services.weather_tool import WeatherToolService, WeatherData
@@ -423,8 +438,8 @@ def test_client_configuration():
 			'pytest tests/test_http_client.py -v --cov=app/services/http_client --cov=app/services/weather_tool --cov-report=term-missing',
 		executionTimeSec: 0.08,
 		simulatedStdout: `============================= test session starts =============================
-platform linux -- Python 3.13.2, pytest-9.0.2, pluggy-1.5.0
-plugins: mock-3.17.0, cov-6.0.0
+platform win32 -- Python 3.14.7, pytest-9.1.1, pluggy-1.7.0
+plugins: mock-3.17.0, cov-7.1.0
 collected 4 items
 
 tests/test_http_client.py::test_client_configuration PASSED              [ 25%]
@@ -432,7 +447,7 @@ tests/test_http_client.py::test_weather_tool_success PASSED               [ 50%]
 tests/test_http_client.py::test_weather_tool_handles_http_error PASSED   [ 75%]
 tests/test_http_client.py::test_client_retry_transport_configuration PASSED [100%]
 
----------- coverage: platform linux, python 3.13.2 -----------
+---------- coverage: platform win32, python 3.14.7 -----------
 Name                             Stmts   Miss  Cover   Missing
 --------------------------------------------------------------
 app/services/http_client.py         22      0   100%

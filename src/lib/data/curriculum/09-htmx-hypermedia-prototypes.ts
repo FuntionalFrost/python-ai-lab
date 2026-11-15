@@ -4,15 +4,15 @@ export const track09: CurriculumLesson = {
 	id: 'track-09',
 	slug: '09-htmx-hypermedia-prototypes',
 	trackNumber: 9,
-	title: 'Hypermedia AI Prototypes: Rapid Interactive Chat & Evals with htmx',
-	shortTitle: 'Flask + htmx AI Prototypes',
+	title: 'Hypermedia AI Prototypes: Rapid Interactive Chat & Evals with Quart & htmx',
+	shortTitle: 'Quart + htmx AI Prototypes',
 	subtitle:
-		'Build instant, zero-build-step AI interactive interfaces using server-rendered HTML fragments, hx-post, hx-swap, and SSE extensions.',
+		'Build instant, zero-build-step AI interactive interfaces using server-rendered HTML fragments, hx-post, hx-swap, and SSE extensions on Quart.',
 	estimatedMinutes: 35,
 	topics: [
 		'Hypermedia-Driven Architecture for Rapid AI Prototyping',
 		'Zero-Build Chat Interfaces with hx-post and hx-swap',
-		'Real-Time Token Streaming with htmx SSE Extension (htmx-ext-sse)',
+		'Real-Time Token Streaming with htmx SSE Extension (htmx-ext-sse) on Quart',
 		'Active Search & Benchmark Filtering with Debounced Server Triggers',
 		'Template Quality & Formatting with djlint (--profile jinja)',
 		'Testing Hypermedia Endpoints with pytest and BeautifulSoup4',
@@ -20,25 +20,37 @@ export const track09: CurriculumLesson = {
 	],
 	frameworks: [
 		'htmx 2.x',
-		'Flask 3.1.3',
+		'Quart 0.23+',
+		'Hypercorn 0.17+',
 		'Jinja2 3.1+',
+		'HTTPX2',
 		'djlint 1.36+',
 		'pytest 9.x',
 		'BeautifulSoup4'
 	],
-	tags: ['htmx', 'Flask', 'Jinja2', 'djlint', 'Hypermedia', 'Prototyping', 'SSE', 'Testing'],
+	tags: [
+		'htmx',
+		'Quart',
+		'Jinja2',
+		'HTTPX2',
+		'djlint',
+		'Hypermedia',
+		'Prototyping',
+		'SSE',
+		'Testing'
+	],
 	summary:
-		'Ditch the JavaScript build step when rapidly testing AI concepts. Master the hypermedia paradigm using Flask and htmx to create interactive streaming chat UIs, live prompt-eval filtering, and tool-execution dashboards in pure HTML. Learn how htmx SSE extensions dynamically append streaming AI tokens straight into the DOM, and write rock-solid pytest test suites that assert on semantic HTML fragments.',
+		'Ditch the JavaScript build step when rapidly testing AI concepts. Master the hypermedia paradigm using Quart and htmx to create interactive streaming chat UIs, live prompt-eval filtering, and tool-execution dashboards in pure HTML. Learn how htmx SSE extensions dynamically append streaming AI tokens straight into the DOM from Quart async generators, and write rock-solid pytest test suites that assert on semantic HTML fragments.',
 	objectives: [
 		'Understand the Hypermedia Architecture (HATEOAS) advantage for prototype velocity: validate ideas in hours without npm or bundlers.',
 		'Build responsive AI chat streams with hx-post, hx-target, and hx-swap="beforeend".',
-		'Integrate the htmx SSE extension (htmx-ext-sse) to push live LLM token fragments directly into DOM containers.',
+		'Integrate the htmx SSE extension (htmx-ext-sse) to push live LLM token fragments directly into DOM containers from Quart.',
 		'Create live evaluation exploration tables using debounced active search (hx-trigger="keyup changed delay:300ms").',
 		'Evaluate the architectural trade-offs: when to leverage lightweight hypermedia (htmx + Jinja2) vs heavy client-side SPAs.',
 		'Test server-rendered HTML partials deterministically with pytest and BeautifulSoup4.'
 	],
 	architecture: {
-		patternName: 'Hypermedia AI Engine: Zero-Client Server-Sent Fragments Architecture',
+		patternName: 'Hypermedia AI Engine: Zero-Client Server-Sent Fragments Architecture on Quart',
 		diagram: `+-------------------------------------------------------------------------+
 |                  Hypermedia AI Client (Zero Build Step)                 |
 |  Browser DOM  <--  HTML Fragments  <--  htmx (hx-post, hx-swap)         |
@@ -46,18 +58,18 @@ export const track09: CurriculumLesson = {
                                      |
                                      v  (HTTP POST / SSE Event Stream)
 +-------------------------------------------------------------------------+
-|                  Flask 3.x AI Hypermedia Controller                     |
-|  - POST /chat/message  -> render_template("_chat_bubble.html")          |
+|                  Quart 0.23 AI Hypermedia Controller                    |
+|  - POST /chat/message  -> await render_template("_chat_bubble.html")     |
 |  - GET  /chat/stream   -> Response(generate(), mimetype="text/event-st")|
-|  - GET  /evals/search  -> render_template("_eval_table_rows.html")      |
+|  - GET  /evals/search  -> await render_template("_eval_table_rows.html") |
 +-------------------------------------------------------------------------+
                                      |
          +---------------------------+---------------------------+
          |                                                       |
          v                                                       v
 +---------------------------------+     +---------------------------------+
-|   AI Engine (OpenAI + HTTPX)    |     |   Jinja2 Partial Fragment Cache |
-|   Streaming Generator via SSE   |     |   Componentized HTML Templates  |
+|   AI Engine (OpenAI + HTTPX2)   |     |   Jinja2 Partial Fragment Cache |
+|   Native Async SSE Generator    |     |   Componentized HTML Templates  |
 |   hx-ext="sse" Live DOM Append  |     |   _message.html, _metric.html   |
 +---------------------------------+     +---------------------------------+`,
 		explanation: `When testing a novel AI workflow—such as prompt disambiguation, RAG chunking variants, or multi-turn conversational repair—building a complex single-page application (SPA) with bundlers and client state stores is often massive overkill.
@@ -65,8 +77,8 @@ export const track09: CurriculumLesson = {
 The Hypermedia Advantage for AI Prototyping:
 1. Zero Tooling Friction: By adding <script src="https://unpkg.com/htmx.org@2.0.4"> and <script src="https://unpkg.com/htmx-ext-sse@2.2.2/sse.js"> to your Jinja2 base template, your backend Python engineer can deliver dynamic, streaming UI interactions in under 15 minutes.
 2. Server as Source of Truth: In hypermedia architecture, the server renders HTML fragments rather than raw JSON. The server dictates styling, error badges, token formatting, and layout. There are no client-side state synchronization bugs.
-3. Live Token Streaming with SSE: With the 'htmx-ext-sse' extension ('hx-ext="sse"'), htmx connects to a standard Flask SSE endpoint and streams incoming token spans directly into a message container ('sse-swap="token"').
-4. Rapid Iteration Loop: Use Flask + htmx + Jinja2 to iterate on prompts, evals, and tool calling within hours while keeping all template rendering verifiable with pytest, BeautifulSoup4, and djlint.`,
+3. Live Token Streaming with SSE: With the 'htmx-ext-sse' extension ('hx-ext="sse"'), htmx connects to a standard Quart SSE endpoint and streams incoming token spans directly into a message container ('sse-swap="token"') without thread-blocking WSGI issues.
+4. Rapid Iteration Loop: Use Quart + htmx + Jinja2 to iterate on prompts, evals, and tool calling within hours while keeping all template rendering verifiable with pytest, BeautifulSoup4, and djlint.`,
 		keyConcepts: [
 			{
 				name: 'hx-post & hx-swap for AI Chat',
@@ -89,7 +101,7 @@ The Hypermedia Advantage for AI Prototyping:
 <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 <script src="https://unpkg.com/htmx-ext-sse@2.2.2/sse.js"></script>
 
-<!-- Connect to Flask SSE generator -->
+<!-- Connect to Quart SSE generator -->
 <div hx-ext="sse" 
      sse-connect="/chat/stream?session_id=123" 
      sse-swap="token" 
@@ -125,7 +137,7 @@ The Hypermedia Advantage for AI Prototyping:
 				description:
 					'Use htmx + Jinja2 for rapid AI validation, interactive chat prototypes, internal test dashboards, and eval viewers without maintaining a separate frontend build pipeline.',
 				pythonCode: `# Architectural Rule of Thumb:
-# Rapid AI Prototyping & Eval Viewers: Flask + Jinja2 + htmx (Zero JS build step)
+# Rapid AI Prototyping & Eval Viewers: Quart + Jinja2 + htmx (Zero JS build step)
 # Template Quality Gate: djlint --profile=jinja + pytest + BeautifulSoup4`
 			}
 		]
@@ -159,7 +171,7 @@ export function ChatWidget() {
   }
   // ... JSX render boilerplate ...
 }`,
-			rightTitle: 'Server Hypermedia (htmx + Flask)',
+			rightTitle: 'Server Hypermedia (htmx + Quart)',
 			rightLanguage: 'html',
 			rightCode: `<!-- ✅ Zero build step, zero npm, purely declarative -->
 <div id="chat-container">
@@ -197,11 +209,6 @@ eventSource.onmessage = (event) => {
   const chunk = JSON.parse(event.data);
   container.textContent += chunk.token;
   container.scrollTop = container.scrollHeight;
-};
-
-eventSource.onerror = (err) => {
-  console.error('Stream failed', err);
-  eventSource.close();
 };`,
 			rightTitle: 'Declarative htmx SSE Extension',
 			rightLanguage: 'html',
@@ -215,7 +222,7 @@ eventSource.onerror = (err) => {
         class="token-stream"></span>
 </div>
 
-<!-- Flask server yields:
+<!-- Quart server yields:
 event: token
 data: <span>Next token </span>\n\n
 event: done
@@ -226,7 +233,7 @@ data: [DONE]\n\n
 		{
 			title: 'Testing: JSON Response vs Semantic HTML Fragment',
 			description:
-				'Verify hypermedia endpoints using Flask test client and BeautifulSoup assertions.',
+				'Verify hypermedia endpoints using Quart test client and BeautifulSoup assertions.',
 			leftTitle: 'JSON API Testing',
 			leftLanguage: 'python',
 			leftCode: `def test_chat_json(client):
@@ -239,14 +246,17 @@ data: [DONE]\n\n
 			rightTitle: 'Hypermedia Fragment Testing (BeautifulSoup4)',
 			rightLanguage: 'python',
 			rightCode: `from bs4 import BeautifulSoup
+import pytest
 
-def test_chat_htmx_fragment(client):
+@pytest.mark.asyncio
+async def test_chat_htmx_fragment(client):
     # ✅ Tests actual rendered UI fragment delivered to the user
-    resp = client.post("/chat/message", data={"prompt": "Show refund policy"})
+    resp = await client.post("/chat/message", form={"prompt": "Show refund policy"})
     assert resp.status_code == 200
     assert resp.headers["Content-Type"].startswith("text/html")
 
-    soup = BeautifulSoup(resp.data.decode(), "html.parser")
+    data = (await resp.get_data()).decode("utf-8")
+    soup = BeautifulSoup(data, "html.parser")
     # Verify assistant bubble and satisfaction badge
     bubble = soup.find("div", class_="chat-bubble-assistant")
     assert bubble is not None
@@ -288,11 +298,11 @@ def test_chat_htmx_fragment(client):
 </div>`
 		},
 		{
-			id: 'flask-htmx-controller',
-			title: 'Flask Hypermedia Blueprint: SSE Streaming & HTML Partials',
+			id: 'quart-htmx-controller',
+			title: 'Quart Hypermedia Blueprint: SSE Streaming & HTML Partials',
 			filePath: 'app/routes/htmx_chat.py',
 			description:
-				'Flask route handler returning HTML fragments for standard AJAX swaps and Server-Sent Events for real-time token streaming.',
+				'Quart route handler returning HTML fragments for standard AJAX swaps and Server-Sent Events for real-time token streaming.',
 			language: 'python',
 			code: `"""
 app/routes/htmx_chat.py
@@ -301,27 +311,28 @@ Hypermedia Controller serving HTML partials and SSE token streams.
 
 from __future__ import annotations
 import time
-from typing import Iterator
-from flask import Blueprint, request, render_template, Response, stream_with_context
+from collections.abc import AsyncIterator
+from quart import Blueprint, request, render_template, Response
 from app.services.ai_gateway import AIGatewayService
 
 htmx_bp = Blueprint("htmx_chat", __name__, url_prefix="/htmx")
 
 
 @htmx_bp.post("/message")
-def handle_chat_message() -> tuple[str, int]:
+async def handle_chat_message() -> tuple[str, int]:
     """Handle prompt submission and return rendered chat bubble HTML fragment."""
-    prompt = request.form.get("prompt", "").strip()
+    form = await request.form
+    prompt = form.get("prompt", "").strip()
     if not prompt:
         return '<div class="text-red-400 text-xs p-2">Prompt cannot be empty.</div>', 400
 
     start_time = time.perf_counter()
     ai_service = AIGatewayService(api_key="sk-mock-or-env")
-    reply = ai_service.complete_sync(prompt, model="gemma-4-e4b-it")
+    reply = await ai_service.complete_async(prompt, model="gemma-4-e4b-it")
     latency_ms = round((time.perf_counter() - start_time) * 1000)
 
     # Render purely server-side HTML fragment for hx-swap="beforeend"
-    html_fragment = render_template(
+    html_fragment = await render_template(
         "_chat_bubble.html",
         user_prompt=prompt,
         assistant_reply=reply,
@@ -333,17 +344,16 @@ def handle_chat_message() -> tuple[str, int]:
 
 
 @htmx_bp.get("/stream")
-def stream_chat_tokens() -> Response:
+async def stream_chat_tokens() -> Response:
     """Stream token fragments via Server-Sent Events to hx-ext='sse'."""
     prompt = request.args.get("prompt", "Hello")
     ai_service = AIGatewayService(api_key="sk-mock-or-env")
 
-    @stream_with_context
-    def generate_sse() -> Iterator[str]:
+    async def generate_sse() -> AsyncIterator[str]:
         # Yield starting wrapper
         yield "event: token\\ndata: <span class='token-chunk'>\\n\\n"
         
-        for token in ai_service.stream_sync(prompt):
+        async for token in ai_service.stream_async(prompt):
             # Yield each token formatted as an HTML fragment
             escaped_token = token.replace("<", "&lt;").replace(">", "&gt;")
             yield f"event: token\\ndata: {escaped_token}\\n\\n"
@@ -367,34 +377,36 @@ Pytest suite verifying hypermedia fragment rendering and safety.
 
 import pytest
 from bs4 import BeautifulSoup
-from flask import Flask
+from quart import Quart
 from app.routes.htmx_chat import htmx_bp
 
 
 @pytest.fixture
-def app() -> Flask:
-    flask_app = Flask(__name__, template_folder="../app/templates")
-    flask_app.config["TESTING"] = True
-    flask_app.register_blueprint(htmx_bp)
-    return flask_app
+def app() -> Quart:
+    quart_app = Quart(__name__, template_folder="../app/templates")
+    quart_app.config["TESTING"] = True
+    quart_app.register_blueprint(htmx_bp)
+    return quart_app
 
 
-def test_handle_chat_message_success(app: Flask, monkeypatch: pytest.MonkeyPatch) -> None:
+@pytest.mark.asyncio
+async def test_handle_chat_message_success(app: Quart, monkeypatch: pytest.MonkeyPatch) -> None:
     """Verify that /htmx/message returns valid HTML fragment with proper CSS classes."""
     from app.services.ai_gateway import AIGatewayService
-    monkeypatch.setattr(
-        AIGatewayService,
-        "complete_sync",
-        lambda self, p, model="gemma-4-e4b-it": f"Echo: {p}"
-    )
+    
+    async def mock_complete(self, p, model="gemma-4-e4b-it"):
+        return f"Echo: {p}"
+
+    monkeypatch.setattr(AIGatewayService, "complete_async", mock_complete)
 
     client = app.test_client()
-    resp = client.post("/htmx/message", data={"prompt": "How does htmx work?"})
+    resp = await client.post("/htmx/message", form={"prompt": "How does htmx work?"})
 
     assert resp.status_code == 200
-    assert "text/html" in resp.content_type
+    assert "text/html" in resp.headers["content-type"]
 
-    soup = BeautifulSoup(resp.data.decode("utf-8"), "html.parser")
+    data = (await resp.get_data()).decode("utf-8")
+    soup = BeautifulSoup(data, "html.parser")
     
     # Assert semantic DOM fragment
     message_row = soup.find("div", class_="message-row")
@@ -407,13 +419,15 @@ def test_handle_chat_message_success(app: Flask, monkeypatch: pytest.MonkeyPatch
     assert "Echo: How does htmx work?" in ai_bubble.text
 
 
-def test_handle_chat_message_empty_prompt_validation(app: Flask) -> None:
+@pytest.mark.asyncio
+async def test_handle_chat_message_empty_prompt_validation(app: Quart) -> None:
     """Verify that an empty prompt returns a 400 status code with error fragment."""
     client = app.test_client()
-    resp = client.post("/htmx/message", data={"prompt": ""})
+    resp = await client.post("/htmx/message", form={"prompt": ""})
 
     assert resp.status_code == 400
-    assert "Prompt cannot be empty" in resp.data.decode("utf-8")`
+    data = (await resp.get_data()).decode("utf-8")
+    assert "Prompt cannot be empty" in data`
 		}
 	],
 	testSuite: {
@@ -423,16 +437,18 @@ def test_handle_chat_message_empty_prompt_validation(app: Flask) -> None:
 import pytest
 from app.routes.htmx_chat import htmx_bp
 
-def test_htmx_empty_prompt(client):
-    res = client.post("/htmx/message", data={"prompt": "   "})
+@pytest.mark.asyncio
+async def test_htmx_empty_prompt(client):
+    res = await client.post("/htmx/message", form={"prompt": "   "})
     assert res.status_code == 400
-    assert "Prompt cannot be empty" in res.data.decode()`,
+    data = (await res.get_data()).decode("utf-8")
+    assert "Prompt cannot be empty" in data`,
 		command:
 			'pytest tests/test_htmx_chat.py -v --cov=app/routes/htmx_chat --cov-report=term-missing',
 		executionTimeSec: 0.14,
 		simulatedStdout: `============================= test session starts =============================
-platform linux -- Python 3.13.2, pytest-9.0.2, pluggy-1.5.0
-plugins: cov-6.0.0, anyio-4.8.0
+platform win32 -- Python 3.14.7, pytest-9.1.1, pluggy-1.7.0
+plugins: cov-7.1.0, mock-3.17.0, asyncio-1.4.1
 collected 4 items
 
 tests/test_htmx_chat.py::test_handle_chat_message_success PASSED        [ 25%]
@@ -440,7 +456,7 @@ tests/test_htmx_chat.py::test_handle_chat_message_empty_prompt_validation PASSED
 tests/test_htmx_chat.py::test_htmx_stream_tokens_sse_headers PASSED    [ 75%]
 tests/test_htmx_chat.py::test_htmx_eval_table_active_search PASSED     [100%]
 
----------- coverage: platform linux, python 3.13.2 -----------
+---------- coverage: platform win32, python 3.14.7 -----------
 Name                             Stmts   Miss  Cover   Missing
 --------------------------------------------------------------
 app/routes/htmx_chat.py             32      0   100%
@@ -465,7 +481,7 @@ TOTAL                               32      0   100%
 			}
 		},
 		summary:
-			'4 tests passed in 0.14s with 100% test coverage on Flask hypermedia endpoints, testing server-rendered HTML fragments and SSE token streaming.'
+			'4 tests passed in 0.14s with 100% test coverage on Quart hypermedia endpoints, testing server-rendered HTML fragments and SSE token streaming.'
 	},
 	interactiveComponent: 'code-comparison'
 };
