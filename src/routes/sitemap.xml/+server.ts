@@ -5,11 +5,5 @@ import { ALL_TRACKS } from '#lib/data/curriculum/index';
 export const prerender = true;
 export const GET = createSitemapHandler({
 	config: siteConfig,
-	staticRoutes: [
-		'/',
-		'/chat',
-		'/playground/chat',
-		'/benchmarks',
-		...ALL_TRACKS.map((t) => `/module/${t.slug}`)
-	]
+	staticRoutes: ['/', '/chat', '/benchmarks', ...ALL_TRACKS.map((t) => `/module/${t.slug}`)]
 });

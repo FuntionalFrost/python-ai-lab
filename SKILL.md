@@ -56,7 +56,7 @@ Establish a strict architectural separation between **unit tests** and **live be
 ### A. Unit Tests (`/tests`) - Fast & Deterministic (Synchronous Default & `pytest-asyncio` for Async Handlers)
 
 - **Default to synchronous tests (`def test_*`)**: For domain schemas, prompt assembly, and standard route logic, use synchronous tests with `pytest-mock` (`mocker.patch`). Mocks return in microseconds ($\approx 0.01\text{ms}$) with zero event-loop overhead.
-- **Async tests (`async def test_*`)**: When testing `flask[async]` endpoints directly or Litestar ASGI controllers (`AsyncTestClient`), write native `async def test_*` functions supported by `pytest-asyncio` (`asyncio_mode = "auto"` with function loop scope).
+- **Async tests (`async def test_*`)**: When testing Quart endpoints directly (`app.test_client()`) or Litestar ASGI controllers (`AsyncTestClient`), write native `async def test_*` functions supported by `pytest-asyncio` (`asyncio_mode = "auto"` with function loop scope).
 - In both sync and async tests, replace all external LLM and network calls with in-memory mocks (`MagicMock` / `AsyncMock`).
 - Example (Sync):
   ```python
