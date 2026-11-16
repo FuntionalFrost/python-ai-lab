@@ -38,23 +38,23 @@
 		if (concurrency <= 16) {
 			return Math.min(220, base * (concurrency / 2.5));
 		}
-		return Math.max(90, 240 - (concurrency - 16) * 1.8);
+		return Math.max(90, 230 - (concurrency - 16) * 2.2);
 	});
 
 	const quartThroughputTokSec = $derived.by(() => {
-		return Math.min(640, 48 + concurrency * 3.6);
+		return Math.min(640, 52 + concurrency * 4.0);
 	});
 
 	const litestarThroughputTokSec = $derived.by(() => {
-		return Math.min(880, 52 + concurrency * 4.4);
+		return Math.min(880, 56 + concurrency * 4.5);
 	});
 
 	// Static series curves for empirical scaling benchmarks (10 to 150 users)
 	const throughputChartData: ChartDataPoint[] = [10, 20, 30, 50, 75, 100, 125, 150].map((c) => ({
 		label: `${c} users`,
-		litestar: Math.round(Math.min(880, 52 + c * 4.4)),
-		quart: Math.round(Math.min(640, 48 + c * 3.6)),
-		flask: Math.round(c <= 16 ? Math.min(220, 48 * (c / 2.5)) : Math.max(90, 240 - (c - 16) * 1.8))
+		litestar: Math.round(Math.min(880, 56 + c * 4.5)),
+		quart: Math.round(Math.min(640, 52 + c * 4.0)),
+		flask: Math.round(c <= 16 ? Math.min(220, 48 * (c / 2.5)) : Math.max(90, 230 - (c - 16) * 2.2))
 	}));
 
 	const throughputSeries: LineSeries[] = [
@@ -74,7 +74,7 @@
 		},
 		{
 			key: 'flask',
-			label: 'Legacy WSGI Baseline (Flask 3.x)',
+			label: 'Legacy WSGI Baseline (Flask)',
 			color: '#f59e0b',
 			curve: 'smooth',
 			area: true
@@ -234,9 +234,9 @@
 >
 	<!-- Top Bar -->
 	<div
-		class="flex flex-col gap-4 border-b border-zinc-800/80 pb-5 md:flex-row md:items-center md:justify-between"
+		class="flex flex-col gap-4 border-b border-zinc-800/80 pb-5 xl:flex-row xl:items-center xl:justify-between"
 	>
-		<div>
+		<div class="max-w-2xl min-w-0">
 			<div class="flex items-center gap-2">
 				<Activity class="h-5 w-5 text-cyan-400" />
 				<h3 class="text-base font-semibold text-zinc-100">
@@ -252,12 +252,13 @@
 
 		<!-- Tab Navigation -->
 		<div
-			class="flex flex-wrap items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-900 p-1 text-xs"
+			class="scrollbar-none flex shrink-0 [scrollbar-width:none] items-center gap-1 overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900 p-1 text-xs [&::-webkit-scrollbar]:hidden"
 		>
 			<button
 				type="button"
 				onclick={() => (activeTab = 'throughput')}
-				class="rounded-lg px-3 py-1.5 font-medium transition-colors {activeTab === 'throughput'
+				class="rounded-lg px-3 py-1.5 font-medium whitespace-nowrap transition-colors {activeTab ===
+				'throughput'
 					? 'bg-cyan-600 text-white shadow'
 					: 'text-zinc-400 hover:text-zinc-200'}"
 			>
@@ -266,7 +267,8 @@
 			<button
 				type="button"
 				onclick={() => (activeTab = 'latency')}
-				class="rounded-lg px-3 py-1.5 font-medium transition-colors {activeTab === 'latency'
+				class="rounded-lg px-3 py-1.5 font-medium whitespace-nowrap transition-colors {activeTab ===
+				'latency'
 					? 'bg-cyan-600 text-white shadow'
 					: 'text-zinc-400 hover:text-zinc-200'}"
 			>
@@ -275,7 +277,8 @@
 			<button
 				type="button"
 				onclick={() => (activeTab = 'models')}
-				class="rounded-lg px-3 py-1.5 font-medium transition-colors {activeTab === 'models'
+				class="rounded-lg px-3 py-1.5 font-medium whitespace-nowrap transition-colors {activeTab ===
+				'models'
 					? 'bg-cyan-600 text-white shadow'
 					: 'text-zinc-400 hover:text-zinc-200'}"
 			>
@@ -284,13 +287,13 @@
 			<button
 				type="button"
 				onclick={() => (activeTab = 'tuning')}
-				class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium transition-colors {activeTab ===
+				class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium whitespace-nowrap transition-colors {activeTab ===
 				'tuning'
 					? 'bg-emerald-600 text-white shadow'
 					: 'text-emerald-400 hover:text-emerald-300'}"
 			>
 				<Sliders class="h-3.5 w-3.5" />
-				<span>Same-Model Tuning & Satisfaction</span>
+				<span>Same-Model Evals</span>
 			</button>
 		</div>
 	</div>
@@ -414,7 +417,7 @@
 				<div class="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
 					<div class="flex items-center justify-between">
 						<span class="text-xs font-semibold tracking-wider text-amber-400 uppercase"
-							>Flask 3.x (Gunicorn WSGI)</span
+							>Flask (Gunicorn WSGI)</span
 						>
 						<Cpu class="h-4 w-4 text-amber-400" />
 					</div>
@@ -513,7 +516,7 @@
 				<div class="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
 					<div class="flex items-center justify-between">
 						<span class="text-xs font-semibold tracking-wider text-amber-400 uppercase"
-							>Flask 3.x (Gunicorn TTFT)</span
+							>Flask (Gunicorn TTFT)</span
 						>
 						<Cpu class="h-4 w-4 text-amber-400" />
 					</div>

@@ -158,10 +158,10 @@ async def stream_chat():
     )`
 		},
 		{
-			title: 'Flask 3.x (stream_with_context) vs. Quart (Native Async Generator)',
+			title: 'Flask (stream_with_context) vs. Quart (Native Async Generator)',
 			description:
 				'Contrast Flask’s synchronous generator requiring stream_with_context wrappers against Quart’s native ASGI async generator returning Response directly.',
-			leftTitle: 'Flask 3.x WSGI (stream_with_context & Sync Generator)',
+			leftTitle: 'Flask WSGI (stream_with_context & Sync Generator)',
 			leftLanguage: 'python',
 			leftCode: `from flask import Blueprint, Response, stream_with_context, request, current_app
 from openai import OpenAI

@@ -271,6 +271,19 @@
 
 	const sseClipboard = useClipboard({ timeout: 2000 });
 
+	const scenarioButtonText = $derived.by(() => {
+		switch (selectedPreset.id) {
+			case 'tool-agent':
+				return 'Execute Tool Call';
+			case 'structured-json':
+				return 'Validate & Generate JSON';
+			case 'rag-retrieval':
+				return 'Retrieve & Stream';
+			default:
+				return 'Start Live Stream';
+		}
+	});
+
 	// Latency Simulator Controls
 	let ttftMs = $state(180); // Time to first token
 	let itlMs = $state(28); // Inter-token latency
@@ -327,7 +340,7 @@ class ChatController(Controller):
             yield "[DONE]"
 
         return ServerSentEvent(token_generator())`,
-		flask: `# Legacy Flask 3.x (WSGI + Threadpool)
+		flask: `# Legacy Flask (WSGI + Threadpool)
 from flask import Flask, Response, stream_with_context
 import json
 import time
@@ -359,7 +372,7 @@ def chat_stream():
 		{ name: '/json', description: 'Pydantic structured JSON extraction' },
 		{ name: '/quart', description: 'Switch to Quart ASGI (Hypercorn)' },
 		{ name: '/litestar', description: 'Switch to Litestar ASGI (Granian)' },
-		{ name: '/flask', description: 'Switch to Legacy WSGI baseline (Flask 3.x)' },
+		{ name: '/flask', description: 'Switch to Legacy WSGI baseline (Flask)' },
 		{ name: '/reset', description: 'Clear messages and reset conversation' }
 	];
 
@@ -730,7 +743,7 @@ def chat_stream():
 								disabled={isGenerating}
 								class="mt-3.5 inline-flex items-center gap-1.5 rounded-xl bg-cyan-600 px-4 py-2 text-xs font-semibold text-white shadow-md transition-all select-none hover:bg-cyan-500 hover:shadow-cyan-600/20 disabled:opacity-40"
 							>
-								<span>Start Live Stream</span>
+								<span>{scenarioButtonText}</span>
 								<Send class="h-3.5 w-3.5" />
 							</button>
 						</div>
@@ -1022,7 +1035,7 @@ def chat_stream():
 						<div class="flex items-center justify-between text-xs">
 							<span class="font-semibold text-zinc-200">
 								{#if selectedFramework === 'flask'}
-									Flask 3.x Streaming Blueprint (Gunicorn WSGI)
+									Flask Streaming Blueprint (Gunicorn WSGI)
 								{:else if selectedFramework === 'quart'}
 									Quart Streaming Blueprint (Hypercorn ASGI)
 								{:else}
@@ -1047,7 +1060,7 @@ def chat_stream():
 							code={backendSnippets[selectedFramework]}
 							language="python"
 							title={selectedFramework === 'flask'
-								? 'Flask 3.x (WSGI + Threadpool)'
+								? 'Flask (WSGI + Threadpool)'
 								: selectedFramework === 'quart'
 									? 'Quart (Pallets Native ASGI)'
 									: 'Litestar (Clean Architecture ASGI)'}
