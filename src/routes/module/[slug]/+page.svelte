@@ -68,9 +68,7 @@
 				class="inline-flex shrink-0 items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-semibold whitespace-nowrap text-white shadow-lg shadow-emerald-600/20 transition-all hover:from-emerald-500 hover:to-teal-500"
 			>
 				<Terminal class="h-4 w-4 shrink-0" />
-				<span class="whitespace-nowrap"
-					>Run {track.testSuite.command.startsWith('vitest') ? 'Vitest' : 'pytest'} Suite</span
-				>
+				<span class="whitespace-nowrap">Run pytest Suite</span>
 			</button>
 		</div>
 	</div>
@@ -222,8 +220,6 @@
 				<p class="mt-1 text-xs text-zinc-400">
 					{#if track.slug === '07-rag-pipelines'}
 						Inspect hybrid vector search context retrieval chunks and grounded citation responses.
-					{:else if track.slug === '12-connecting-to-sveltekit'}
-						Validate full-duplex client stream consumption across Python ASGI and SvelteKit readers.
 					{:else}
 						Test latency simulation, inspect raw Server-Sent Event chunks, and verify payload
 						schemas.
@@ -324,11 +320,7 @@
 			<div>
 				<h2 class="flex items-center gap-2 text-xl font-bold text-zinc-100">
 					<Terminal class="h-5 w-5 text-emerald-400" />
-					<span>
-						Accompanying Test Suite ({track.testSuite.command.startsWith('vitest')
-							? 'Vitest + Web Streams'
-							: 'pytest + pytest-mock'})
-					</span>
+					<span>Accompanying Test Suite (pytest + pytest-mock)</span>
 				</h2>
 				<p class="mt-1 text-xs text-zinc-400">
 					Deterministic unit & integration tests validating domain invariants without network calls.

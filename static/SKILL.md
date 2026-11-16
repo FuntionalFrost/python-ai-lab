@@ -1,6 +1,6 @@
 ---
 name: python-ai-lab
-description: Guide and operational standard for prototyping, testing, benchmarking, and iterating on AI backends and web interfaces using modern Python (Quart, Litestar, Pydantic v2, HTTPX2, pytest-mock) and SvelteKit 3. Enforces <=4B open-weight model benchmarking, deterministic synchronous unit testing, and fail-fast configuration.
+description: Guide and operational standard for prototyping, testing, benchmarking, and iterating on AI backends and web interfaces using modern Python (Quart, Litestar, Pydantic v2, HTTPX2, pytest-mock). Enforces <=4B open-weight model benchmarking, deterministic synchronous unit testing, and fail-fast configuration.
 ---
 
 # Python AI Lab: Prototyping, Testing & Benchmarking Standard
@@ -135,8 +135,8 @@ async def stream_chat():
 
 - **Hypermedia / Rapid Prototypes (Quart + Jinja2 + htmx)**:
   Use `htmx-ext-sse` (`<div hx-ext="sse" sse-connect="/stream" sse-swap="token">`) for zero-JS prototypes. Test rendered HTML fragments using `BeautifulSoup4` and lint templates with `djlint`.
-- **Full Web Application (SvelteKit 3 BFF)**:
-  Use SvelteKit `+server.ts` to proxy requests and isolate private `$env` secrets. In the browser component, consume using `fetch() + ReadableStream` with a `TextDecoder` and push tokens into Svelte 5 `$state` runes.
+- **Resilient Python Client (HTTPX2)**:
+  Use `httpx2.AsyncClient()` with `client.stream("POST", url)` and `aiter_lines()` for non-blocking token consumption in Python services, background workers, and evaluation harnesses.
 
 ---
 

@@ -2,7 +2,7 @@
 	"name": "python-ai-lab",
 	"private": true,
 	"version": "0.0.1",
-	"description": "Interactive prototyping, testing, benchmarking, and iteration lab for modern Python AI backends (Flask, Quart, Litestar, Pydantic v2, HTTPX) and SvelteKit 3.",
+	"description": "Interactive prototyping, testing, benchmarking, and iteration lab for modern Python AI backends (Quart, Litestar, Pydantic v2, HTTPX2).",
 	"homepage": "https://python-ai-lab.pages.dev",
 	"repository": {
 		"type": "git",

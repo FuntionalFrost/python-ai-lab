@@ -14,7 +14,7 @@
 		FileText,
 		Zap,
 		Code2,
-		Globe
+		Terminal
 	} from '@lucide/svelte';
 	import CodeBlock from '#lib/components/CodeBlock.svelte';
 	import { useClipboard, PromptBar, AiToolCall, AiThought, type SlashCommand } from 'yaxa-svelte';
@@ -936,8 +936,8 @@ def chat_stream():
 						? 'bg-zinc-800 text-cyan-400 shadow-sm'
 						: 'text-zinc-400 hover:text-zinc-200'}"
 				>
-					<Globe class="h-3.5 w-3.5" />
-					<span>SvelteKit Client</span>
+					<Terminal class="h-3.5 w-3.5" />
+					<span>HTTPX2 Client</span>
 				</button>
 			</div>
 
@@ -1057,43 +1057,40 @@ def chat_stream():
 				{:else if activeTab === 'client'}
 					<div class="space-y-3">
 						<div class="flex items-center justify-between text-xs">
-							<span class="font-semibold text-zinc-200">SvelteKit SSE Streaming Consumer</span>
+							<span class="font-semibold text-zinc-200">HTTPX2 Async SSE Consumer</span>
 							<span
 								class="rounded border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 font-mono text-[10px] text-cyan-400"
 							>
-								Fetch + ReadableStream
+								httpx2.AsyncClient
 							</span>
 						</div>
 						<CodeBlock
-							code={`// src/lib/streaming-client.ts
-export async function streamChat(
-  prompt: string,
-  onToken: (token: string) => void
-): Promise<void> {
-  const response = await fetch('/api/v1/chat/stream', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt, stream: true })
-  });
+							code={`# app/clients/stream_client.py
+import asyncio
+import json
+import httpx2
 
-  if (!response.body) throw new Error('ReadableStream not supported');
-  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+async def stream_chat(prompt: str) -> None:
+    limits = httpx2.Limits(max_connections=50, max_keepalive_connections=15)
+    timeout = httpx2.Timeout(connect=3.0, read=60.0, write=10.0, pool=5.0)
 
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    for (const line of value.split('\\n')) {
-      if (line.startsWith('data: ') && !line.includes('[DONE]')) {
-        try {
-          const parsed = JSON.parse(line.slice(6));
-          onToken(parsed.choices[0]?.delta?.content ?? '');
-        } catch { /* parse error handling */ }
-      }
-    }
-  }
-}`}
-							language="typescript"
-							title="SvelteKit SSE Client Reader"
+    async with httpx2.AsyncClient(limits=limits, timeout=timeout) as client:
+        async with client.stream(
+            "POST",
+            "http://localhost:8000/api/chat/stream",
+            json={"prompt": prompt}
+        ) as response:
+            response.raise_for_status()
+            async for line in response.aiter_lines():
+                if line.startswith("data: ") and not line.endswith("[DONE]"):
+                    payload = json.loads(line[6:])
+                    token = payload.get("token") or ""
+                    print(token, end="", flush=True)
+
+if __name__ == "__main__":
+    asyncio.run(stream_chat("Explain non-blocking ASGI streaming"))`}
+							language="python"
+							title="app/clients/stream_client.py"
 							showLineNumbers={true}
 						/>
 					</div>

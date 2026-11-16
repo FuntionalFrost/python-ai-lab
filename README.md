@@ -48,13 +48,13 @@ The platform is not just static documentation—it includes live interactive sim
 - **Realistic Pytest Terminal Modal:** Watch animated test suites execute line-by-line with ANSI highlights, `--cov` coverage breakdowns, `-v` verbose flags, and failure simulations.
 - **Side-by-Side Code Comparators:** Dual-pane diff viewers comparing Quart vs. Litestar, and Hackathon Prototype vs. Production-grade patterns.
 - **Concurrency Load Simulator:** Live throughput & latency benchmark graphing how Quart (Hypercorn) and Litestar (Granian) maintain peak performance compared to legacy WSGI threadpool saturation.
-- **Command Palette Search:** Fast global navigation across all 12 tracks and tools (**Cmd+K** / **Ctrl+K**).
+- **Command Palette Search:** Fast global navigation across all 11 tracks and tools (**Cmd+K** / **Ctrl+K**).
 
 ---
 
 ## Curriculum Tracks
 
-The platform features 12 comprehensive tracks organized into rapid prototyping/testing foundations (Tracks 01–09) followed by full-stack, production deployment, and ASGI scaling (Tracks 10–12):
+The platform features 11 comprehensive tracks organized into rapid prototyping/testing foundations (Tracks 01–09) followed by production deployment and ASGI scaling (Tracks 10–11):
 
 | #      | Track                                                 | Focus & Architectural Concepts                                                                                                                                 | Stack                                      |
 | :----- | :---------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------- |
@@ -69,7 +69,6 @@ The platform features 12 comprehensive tracks organized into rapid prototyping/t
 | **09** | **Hypermedia AI Prototypes (htmx & Jinja2)**          | Zero-build AI interfaces, `hx-post` chat feeds, declarative `htmx-ext-sse` token streaming, Jinja2 partials, and `djlint` template quality gates on Quart.     | htmx 2.x, Quart, Jinja2, djlint, pytest    |
 | **10** | **Production ASGI & Hardening**                       | Hypercorn ASGI concurrency, long-running streaming timeouts, Tenacity exponential jitter backoff, and Nginx proxying.                                          | Hypercorn, Tenacity, Nginx                 |
 | **11** | **The ASGI Matrix: Quart vs. Litestar**               | The ASGI Decision Matrix: Road A (Zero-DB Pallets ASGI via Quart on Hypercorn) vs. Road B (Clean Architecture via Litestar on Granian), and async test suites. | Quart, Litestar, pytest-asyncio            |
-| **12** | **Connecting to SvelteKit**                           | Full-Stack AI Integration: SvelteKit BFF, consuming Quart backend SSE streams with Svelte 5 runes (`$state`, `$derived`), and type-safe contracts.             | SvelteKit 3, Svelte 5, TypeScript, Quart   |
 
 ---
 
@@ -145,7 +144,7 @@ python-ai-lab/
 │   │   │   ├── PytestRunnerModal.svelte # Animated terminal test execution modal
 │   │   │   └── BenchmarkGraph.svelte  # Concurrency & latency load visualizer
 │   │   ├── data/
-│   │   │   ├── curriculum/            # All 12 typed curriculum modules
+│   │   │   ├── curriculum/            # All 11 typed curriculum modules
 │   │   │   └── code-snippets/         # Pure Python runnable reference snippets & tests
 │   │   └── types/
 │   │       └── curriculum.ts          # TypeScript type definitions

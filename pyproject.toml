@@ -12,7 +12,7 @@ license = "MIT"
 authors = [
     { name = "Python AI Lab Contributors" }
 ]
-keywords = ["python", "ai", "sveltekit", "quart", "litestar", "httpx2", "pydantic", "rag", "agents", "openai", "pytest"]
+keywords = ["python", "ai", "quart", "litestar", "httpx2", "pydantic", "rag", "agents", "openai", "pytest"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",

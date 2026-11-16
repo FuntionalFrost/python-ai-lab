@@ -1,6 +1,6 @@
 # Python AI Lab
 
-> A comprehensive interactive curriculum and reference implementation for prototyping, testing, benchmarking, and iterating on AI backends and web interfaces using modern Python (Quart, Litestar, Pydantic v2, HTTPX2, pytest-mock) and SvelteKit 3.
+> A comprehensive interactive curriculum and reference implementation for prototyping, testing, benchmarking, and iterating on AI backends and web interfaces using modern Python (Quart, Litestar, Pydantic v2, HTTPX2, pytest-mock).
 
 ## Core Architectural Principles
 
@@ -9,7 +9,7 @@
 - **Target Models (<=4B Parameters)**: Systematically benchmark prototypes across open-weight instruction-tuned LLMs with <=4B total/effective parameters (`gemma-4-e4b-it`, `gemma-4-e2b-it`, `gemma-3-1b-it`, `functiongemma-270m-it`).
 - **Live Concurrent Benchmarks**: Separate unit tests from live model evaluations (`/benchmarks`). Use `AsyncOpenAI`, `asyncio.gather()`, and `asyncio.Semaphore(10)` invoked via Python's built-in `asyncio.run()`.
 - **Fail-Fast Configuration**: Centralize all environment configuration in `app/config.py` using `pydantic-settings` (`BaseSettings`) and module-level singleton `settings = Settings()`. Mask all API keys with `SecretStr`.
-- **Streaming Protocols**: Produce Server-Sent Events (SSE) via Quart's native async generator (`Response(generate())`) or Litestar's `ServerSentEvent`. Consume on clients via either `fetch() + ReadableStream` (SvelteKit) or `htmx-ext-sse` (hypermedia).
+- **Streaming Protocols**: Produce Server-Sent Events (SSE) via Quart's native async generator (`Response(generate())`) or Litestar's `ServerSentEvent`. Consume on clients via either Python HTTPX2 async clients or `htmx-ext-sse` (hypermedia).
 
 ## Curriculum Tracks
 
@@ -24,7 +24,6 @@
 - [Track 09: HTMX & Hypermedia Prototypes](module/09-htmx-hypermedia-prototypes): Zero-JavaScript server-rendered UI partials, real-time token streaming with `htmx-ext-sse`, djlint quality gates, and semantic DOM assertions with BeautifulSoup4.
 - [Track 10: Prototype to Production Readiness](module/10-prototype-to-production): Structured JSON logging, Gunicorn WSGI workers, multistage Docker builds, and health/readiness probe contracts.
 - [Track 11: Scale-Up: Migrating Flask to Quart & Litestar (The ASGI Decision Matrix)](module/11-migrating-flask-to-litestar): High-throughput ASGI migration evaluating Road A (Zero-Rewrite Pallets ASGI with Quart on Hypercorn) vs. Road B (Clean Architecture with Litestar on Granian), native DTO schemas, and async test suites.
-- [Track 12: Connecting Python AI Backends to SvelteKit](module/12-connecting-to-sveltekit): SvelteKit 3 server BFF (`+server.ts`), streaming `fetch() + ReadableStream` consumer with Svelte 5 runes (`$state`), and `$env/static/private` secret isolation.
 
 ## Interactive Tools & Telemetry
 
