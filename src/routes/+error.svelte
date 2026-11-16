@@ -69,6 +69,6 @@
 		<Search class="h-3.5 w-3.5 text-zinc-500" />
 		<span>Press</span>
 		<Kbd combo={['meta', 'k']} size="xs" />
-		<span>to search all 10 production modules</span>
+		<span>to search all 11 curriculum tracks</span>
 	</div>
 </div>

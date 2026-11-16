@@ -25,7 +25,7 @@
 	const prevTrack = $derived(data.prevTrack);
 
 	let isPytestModalOpen = $state(false);
-	let track11Tab = $state<'benchmark' | 'playground'>('benchmark');
+	let track10Tab = $state<'benchmark' | 'playground'>('benchmark');
 </script>
 
 <svelte:head>
@@ -240,26 +240,26 @@
 					<h2 class="flex items-center gap-2 text-xl font-bold text-zinc-100">
 						<Sparkles class="h-5 w-5 text-cyan-400" />
 						<span>
-							{track.slug === '11-migrating-flask-to-litestar' && track11Tab === 'playground'
+							{track.slug === '10-prototype-to-production' && track10Tab === 'playground'
 								? 'Live Runtime Migration Playground'
 								: 'Interactive Latency & Eval Visualizer'}
 						</span>
 					</h2>
 					<p class="mt-1 text-xs text-zinc-400">
-						{track.slug === '11-migrating-flask-to-litestar' && track11Tab === 'playground'
+						{track.slug === '10-prototype-to-production' && track10Tab === 'playground'
 							? 'Switch between Flask WSGI, Quart ASGI, and Litestar ASGI to compare streaming behavior.'
 							: 'Adjust concurrent client load to simulate threadpool worker saturation versus async event loop scaling.'}
 					</p>
 				</div>
 
-				{#if track.slug === '11-migrating-flask-to-litestar'}
+				{#if track.slug === '10-prototype-to-production'}
 					<div
 						class="flex items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-950/70 p-1 font-mono text-xs"
 					>
 						<button
 							type="button"
-							onclick={() => (track11Tab = 'benchmark')}
-							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {track11Tab ===
+							onclick={() => (track10Tab = 'benchmark')}
+							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {track10Tab ===
 							'benchmark'
 								? 'bg-cyan-600 text-white shadow-sm'
 								: 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}"
@@ -268,8 +268,8 @@
 						</button>
 						<button
 							type="button"
-							onclick={() => (track11Tab = 'playground')}
-							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {track11Tab ===
+							onclick={() => (track10Tab = 'playground')}
+							class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all select-none {track10Tab ===
 							'playground'
 								? 'bg-emerald-600 text-white shadow-sm'
 								: 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}"
@@ -280,7 +280,7 @@
 				{/if}
 			</div>
 
-			{#if track.slug === '11-migrating-flask-to-litestar' && track11Tab === 'playground'}
+			{#if track.slug === '10-prototype-to-production' && track10Tab === 'playground'}
 				<ChatPlayground initialFramework="quart" initialPresetId="realtime-sse" />
 			{:else}
 				<BenchmarkGraph />

@@ -9,7 +9,6 @@ import { track07 } from './07-rag-pipelines';
 import { track08 } from './08-agent-harnesses';
 import { track09 } from './09-htmx-hypermedia-prototypes';
 import { track10 } from './10-prototype-to-production';
-import { track11 } from './11-migrating-flask-to-litestar';
 
 export const ALL_TRACKS: CurriculumLesson[] = [
 	track01,
@@ -21,8 +20,7 @@ export const ALL_TRACKS: CurriculumLesson[] = [
 	track07,
 	track08,
 	track09,
-	track10,
-	track11
+	track10
 ];
 
 export const TRACK_SUMMARIES: TrackSummary[] = ALL_TRACKS.map((t) => ({
